@@ -1,0 +1,20 @@
+{
+  "name": "@testring/plugin-playwright-driver",
+  "version": "0.0.1",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ringcentral/testring.git"
+  },
+  "author": "RingCentral",
+  "license": "MIT",
+  "dependencies": {
+    "@testring/plugin-api": "0.8.0",
+    "@testring/logger": "0.8.0",
+    "@testring/child-process": "0.8.0",
+    "@testring/types": "0.8.0",
+    "@types/node": "22.8.5",
+    "playwright-core": "1.41.2"
+  }
+}
