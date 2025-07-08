@@ -1,0 +1,28 @@
+{
+  "name": "@testring/plugin-playwright-driver",
+  "version": "0.0.1",
+  "description": "Playwright driver plugin for Testring",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "testring",
+    "playwright",
+    "driver",
+    "plugin"
+  ],
+  "author": "Testring Team",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.17.0",
+    "@testring/types": "^0.5.2",
+    "@testring/logger": "^0.5.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.0",
+    "@types/node": "^16.0.0"
+  }
+}
