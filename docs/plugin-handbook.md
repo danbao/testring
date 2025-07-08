@@ -12,8 +12,8 @@ Config:
         "format": "json"
       }],
       
-      ["selenium-driver", {
-        "seleniumHub": "10.313.441.302:3232"
+      ["playwright-driver", {
+        "browser": "chromium"
       }]
     ]
 }

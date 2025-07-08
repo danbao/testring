@@ -12,4 +12,7 @@ module.exports = {
 };
 ```
 
+See [the migration guide](../../docs/playwright-migration.md) for tips on
+switching from the Selenium driver.
+
 All existing browser commands are mapped to Playwright equivalents.
