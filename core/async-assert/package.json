@@ -1,9 +1,12 @@
 {
   "name": "@testring/async-assert",
   "version": "0.8.0",
-  "description": "an async wrapper around chai",
+  "description": "an async wrapper around chai with enhanced features",
   "keywords": [
-    "assert"
+    "assert",
+    "async",
+    "chai",
+    "testing"
   ],
   "author": "RingCentral",
   "homepage": "https://github.com/ringcentral/testring#readme",
@@ -22,6 +25,9 @@
   },
   "dependencies": {
     "@testring/types": "0.8.0",
-    "chai": "4.3.10"
+    "chai": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/chai": "^5.0.0"
   }
 }
