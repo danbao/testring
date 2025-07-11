@@ -1,5 +1,5 @@
 {
-  "name": "@testring/plugin-selenium-driver",
+  "name": "@testring/plugin-playwright-driver",
   "version": "0.8.0",
   "main": "./dist/index.js",
   "typings": "./src/index.ts",
@@ -13,20 +13,11 @@
     "test": "mocha test/**/*.spec.ts --require ts-node/register --recursive"
   },
   "dependencies": {
-    "@nullcc/code-coverage-client": "1.4.2",
-    "@testring/child-process": "0.8.0",
-    "@testring/dwnld-collector-crx": "0.8.0",
     "@testring/logger": "0.8.0",
     "@testring/plugin-api": "0.8.0",
     "@testring/types": "0.8.0",
-    "@types/deepmerge": "2.2.3",
     "@types/node": "22.8.5",
-    "@wdio/types": "9.2.2",
-    "chromedriver": "*",
-    "deepmerge": "4.3.1",
-    "puppeteer-core": "22.3.0",
-    "selenium-server": "3.141.59",
-    "webdriverio": "9.2.6"
+    "playwright": "^1.48.0"
   },
   "devDependencies": {
     "@types/chai": "^4.3.5",

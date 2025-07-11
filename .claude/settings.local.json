@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:main:*)",
+      "Bash(npm install:*)",
+      "Bash(npx mocha:*)",
+      "Bash(npm test)"
+    ],
+    "deny": []
+  }
+}
