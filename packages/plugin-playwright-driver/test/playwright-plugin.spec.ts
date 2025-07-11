@@ -1,10 +1,9 @@
 /// <reference types="mocha" />
 
-import * as chai from 'chai';
 import * as sinon from 'sinon';
 import { expect } from 'chai';
 import { PlaywrightPlugin } from '../src/plugin/index';
-import { MockBrowser, MockBrowserContext, MockPage, MockElement, mockPlaywright } from './mocks/playwright.mock';
+import { MockBrowser, MockBrowserContext, MockPage, MockElement } from './mocks/playwright.mock';
 
 describe('PlaywrightPlugin Core Functionality', () => {
     let plugin: PlaywrightPlugin;
@@ -135,7 +134,7 @@ describe('PlaywrightPlugin Core Functionality', () => {
         });
 
         it('should click element', async () => {
-            const element = mockPage._elements.get('#button')!;
+            const element = (mockPage as any)._elements.get('#button')!;
             const spy = sandbox.spy(element, 'click');
             
             await plugin.click(applicant, '#button');
@@ -291,7 +290,7 @@ describe('PlaywrightPlugin Core Functionality', () => {
                 await plugin.click(applicant, '#nonexistent');
                 expect.fail('Should have thrown error');
             } catch (error) {
-                expect(error.message).to.include('Element not found');
+                expect(error instanceof Error ? error.message : String(error)).to.include('Element not found');
             }
         });
 
@@ -305,7 +304,7 @@ describe('PlaywrightPlugin Core Functionality', () => {
                 await invalidPlugin.url(applicant, 'https://example.com');
                 expect.fail('Should have thrown error');
             } catch (error) {
-                expect(error.message).to.include('Unsupported browser');
+                expect(error instanceof Error ? error.message : String(error)).to.include('Unsupported browser');
             }
         });
     });

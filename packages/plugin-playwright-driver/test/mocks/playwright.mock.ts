@@ -108,7 +108,7 @@ export class MockPage {
     async selectOption(selector: string, option: any) {
         const element = this._elements.get(selector);
         if (element) {
-            element._value = option.value || option.label || option;
+            (element as any)._value = option.value || option.label || option;
         }
     }
 

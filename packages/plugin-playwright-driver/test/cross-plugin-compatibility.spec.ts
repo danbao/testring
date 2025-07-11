@@ -1,9 +1,7 @@
 /// <reference types="mocha" />
 
-import * as chai from 'chai';
 import { expect } from 'chai';
 import { PlaywrightPlugin } from '../src/plugin/index';
-import { PlaywrightPluginConfig } from '../src/types';
 
 /**
  * Cross-plugin compatibility tests that verify both Selenium and Playwright plugins
@@ -261,14 +259,14 @@ describe('Cross-Plugin Compatibility Tests', () => {
                     await plugin.click(applicant, '#nonexistent');
                     expect.fail('Should have thrown an error');
                 } catch (error) {
-                    expect(error.message).to.include('Element not found');
+                    expect(error instanceof Error ? error.message : String(error)).to.include('Element not found');
                 }
 
                 try {
                     await plugin.setValue(applicant, '#nonexistent', 'value');
                     expect.fail('Should have thrown an error');
                 } catch (error) {
-                    expect(error.message).to.include('Element not found');
+                    expect(error instanceof Error ? error.message : String(error)).to.include('Element not found');
                 }
 
                 // Non-existent session should handle gracefully

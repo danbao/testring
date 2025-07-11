@@ -1,6 +1,5 @@
 /// <reference types="mocha" />
 
-import * as chai from 'chai';
 import { expect } from 'chai';
 import { PlaywrightPlugin } from '../src/plugin/index';
 import { PlaywrightPluginConfig } from '../src/types';
@@ -99,7 +98,7 @@ describe('Playwright-Selenium Compatibility Tests', () => {
                 await playwrightPlugin.click(applicant, selector);
             } catch (error) {
                 // Expected to fail due to missing element in test
-                expect(error.message).to.include('Element not found');
+                expect(error instanceof Error ? error.message : String(error)).to.include('Element not found');
             }
         });
 
@@ -109,7 +108,7 @@ describe('Playwright-Selenium Compatibility Tests', () => {
                 await playwrightPlugin.waitForExist(applicant, selector, timeout);
             } catch (error) {
                 // Expected to fail due to missing element in test
-                expect(error.message).to.include('Element not found');
+                expect(error instanceof Error ? error.message : String(error)).to.include('Element not found');
             }
         });
 
@@ -254,7 +253,7 @@ describe('Playwright-Selenium Compatibility Tests', () => {
                 expect.fail('Should have thrown an error');
             } catch (error) {
                 expect(error).to.be.an('error');
-                expect(error.message).to.include('Element not found');
+                expect(error instanceof Error ? error.message : String(error)).to.include('Element not found');
             }
         });
 

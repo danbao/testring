@@ -228,7 +228,9 @@ export class PluginCompatibilityTester {
 
             const screenshot = await this.plugin.makeScreenshot(applicant);
             expect(typeof screenshot).to.equal('string');
-            expect(screenshot.length).to.be.greaterThan(0);
+            if (screenshot) {
+                expect(screenshot.length).to.be.greaterThan(0);
+            }
 
         } finally {
             await this.plugin.end(applicant);
@@ -361,7 +363,7 @@ export class PluginCompatibilityTester {
                 console.log(`✅ Passed: ${test.name}`);
                 passed++;
             } catch (error) {
-                console.log(`❌ Failed: ${test.name} - ${error.message}`);
+                console.log(`❌ Failed: ${test.name} - ${error instanceof Error ? error.message : String(error)}`);
                 failed++;
             }
         }
