@@ -72,11 +72,16 @@ describe('PlaywrightPlugin Core Functionality', () => {
     describe('Navigation Methods', () => {
         const applicant = 'test-applicant';
 
-        beforeEach(() => {
+        beforeEach(async () => {
+            // Ensure plugin is initialized with mock page
+            await plugin.url(applicant, 'https://test.com');
+            await mockPage.setTitle('Test Page');
+            
             // Setup mock page with elements
-            mockPage._addElement('#button', new MockElement({ text: 'Click me' }));
-            mockPage._addElement('#input', new MockElement({ value: 'initial' }));
-            mockPage._addElement('#text', new MockElement({ text: 'Sample text' }));
+            mockPage._addElement('#button', new MockElement({ text: 'Click me', enabled: true, visible: true }));
+            mockPage._addElement('#input', new MockElement({ value: 'initial', enabled: true, visible: true }));
+            mockPage._addElement('#text', new MockElement({ text: 'Sample text', enabled: true, visible: true }));
+            mockPage._addElement('#element', new MockElement({ text: 'Element', enabled: true, visible: true }));
         });
 
         it('should navigate to URL', async () => {
@@ -254,15 +259,15 @@ describe('PlaywrightPlugin Core Functionality', () => {
     });
 
     describe('Session Management', () => {
-        const applicant = 'test-applicant';
-
         it('should end session for applicant', async () => {
+            const applicant = 'session-test-applicant';
             await plugin.url(applicant, 'https://example.com');
+            const initialCount = mockBrowser.contexts().length;
             
             await plugin.end(applicant);
             
-            // Context should be closed
-            expect(mockBrowser.contexts().length).to.equal(0);
+            // One context should be removed
+            expect(mockBrowser.contexts().length).to.equal(initialCount - 1);
         });
 
         it('should handle ending non-existent session gracefully', async () => {

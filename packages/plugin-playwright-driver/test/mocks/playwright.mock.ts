@@ -8,7 +8,7 @@ export class MockPage {
 
     async goto(url: string) {
         this._url = url;
-        return url;
+        return { url };
     }
 
     url() {
@@ -41,7 +41,7 @@ export class MockPage {
 
     async textContent(selector: string) {
         const element = this._elements.get(selector);
-        return element ? element.textContent() : null;
+        return element ? await element.textContent() : null;
     }
 
     async $(selector: string) {
@@ -66,7 +66,21 @@ export class MockPage {
         if (typeof fn === 'function') {
             return fn(...args);
         }
-        return eval(fn)(...args);
+        if (typeof fn === 'string') {
+            // Handle string function expressions
+            try {
+                const func = new Function('args', fn);
+                return func(args);
+            } catch (e) {
+                // For simple return statements
+                if (fn.includes('return ')) {
+                    const returnValue = fn.replace(/^return\s+/, '').replace(/;$/, '');
+                    return eval(returnValue);
+                }
+                throw e;
+            }
+        }
+        return fn;
     }
 
     async screenshot() {
@@ -74,7 +88,8 @@ export class MockPage {
     }
 
     async reload() {
-        // Mock reload
+        // Mock reload - return response like real Playwright
+        return { url: this._url };
     }
 
     async content() {
@@ -271,6 +286,7 @@ export class MockElement {
 export class MockBrowserContext {
     private _pages: MockPage[] = [];
     private _cookies: any[] = [];
+    public _browser: MockBrowser | undefined;
 
     async newPage() {
         const page = new MockPage();
@@ -297,6 +313,13 @@ export class MockBrowserContext {
     async close() {
         this._pages = [];
         this._cookies = [];
+        // Remove this context from browser
+        if (this._browser) {
+            const index = this._browser.contexts().indexOf(this);
+            if (index > -1) {
+                this._browser._contexts.splice(index, 1);
+            }
+        }
     }
 
     tracing = {
@@ -306,10 +329,11 @@ export class MockBrowserContext {
 }
 
 export class MockBrowser {
-    private _contexts: MockBrowserContext[] = [];
+    public _contexts: MockBrowserContext[] = [];
 
     async newContext(options?: any) {
         const context = new MockBrowserContext();
+        context._browser = this;
         this._contexts.push(context);
         return context;
     }
