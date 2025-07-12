@@ -10,7 +10,8 @@
   "author": "RingCentral",
   "license": "MIT",
   "scripts": {
-    "test": "mocha test/**/*.spec.ts --require ts-node/register --recursive"
+    "test": "mocha test/**/*.spec.ts --require ts-node/register --recursive",
+    "test:debug": "PLAYWRIGHT_DEBUG=1 mocha --config .mocharc.debug.json"
   },
   "dependencies": {
     "@testring/logger": "0.8.0",

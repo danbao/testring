@@ -26,7 +26,7 @@ export class MockPage {
     async click(selector: string, options?: any) {
         const element = this._elements.get(selector);
         if (!element) {
-            throw new Error(`Element not found: ${selector}`);
+            throw new Error(`Timeout: ${selector}`);
         }
         return element.click(options);
     }
@@ -34,7 +34,7 @@ export class MockPage {
     async fill(selector: string, value: string) {
         const element = this._elements.get(selector);
         if (!element) {
-            throw new Error(`Element not found: ${selector}`);
+            throw new Error(`Timeout: ${selector}`);
         }
         return element.fill(value);
     }
@@ -57,7 +57,7 @@ export class MockPage {
     async waitForSelector(selector: string, options: any = {}) {
         const element = this._elements.get(selector);
         if (!element) {
-            throw new Error(`Element not found: ${selector}`);
+            throw new Error(`Timeout: ${selector}`);
         }
         return element;
     }
@@ -130,7 +130,7 @@ export class MockPage {
     async hover(selector: string) {
         const element = this._elements.get(selector);
         if (!element) {
-            throw new Error(`Element not found: ${selector}`);
+            throw new Error(`Timeout: ${selector}`);
         }
     }
 

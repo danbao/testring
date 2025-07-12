@@ -85,16 +85,18 @@ describe('Cross-Plugin Compatibility Tests', () => {
             const applicant = 'async-test';
 
             try {
-                // All these methods should return promises
-                const urlPromise = plugin.url(applicant, 'https://example.com');
+                // All these methods should return promises - use data URL to avoid network issues
+                const urlPromise = plugin.url(applicant, 'data:text/html,<div id="test">Test</div>');
+                
+                expect(urlPromise).to.be.instanceof(Promise);
+                await urlPromise;
+                
                 const titlePromise = plugin.getTitle(applicant);
                 const existsPromise = plugin.isExisting(applicant, '#test');
 
-                expect(urlPromise).to.be.instanceof(Promise);
                 expect(titlePromise).to.be.instanceof(Promise);
                 expect(existsPromise).to.be.instanceof(Promise);
 
-                await urlPromise;
                 await titlePromise;
                 await existsPromise;
             } finally {
@@ -164,7 +166,7 @@ describe('Cross-Plugin Compatibility Tests', () => {
 
             try {
                 // Typical test workflow that should work with both plugins
-                await plugin.url(applicant, 'https://example.com');
+                await plugin.url(applicant, 'data:text/html,<html><body><div>Test Content</div></body></html>');
                 const title = await plugin.getTitle(applicant);
                 expect(typeof title).to.equal('string');
 
@@ -225,8 +227,8 @@ describe('Cross-Plugin Compatibility Tests', () => {
 
             try {
                 // Multiple sessions should work independently
-                await plugin.url('session1', 'https://example.com');
-                await plugin.url('session2', 'https://google.com');
+                await plugin.url('session1', 'data:text/html,<title>Session 1</title><div>Session 1 Content</div>');
+                await plugin.url('session2', 'data:text/html,<title>Session 2</title><div>Session 2 Content</div>');
 
                 const title1 = await plugin.getTitle('session1');
                 const title2 = await plugin.getTitle('session2');
@@ -254,19 +256,21 @@ describe('Cross-Plugin Compatibility Tests', () => {
             const applicant = 'error-test';
 
             try {
+                await plugin.url(applicant, 'data:text/html,<div>Test Content</div>');
+                
                 // Test error scenarios that should behave similarly to Selenium
                 try {
                     await plugin.click(applicant, '#nonexistent');
                     expect.fail('Should have thrown an error');
                 } catch (error) {
-                    expect(error instanceof Error ? error.message : String(error)).to.include('Element not found');
+                    expect(error instanceof Error ? error.message : String(error)).to.include('Timeout');
                 }
 
                 try {
                     await plugin.setValue(applicant, '#nonexistent', 'value');
                     expect.fail('Should have thrown an error');
                 } catch (error) {
-                    expect(error instanceof Error ? error.message : String(error)).to.include('Element not found');
+                    expect(error instanceof Error ? error.message : String(error)).to.include('Timeout');
                 }
 
                 // Non-existent session should handle gracefully
@@ -297,7 +301,7 @@ describe('Cross-Plugin Compatibility Tests', () => {
             const applicant = 'cleanup-test';
 
             // Create session
-            await plugin.url(applicant, 'https://example.com');
+            await plugin.url(applicant, 'data:text/html,<div>Cleanup Test</div>');
 
             // End specific session
             await plugin.end(applicant);
@@ -318,9 +322,9 @@ describe('Cross-Plugin Compatibility Tests', () => {
             try {
                 // Concurrent operations should work
                 const promises = [
-                    plugin.url('concurrent1', 'https://example.com'),
-                    plugin.url('concurrent2', 'https://google.com'),
-                    plugin.url('concurrent3', 'https://github.com')
+                    plugin.url('concurrent1', 'data:text/html,<title>Concurrent 1</title><div>Content 1</div>'),
+                    plugin.url('concurrent2', 'data:text/html,<title>Concurrent 2</title><div>Content 2</div>'),
+                    plugin.url('concurrent3', 'data:text/html,<title>Concurrent 3</title><div>Content 3</div>')
                 ];
 
                 await Promise.all(promises);

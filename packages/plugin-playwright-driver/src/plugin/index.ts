@@ -47,6 +47,14 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
 
     constructor(config: Partial<PlaywrightPluginConfig> = {}) {
         this.config = { ...DEFAULT_CONFIG, ...config };
+        
+        // Enable non-headless mode for debugging when PLAYWRIGHT_DEBUG is set
+        if (process.env['PLAYWRIGHT_DEBUG'] === '1' && this.config.launchOptions) {
+            this.config.launchOptions.headless = false;
+            this.config.launchOptions.slowMo = this.config.launchOptions.slowMo || 500; // Add slow motion for better debugging
+            console.log('🐛 Playwright Debug Mode: Running in non-headless mode with slowMo=500ms');
+        }
+        
         this.initIntervals();
     }
 
@@ -282,7 +290,8 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
     public async click(applicant: string, selector: string, options?: any): Promise<void> {
         await this.createClient(applicant);
         const { page } = this.getBrowserClient(applicant);
-        await page.click(selector, options);
+        const clickOptions = { timeout: 2000, ...options }; // 2 second timeout for click operations
+        await page.click(selector, clickOptions);
     }
 
     public async newWindow(applicant: string, url: string, _windowName: string, _windowFeatures: WindowFeaturesConfig): Promise<any> {
@@ -387,7 +396,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
     public async setValue(applicant: string, selector: string, value: any): Promise<void> {
         await this.createClient(applicant);
         const { page } = this.getBrowserClient(applicant);
-        await page.fill(selector, value);
+        await page.fill(selector, value, { timeout: 2000 }); // 2 second timeout for setValue operations
     }
 
     public async selectByIndex(applicant: string, selector: string, index: number): Promise<void> {

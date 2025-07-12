@@ -109,7 +109,7 @@ describe('Plugin Compatibility Summary', () => {
         });
 
         it('should handle basic operations like Selenium', async function() {
-            this.timeout(10000);
+            this.timeout(5000);
             
             const applicant = 'compatibility-test';
 
@@ -151,7 +151,7 @@ describe('Plugin Compatibility Summary', () => {
                     expect.fail('Should have thrown an error for non-existent element');
                 } catch (error: any) {
                     expect(error).to.be.an('error');
-                    expect(error.message).to.include('Element not found');
+                    expect(error.message).to.include('Timeout');
                 }
 
                 // Test graceful handling of session operations
@@ -166,7 +166,7 @@ describe('Plugin Compatibility Summary', () => {
         });
 
         it('should support multiple sessions like Selenium', async function() {
-            this.timeout(15000);
+            this.timeout(8000);
 
             try {
                 // Create multiple independent sessions
@@ -209,7 +209,7 @@ describe('Plugin Compatibility Summary', () => {
         });
 
         it('should support common test patterns', async function() {
-            this.timeout(10000);
+            this.timeout(5000);
 
             const plugin = new PlaywrightPlugin({
                 browserName: 'chromium',
