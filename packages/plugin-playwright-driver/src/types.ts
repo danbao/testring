@@ -72,4 +72,5 @@ export interface BrowserClientItem {
     page: any;
     initTime: number;
     coverage: any;
+    currentFrame?: any;
 }

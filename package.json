@@ -11,6 +11,7 @@
     "cleanup": "npm run cleanup:packages && npm run cleanup:root",
     "cleanup:root": "node ./utils/cleanup.js",
     "cleanup:packages": "lerna clean --yes && lerna exec --parallel -- node ../../utils/cleanup",
+    "cleanup:playwright": "./cleanup-playwright.sh",
     "reinstall": "npm run cleanup && npm install && npm run build",
     "add-package-files": "lerna exec --no-sort -- node ../../utils/add-package-files",
     "generate-readme": "lerna exec --no-sort -- node ../../utils/generate-readme",
@@ -38,7 +39,7 @@
     "check-deps:find-updates": "ncu -m --deep --color",
     "check-deps:lerna-update": "lernaupdate",
     "check-deps:lerna-dedupe": "lernaupdate -d",
-    "test:e2e-coverage": "c8 --config .c8.json ts-node ./packages/e2e-test-app/src/test-runner.ts --config ./packages/e2e-test-app/test/selenium/config.coverage.js --env-config=./packages/e2e-test-app/test/selenium/env.json --headless"
+    "test:e2e-coverage": "c8 --config .c8.json ts-node ./packages/e2e-test-app/src/test-runner.ts --config ./packages/e2e-test-app/test/playwright/config.coverage.js --env-config=./packages/e2e-test-app/test/playwright/env.json --headless"
   },
   "nyc": {
     "report-dir": "./.coverage",

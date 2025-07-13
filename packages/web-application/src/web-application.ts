@@ -703,6 +703,13 @@ export class WebApplication extends PluggableModule {
     ) {
         await this.waitForExist(xpath, timeout);
 
+        // Explicitly trigger mouse hover to ensure onmouseover events are fired
+        try {
+            await this.moveToObject(xpath, 1, 1);
+        } catch (ignore) {
+            // Ignore errors from moveToObject
+        }
+
         const texts = await this.getTextsInternal(xpath, trim, true);
 
         this.logger.debug(
@@ -1441,10 +1448,10 @@ export class WebApplication extends PluggableModule {
         return this.client.setCookie(cookieObj);
     }
 
-    @stepLog(function (this: WebApplication, cookieName: string) {
-        return `Getting cookie ${cookieName}`;
+    @stepLog(function (this: WebApplication, cookieName?: string) {
+        return `Getting cookie ${cookieName || 'all'}`;
     })
-    public getCookie(cookieName: string) {
+    public getCookie(cookieName?: string) {
         return this.client.getCookie(cookieName);
     }
 
