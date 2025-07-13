@@ -882,7 +882,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
     private normalizeSelector(selector: string): string {
         // If selector starts with xpath= or contains XPath syntax, use xpath:
         if (selector.startsWith('xpath=')) {
-            return selector.replace('xpath=', 'xpath=');
+            return selector;
         }
         if (selector.startsWith('(//*[') || selector.startsWith('//*[') || selector.includes('[@')) {
             return `xpath=${selector}`;
@@ -1189,7 +1189,76 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
     public async keys(applicant: string, value: any): Promise<void> {
         await this.createClient(applicant);
         const { page } = this.getBrowserClient(applicant);
-        await page.keyboard.type(value);
+        
+        // Handle different input types
+        if (Array.isArray(value)) {
+            // Map common key names to Playwright key names
+            const keyMap: { [key: string]: string } = {
+                'Control': 'Control',
+                'Ctrl': 'Control',
+                'Alt': 'Alt',
+                'Shift': 'Shift',
+                'Meta': 'Meta',
+                'Backspace': 'Backspace',
+                'Delete': 'Delete',
+                'Enter': 'Enter',
+                'Tab': 'Tab',
+                'Escape': 'Escape',
+                'ArrowUp': 'ArrowUp',
+                'ArrowDown': 'ArrowDown',
+                'ArrowLeft': 'ArrowLeft',
+                'ArrowRight': 'ArrowRight',
+                'Home': 'Home',
+                'End': 'End',
+                'PageUp': 'PageUp',
+                'PageDown': 'PageDown'
+            };
+            
+            // Check if this is a key combination (modifier + key)
+            const modifiers = ['Control', 'Ctrl', 'Alt', 'Shift', 'Meta'];
+            const hasModifier = value.some(key => modifiers.includes(key));
+            
+            if (hasModifier && value.length === 2) {
+                // Handle key combinations like ['Control', 'A']
+                const modifierKey = value.find(key => modifiers.includes(key));
+                const regularKey = value.find(key => !modifiers.includes(key));
+                
+                if (modifierKey && regularKey) {
+                    const mappedModifier = keyMap[modifierKey] || modifierKey;
+                    const mappedRegular = keyMap[regularKey] || regularKey;
+                    
+                    // Special case for Control+A (select all) - use keyboard shortcut
+                    if ((modifierKey === 'Control' || modifierKey === 'Ctrl') && regularKey.toLowerCase() === 'a') {
+                        await page.keyboard.press('Control+a');
+                        return;
+                    }
+                    
+                    // Use keyboard.press with modifier+key format for other combinations
+                    await page.keyboard.press(`${mappedModifier}+${mappedRegular}`);
+                    return;
+                }
+            }
+            
+            // Handle array of individual keys (e.g., ['Backspace'] or multiple separate keys)
+            for (const key of value) {
+                if (typeof key === 'string') {
+                    const mappedKey = keyMap[key] || key;
+                    
+                    // Use press for special keys, type for regular characters
+                    if (keyMap[key] || key.length > 1) {
+                        await page.keyboard.press(mappedKey);
+                    } else {
+                        await page.keyboard.type(key);
+                    }
+                }
+            }
+        } else if (typeof value === 'string') {
+            // Handle string input - just type it
+            await page.keyboard.type(value);
+        } else {
+            // Fallback - convert to string and type
+            await page.keyboard.type(String(value));
+        }
     }
 
     public async elementIdText(applicant: string, elementId: string): Promise<string> {
@@ -1299,6 +1368,35 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         await this.createClient(applicant);
         const { page } = this.getBrowserClient(applicant);
         const normalizedSelector = this.normalizeSelector(selector);
+        
+        // Handle boolean attributes properly - return the attribute name when present
+        const booleanAttributes = ['readonly', 'disabled', 'checked', 'selected', 'multiple', 'autofocus', 'autoplay', 'controls', 'defer', 'hidden', 'loop', 'open', 'required', 'reversed'];
+        
+        if (booleanAttributes.includes(attr.toLowerCase())) {
+            // For boolean attributes, check if the attribute exists
+            const hasAttribute = await page.evaluate(
+                ({ selector, attribute }) => {
+                    let element;
+                    if (selector.startsWith('xpath=')) {
+                        const xpath = selector.replace('xpath=', '');
+                        element = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as Element;
+                    } else {
+                        element = document.querySelector(selector);
+                    }
+                    return element ? element.hasAttribute(attribute) : false;
+                },
+                { selector: normalizedSelector, attribute: attr }
+            );
+            
+            if (hasAttribute) {
+                // Return the attribute name for boolean attributes when present
+                return attr;
+            } else {
+                return null;
+            }
+        }
+        
+        // For non-boolean attributes, return the actual value
         return await page.getAttribute(normalizedSelector, attr);
     }
 
@@ -1313,6 +1411,65 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         const { page } = this.getBrowserClient(applicant);
         const normalizedSelector = this.normalizeSelector(selector);
         return await page.isEnabled(normalizedSelector);
+    }
+
+    public async isDisabled(applicant: string, selector: string): Promise<boolean> {
+        await this.createClient(applicant);
+        const { page } = this.getBrowserClient(applicant);
+        const normalizedSelector = this.normalizeSelector(selector);
+        return await page.isDisabled(normalizedSelector);
+    }
+
+    public async isChecked(applicant: string, selector: string): Promise<boolean> {
+        await this.createClient(applicant);
+        const { page } = this.getBrowserClient(applicant);
+        const normalizedSelector = this.normalizeSelector(selector);
+        return await page.isChecked(normalizedSelector);
+    }
+
+    public async setChecked(applicant: string, selector: string, checked: boolean): Promise<void> {
+        await this.createClient(applicant);
+        const { page } = this.getBrowserClient(applicant);
+        const normalizedSelector = this.normalizeSelector(selector);
+        await page.setChecked(normalizedSelector, checked);
+    }
+
+    public async isReadOnly(applicant: string, selector: string): Promise<boolean> {
+        await this.createClient(applicant);
+        const { page } = this.getBrowserClient(applicant);
+        const normalizedSelector = this.normalizeSelector(selector);
+        
+        // For XPath selectors, use page.evaluate to handle them correctly
+        if (normalizedSelector.startsWith('xpath=')) {
+            const xpath = normalizedSelector.replace('xpath=', '');
+            return await page.evaluate((xpathExpr) => {
+                const element = document.evaluate(xpathExpr, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLInputElement;
+                if (!element) return false;
+                return element.hasAttribute('readonly') || element.readOnly === true;
+            }, xpath);
+        } else {
+            // For CSS selectors, use page.evaluate as well for consistency
+            return await page.evaluate((cssSelector) => {
+                const element = document.querySelector(cssSelector) as HTMLInputElement;
+                if (!element) return false;
+                return element.hasAttribute('readonly') || element.readOnly === true;
+            }, normalizedSelector);
+        }
+    }
+
+    public async getPlaceHolderValue(applicant: string, selector: string): Promise<string> {
+        await this.createClient(applicant);
+        const { page } = this.getBrowserClient(applicant);
+        const normalizedSelector = this.normalizeSelector(selector);
+        const placeholder = await page.getAttribute(normalizedSelector, 'placeholder');
+        return placeholder || '';
+    }
+
+    public async clearElement(applicant: string, selector: string): Promise<void> {
+        await this.createClient(applicant);
+        const { page } = this.getBrowserClient(applicant);
+        const normalizedSelector = this.normalizeSelector(selector);
+        await page.fill(normalizedSelector, '');
     }
 
     public async scroll(applicant: string, selector: string, _x: number, _y: number): Promise<void> {
