@@ -443,12 +443,20 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
             case 'webkit':
                 this.browser = await webkit.launch(launchOptions);
                 break;
+            case 'msedge':
+                // Microsoft Edge 使用 chromium 引擎，通过 channel 参数指定
+                const msedgeOptions = {
+                    ...launchOptions,
+                    channel: 'msedge'
+                };
+                this.browser = await chromium.launch(msedgeOptions);
+                break;
             default:
                 throw new Error(`Unsupported browser: ${browserName}`);
         }
 
-        // 尝试获取并注册浏览器进程 PID（仅限 Chromium）
-        if (browserName === 'chromium' && this.browser) {
+        // 尝试获取并注册浏览器进程 PID（适用于 Chromium 和 MSEdge）
+        if ((browserName === 'chromium' || browserName === 'msedge') && this.browser) {
             try {
                 // Playwright 没有直接暴露 PID，但我们可以通过其他方式追踪
                 const context = await this.browser.newContext();

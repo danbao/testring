@@ -112,13 +112,13 @@ describe('Cross-Plugin Compatibility Tests', () => {
                 { selenium: 'chrome', playwright: 'chromium' },
                 { selenium: 'firefox', playwright: 'firefox' },
                 { selenium: 'safari', playwright: 'webkit' },
-                { selenium: 'edge', playwright: 'chromium' }
+                { selenium: 'edge', playwright: 'msedge' }
             ];
 
             browserMappings.forEach(({ playwright }) => {
                 expect(() => {
                     new PlaywrightPlugin({
-                        browserName: playwright as 'chromium' | 'firefox' | 'webkit'
+                        browserName: playwright as 'chromium' | 'firefox' | 'webkit' | 'msedge'
                     });
                 }).to.not.throw();
             });

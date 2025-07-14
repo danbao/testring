@@ -4,7 +4,7 @@ export interface PlaywrightPluginConfig {
     /**
      * Browser type to use: 'chromium', 'firefox', or 'webkit'
      */
-    browserName?: 'chromium' | 'firefox' | 'webkit';
+    browserName?: 'chromium' | 'firefox' | 'webkit' | 'msedge';
     
     /**
      * Launch options for the browser
