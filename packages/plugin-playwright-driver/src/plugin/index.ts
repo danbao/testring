@@ -24,6 +24,7 @@ const DEFAULT_CONFIG: PlaywrightPluginConfig = {
     clientTimeout: TIMEOUTS.CLIENT_SESSION,
     disableClientPing: false,
     coverage: false,
+    cdpCoverage: false,
     video: false,
     trace: false,
 };
@@ -344,7 +345,9 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
     private pageToTabIdMap: WeakMap<Page, string> = new WeakMap(); // Maps page instances to tab IDs
 
     constructor(config: Partial<PlaywrightPluginConfig> = {}) {
-        this.config = { ...DEFAULT_CONFIG, ...config };
+        // Handle Selenium plugin compatibility parameters
+        const compatConfig = this.handleSeleniumCompatibility(config);
+        this.config = { ...DEFAULT_CONFIG, ...compatConfig };
         
         // Enable non-headless mode for debugging when PLAYWRIGHT_DEBUG is set
         if (process.env['PLAYWRIGHT_DEBUG'] === '1' && this.config.launchOptions) {
@@ -388,6 +391,141 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         }
     }
 
+    private handleSeleniumCompatibility(config: Partial<PlaywrightPluginConfig>): Partial<PlaywrightPluginConfig> {
+        const compatConfig = { ...config };
+        
+        // Track which compatibility parameters are being used
+        const compatParamsUsed: string[] = [];
+        
+        // Map Selenium host/hostname to Selenium Grid configuration
+        if ((config.host || config.hostname) && !config.seleniumGrid) {
+            const gridHost = config.hostname || config.host;
+            const gridPort = config.port || 4444;
+            
+            compatConfig.seleniumGrid = {
+                gridUrl: `http://${gridHost}:${gridPort}/wd/hub`,
+                ...(config.seleniumGrid || {})
+            };
+            
+            if (config.host) {
+                compatParamsUsed.push('host');
+                this.logger.warn(`[Selenium Compatibility] Parameter 'host' is deprecated. Please use 'seleniumGrid.gridUrl' instead.`);
+            }
+            if (config.hostname) {
+                compatParamsUsed.push('hostname');
+                this.logger.warn(`[Selenium Compatibility] Parameter 'hostname' is deprecated. Please use 'seleniumGrid.gridUrl' instead.`);
+            }
+            if (config.port) {
+                compatParamsUsed.push('port');
+                this.logger.warn(`[Selenium Compatibility] Parameter 'port' is deprecated. Please include port in 'seleniumGrid.gridUrl'.`);
+            }
+        }
+        
+        // Map desiredCapabilities to launch/context options
+        if (config.desiredCapabilities && config.desiredCapabilities.length > 0) {
+            compatParamsUsed.push('desiredCapabilities');
+            this.logger.warn(`[Selenium Compatibility] Parameter 'desiredCapabilities' is deprecated. Please use 'browserName', 'launchOptions', and 'contextOptions' instead.`);
+            
+            const desiredCaps = config.desiredCapabilities[0];
+            
+            // Map browserName
+            if (desiredCaps.browserName && !config.browserName) {
+                // Map chrome to chromium for Playwright
+                compatConfig.browserName = desiredCaps.browserName === 'chrome' ? 'chromium' : desiredCaps.browserName;
+                this.logger.warn(`[Selenium Compatibility] Mapped desiredCapabilities.browserName='${desiredCaps.browserName}' to browserName='${compatConfig.browserName}'`);
+            }
+            
+            // Map Chrome options
+            if (desiredCaps['goog:chromeOptions']) {
+                const chromeOptions = desiredCaps['goog:chromeOptions'];
+                if (chromeOptions.args && !config.launchOptions?.args) {
+                    compatConfig.launchOptions = {
+                        ...config.launchOptions,
+                        args: chromeOptions.args
+                    };
+                    this.logger.warn(`[Selenium Compatibility] Mapped desiredCapabilities['goog:chromeOptions'].args to launchOptions.args`);
+                }
+            }
+        }
+        
+        // Map capabilities to launch/context options
+        if (config.capabilities) {
+            compatParamsUsed.push('capabilities');
+            this.logger.warn(`[Selenium Compatibility] Parameter 'capabilities' is deprecated. Please use 'browserName', 'launchOptions', and 'contextOptions' instead.`);
+            
+            // Map browserName
+            if (config.capabilities.browserName && !config.browserName) {
+                // Map chrome to chromium for Playwright
+                compatConfig.browserName = config.capabilities.browserName === 'chrome' ? 'chromium' : config.capabilities.browserName;
+                this.logger.warn(`[Selenium Compatibility] Mapped capabilities.browserName='${config.capabilities.browserName}' to browserName='${compatConfig.browserName}'`);
+            }
+            
+            // Map Chrome options
+            if (config.capabilities['goog:chromeOptions']) {
+                const chromeOptions = config.capabilities['goog:chromeOptions'];
+                if (chromeOptions.args && !config.launchOptions?.args) {
+                    compatConfig.launchOptions = {
+                        ...config.launchOptions,
+                        args: chromeOptions.args
+                    };
+                    this.logger.warn(`[Selenium Compatibility] Mapped capabilities['goog:chromeOptions'].args to launchOptions.args`);
+                }
+                
+                // Check for headless mode
+                if (chromeOptions.args?.includes('--headless') || chromeOptions.args?.includes('--headless=new')) {
+                    compatConfig.launchOptions = {
+                        ...compatConfig.launchOptions,
+                        headless: true
+                    };
+                    this.logger.warn(`[Selenium Compatibility] Detected headless mode from Chrome args, set launchOptions.headless=true`);
+                }
+            }
+        }
+        
+        // Log level mapping (Selenium uses WebDriverIO log levels)
+        if (config.logLevel && !process.env['DEBUG']) {
+            compatParamsUsed.push('logLevel');
+            this.logger.warn(`[Selenium Compatibility] Parameter 'logLevel' is deprecated. Please use DEBUG environment variable for Playwright logging.`);
+            
+            const logLevelMap: { [key: string]: string } = {
+                'trace': 'pw:api',
+                'debug': 'pw:api',
+                'info': 'pw:api',
+                'warn': 'pw:api',
+                'error': 'pw:api',
+                'silent': ''
+            };
+            
+            if (logLevelMap[config.logLevel]) {
+                process.env['DEBUG'] = logLevelMap[config.logLevel];
+                this.logger.warn(`[Selenium Compatibility] Mapped logLevel='${config.logLevel}' to DEBUG='${logLevelMap[config.logLevel]}'`);
+            }
+        }
+        
+        // Note: chromeDriverPath and recorderExtension are ignored as they are Selenium-specific
+        if (config.chromeDriverPath) {
+            compatParamsUsed.push('chromeDriverPath');
+            this.logger.warn(`[Selenium Compatibility] Parameter 'chromeDriverPath' is not applicable to Playwright and will be ignored.`);
+        }
+        if (config.recorderExtension) {
+            compatParamsUsed.push('recorderExtension');
+            this.logger.warn(`[Selenium Compatibility] Parameter 'recorderExtension' is not applicable to Playwright and will be ignored.`);
+        }
+        
+        // Check for cdpCoverage
+        if (config.cdpCoverage) {
+            compatParamsUsed.push('cdpCoverage');
+            this.logger.warn(`[Selenium Compatibility] Parameter 'cdpCoverage' is deprecated. Please use 'coverage' instead.`);
+        }
+        
+        // Log summary if any compatibility parameters were used
+        if (compatParamsUsed.length > 0) {
+            this.logger.warn(`[Selenium Compatibility] Found ${compatParamsUsed.length} deprecated Selenium parameters: ${compatParamsUsed.join(', ')}. Please update your configuration to use Playwright-native parameters.`);
+        }
+        
+        return compatConfig;
+    }
+    
     private initIntervals() {
         if (this.config.workerLimit !== 'local' && !this.config.disableClientPing) {
             if (this.config.clientCheckInterval && this.config.clientCheckInterval > 0) {
@@ -603,7 +741,8 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         });
         
         let coverage = null;
-        if (this.config.coverage) {
+        // Support both 'coverage' and 'cdpCoverage' for compatibility with Selenium plugin
+        if (this.config.coverage || this.config.cdpCoverage) {
             await page.coverage.startJSCoverage();
             await page.coverage.startCSSCoverage();
             coverage = page.coverage;
@@ -727,7 +866,8 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
             }
 
             // Stop coverage with timeout
-            if (this.config.coverage && clientData?.coverage) {
+            // Support both 'coverage' and 'cdpCoverage' for compatibility with Selenium plugin
+            if ((this.config.coverage || this.config.cdpCoverage) && clientData?.coverage) {
                 try {
                     await Promise.race([
                         Promise.all([

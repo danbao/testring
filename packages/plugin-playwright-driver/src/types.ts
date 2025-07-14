@@ -69,6 +69,51 @@ export interface PlaywrightPluginConfig {
     coverage?: boolean;
     
     /**
+     * Enable CDP coverage collection (alias for coverage, for compatibility with Selenium plugin)
+     */
+    cdpCoverage?: boolean;
+    
+    /**
+     * Chrome driver path (for compatibility with Selenium plugin, not used in Playwright)
+     */
+    chromeDriverPath?: string;
+    
+    /**
+     * Enable recorder extension (for compatibility with Selenium plugin, not used in Playwright)
+     */
+    recorderExtension?: boolean;
+    
+    /**
+     * Host (for compatibility with Selenium plugin, maps to seleniumGrid.gridUrl)
+     */
+    host?: string;
+    
+    /**
+     * Hostname (for compatibility with Selenium plugin, maps to seleniumGrid.gridUrl)
+     */
+    hostname?: string;
+    
+    /**
+     * Port (for compatibility with Selenium plugin)
+     */
+    port?: number;
+    
+    /**
+     * Desired capabilities (for compatibility with Selenium plugin)
+     */
+    desiredCapabilities?: any[];
+    
+    /**
+     * Capabilities (for compatibility with Selenium plugin)
+     */
+    capabilities?: any;
+    
+    /**
+     * Log level (for compatibility with Selenium plugin)
+     */
+    logLevel?: string;
+    
+    /**
      * Enable video recording
      */
     video?: boolean;
