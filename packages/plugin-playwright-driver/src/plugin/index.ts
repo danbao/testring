@@ -10,6 +10,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 
+// 导入统一的timeout配置
+const TIMEOUTS = require('../../../e2e-test-app/timeout-config.js');
+
 const DEFAULT_CONFIG: PlaywrightPluginConfig = {
     browserName: 'chromium',
     launchOptions: {
@@ -18,7 +21,7 @@ const DEFAULT_CONFIG: PlaywrightPluginConfig = {
     },
     contextOptions: {},
     clientCheckInterval: 5 * 1000,
-    clientTimeout: 15 * 60 * 1000,
+    clientTimeout: TIMEOUTS.CLIENT_SESSION,
     disableClientPing: false,
     coverage: false,
     video: false,
@@ -106,7 +109,7 @@ class PlaywrightCleanupManager {
                 
                 await Promise.race([
                     Promise.all(cleanupPromises),
-                    new Promise(resolve => setTimeout(resolve, 3000)) // 3秒超时
+                    new Promise(resolve => setTimeout(resolve, TIMEOUTS.PAGE_LOAD)) // 页面加载超时
                 ]);
 
                 // 然后清理注册的进程和发现的进程
@@ -651,7 +654,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
                             path: `${this.config.traceDir || './test-results/traces'}/${applicant}-trace.zip`,
                         }),
                         new Promise((_, reject) => 
-                            setTimeout(() => reject(new Error('Trace stop timeout')), 2000)
+                            setTimeout(() => reject(new Error('Trace stop timeout')), TIMEOUTS.TRACE_STOP)
                         )
                     ]);
                 } catch (traceError) {
@@ -668,7 +671,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
                             clientData.coverage.stopCSSCoverage()
                         ]),
                         new Promise((_, reject) => 
-                            setTimeout(() => reject(new Error('Coverage stop timeout')), 2000)
+                            setTimeout(() => reject(new Error('Coverage stop timeout')), TIMEOUTS.COVERAGE_STOP)
                         )
                     ]);
                 } catch (coverageError) {
@@ -680,7 +683,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
             await Promise.race([
                 context.close(),
                 new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Context close timeout')), 3000)
+                    setTimeout(() => reject(new Error('Context close timeout')), TIMEOUTS.CONTEXT_CLOSE)
                 )
             ]);
             
@@ -752,7 +755,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
                 await Promise.race([
                     Promise.all(closePromises),
                     new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Timeout closing sessions')), 2000)
+                        setTimeout(() => reject(new Error('Timeout closing sessions')), TIMEOUTS.SESSION_CLOSE)
                     )
                 ]);
             } catch (e) {
@@ -765,7 +768,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
                     await Promise.race([
                         this.browser.close(),
                         new Promise((_, reject) => 
-                            setTimeout(() => reject(new Error('Browser close timeout')), 1500)
+                            setTimeout(() => reject(new Error('Browser close timeout')), TIMEOUTS.BROWSER_CLOSE)
                         )
                     ]);
                 } catch (e) {
@@ -872,7 +875,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
     public async click(applicant: string, selector: string, options?: any): Promise<void> {
         await this.createClient(applicant);
         const { page } = this.getBrowserClient(applicant);
-        const clickOptions = { timeout: 2000, ...options }; // 2 second timeout for click operations
+        const clickOptions = { timeout: TIMEOUTS.CLICK, ...options }; // 点击操作timeout
         
         // Handle XPath selectors
         const normalizedSelector = this.normalizeSelector(selector);
@@ -1005,7 +1008,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         await this.createClient(applicant);
         const { page } = this.getBrowserClient(applicant);
         const normalizedSelector = this.normalizeSelector(selector);
-        await page.hover(normalizedSelector);
+        await page.hover(normalizedSelector, { timeout: TIMEOUTS.HOVER });
     }
 
     public async execute(applicant: string, fn: any, args: any[]): Promise<any> {
@@ -1339,7 +1342,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
             // Handle file upload
             await page.setInputFiles(normalizedSelector, value);
         } else {
-            await page.fill(normalizedSelector, value, { timeout: 2000 }); // 2 second timeout for setValue operations
+            await page.fill(normalizedSelector, value, { timeout: TIMEOUTS.FILL }); // 填充操作timeout
         }
     }
 
@@ -1941,7 +1944,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
     public async waitUntil(applicant: string, condition: () => boolean | Promise<boolean>, timeout?: number, _timeoutMsg?: string, _interval?: number): Promise<void> {
         await this.createClient(applicant);
         const { page } = this.getBrowserClient(applicant);
-        await page.waitForFunction(condition, {}, { timeout: timeout || 5000 });
+        await page.waitForFunction(condition, {}, { timeout: timeout || TIMEOUTS.CONDITION });
     }
 
     public async selectByAttribute(applicant: string, selector: string, attribute: string, value: string): Promise<void> {
@@ -2196,7 +2199,7 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         
         try {
             // Wait for element to exist
-            await page.waitForSelector(selector, { state: 'attached', timeout: 100 });
+            await page.waitForSelector(selector, { state: 'attached', timeout: TIMEOUTS.WAIT_FOR_ELEMENT });
             
             // For now, let's wait a bit to check if element is stable
             // This is a simplified implementation

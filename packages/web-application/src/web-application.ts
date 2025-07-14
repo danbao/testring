@@ -34,6 +34,9 @@ import {
     simulateJSFieldChangeScript,
 } from './browser-scripts';
 
+// 导入统一的timeout配置
+const TIMEOUTS = require('../../e2e-test-app/timeout-config.js');
+
 type valueType = string | number | null | undefined;
 
 type ClickOptions = {
@@ -46,11 +49,11 @@ type ElementPath = string | ElementPathProxy;
 export class WebApplication extends PluggableModule {
     protected LOGGER_PREFIX = '[web-application]';
 
-    protected WAIT_PAGE_LOAD_TIMEOUT: number = 3 * 60000;
+    protected WAIT_PAGE_LOAD_TIMEOUT: number = TIMEOUTS.PAGE_LOAD_MAX;
 
-    protected WAIT_TIMEOUT = 30000;
+    protected WAIT_TIMEOUT = TIMEOUTS.WAIT_TIMEOUT;
 
-    protected TICK_TIMEOUT = 100;
+    protected TICK_TIMEOUT = TIMEOUTS.TICK_TIMEOUT;
 
     protected config: IWebApplicationConfig;
 

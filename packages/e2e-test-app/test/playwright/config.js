@@ -1,3 +1,6 @@
+// 导入统一的timeout配置
+const TIMEOUTS = require('../../timeout-config.js');
+
 module.exports = async (config) => {
     const local = !config.headless;
 
@@ -25,7 +28,7 @@ module.exports = async (config) => {
         maxWriteThreadCount: 2,
         screenshots: 'disable',
         retryCount: 0,
-        testTimeout: local ? 0 : config.testTimeout,
+        testTimeout: local ? 0 : (config.testTimeout || TIMEOUTS.TEST_EXECUTION),
         tests: 'test/playwright/test/**/*.spec.js',
         plugins: [
             [
@@ -37,7 +40,7 @@ module.exports = async (config) => {
                         slowMo: local ? 100 : 0, // Add slow motion for local debugging
                         args: local ? [] : ['--no-sandbox']
                     },
-                    clientTimeout: local ? 0 : config.testTimeout,
+                    clientTimeout: local ? 0 : (config.testTimeout || TIMEOUTS.CLIENT_SESSION),
                 },
             ],
             ['babel', babelConfig],

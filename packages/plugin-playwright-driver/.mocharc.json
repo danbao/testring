@@ -3,5 +3,6 @@
   "require": ["ts-node/register"],
   "recursive": true,
   "timeout": 8000,
-  "exit": true
+  "exit": true,
+  "_comment": "使用fast timeout (8秒) 适合快速的单元测试"
 }
