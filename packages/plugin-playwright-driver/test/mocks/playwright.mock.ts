@@ -163,6 +163,49 @@ export class MockPage {
         stopCSSCoverage: async () => {}
     };
 
+    // Event handling
+    private _eventHandlers: Map<string, Function[]> = new Map();
+
+    on(event: string, handler: Function) {
+        if (!this._eventHandlers.has(event)) {
+            this._eventHandlers.set(event, []);
+        }
+        this._eventHandlers.get(event)!.push(handler);
+    }
+
+    off(event: string, handler: Function) {
+        const handlers = this._eventHandlers.get(event);
+        if (handlers) {
+            const index = handlers.indexOf(handler);
+            if (index > -1) {
+                handlers.splice(index, 1);
+            }
+        }
+    }
+
+    // Page lifecycle
+    async close() {
+        // Clean up page resources
+        this._elements.clear();
+        this._eventHandlers.clear();
+    }
+
+    // Frame handling
+    mainFrame() {
+        return {
+            // Mock frame methods
+            url: () => this._url,
+            title: async () => this._title,
+            $: async (selector: string) => this.$(selector),
+            $$: async (selector: string) => this.$$(selector),
+            click: async (selector: string, options?: any) => this.click(selector, options),
+            fill: async (selector: string, value: string) => this.fill(selector, value),
+            waitForSelector: async (selector: string, options?: any) => this.waitForSelector(selector, options),
+            evaluate: async (fn: any, ...args: any[]) => this.evaluate(fn, ...args),
+            textContent: async (selector: string) => this.textContent(selector)
+        };
+    }
+
     // Helper methods for testing
     _addElement(selector: string, element: MockElement) {
         element._selector = selector;
@@ -311,11 +354,15 @@ export class MockBrowserContext {
     }
 
     async close() {
+        // Close all pages first
+        for (const page of this._pages) {
+            // Clean up page resources if needed
+        }
         this._pages = [];
         this._cookies = [];
         // Remove this context from browser
         if (this._browser) {
-            const index = this._browser.contexts().indexOf(this);
+            const index = this._browser._contexts.indexOf(this);
             if (index > -1) {
                 this._browser._contexts.splice(index, 1);
             }
@@ -347,6 +394,10 @@ export class MockBrowser {
             await context.close();
         }
         this._contexts = [];
+    }
+
+    version() {
+        return '1.0.0';
     }
 }
 

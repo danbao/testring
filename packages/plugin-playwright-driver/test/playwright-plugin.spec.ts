@@ -9,16 +9,12 @@ describe('PlaywrightPlugin Core Functionality', () => {
     let plugin: PlaywrightPlugin;
     let sandbox: sinon.SinonSandbox;
     let mockBrowser: MockBrowser;
-    let mockContext: MockBrowserContext;
-    let mockPage: MockPage;
 
     beforeEach(async () => {
         sandbox = sinon.createSandbox();
         
-        // Mock playwright module
+        // Create fresh mock browser for each test
         mockBrowser = new MockBrowser();
-        mockContext = await mockBrowser.newContext();
-        mockPage = await mockContext.newPage();
 
         // Stub playwright module
         sandbox.stub(require('playwright'), 'chromium').value({
@@ -42,7 +38,7 @@ describe('PlaywrightPlugin Core Functionality', () => {
         it('should create browser client for applicant', async () => {
             const applicant = 'test-applicant';
             
-            await plugin.url(applicant, 'https://example.com');
+            await plugin.url(applicant, 'data:text/html,<html><body><h1>Test Page</h1></body></html>');
             
             // Browser should have been created
             expect(mockBrowser.contexts().length).to.be.greaterThan(0);
@@ -51,23 +47,42 @@ describe('PlaywrightPlugin Core Functionality', () => {
         it('should reuse existing client for same applicant', async () => {
             const applicant = 'test-applicant';
             
-            await plugin.url(applicant, 'https://example.com');
+            await plugin.url(applicant, 'data:text/html,<html><body><h1>Test Page</h1></body></html>');
             const initialContextCount = mockBrowser.contexts().length;
             
-            await plugin.url(applicant, 'https://example2.com');
+            await plugin.url(applicant, 'data:text/html,<html><body><h1>Test Page 2</h1></body></html>');
             
             // Should not create new context
             expect(mockBrowser.contexts().length).to.equal(initialContextCount);
         });
 
         it('should create separate clients for different applicants', async () => {
-            const initialContextCount = mockBrowser.contexts().length;
+            // Create a fresh plugin and browser for this test to ensure isolation
+            const isolatedBrowser = new MockBrowser();
+            const isolatedSandbox = sinon.createSandbox();
             
-            await plugin.url('applicant1', 'https://example.com');
-            await plugin.url('applicant2', 'https://example.com');
+            isolatedSandbox.stub(require('playwright'), 'chromium').value({
+                launch: async () => isolatedBrowser
+            });
             
-            // Should create separate contexts (2 new ones from initial count)
-            expect(mockBrowser.contexts().length).to.equal(initialContextCount + 2);
+            const isolatedPlugin = new PlaywrightPlugin({
+                browserName: 'chromium',
+                launchOptions: { headless: true }
+            });
+            
+            try {
+                const initialContextCount = isolatedBrowser.contexts().length;
+                expect(initialContextCount).to.equal(0); // Should start with 0
+                
+                await isolatedPlugin.url('applicant1', 'data:text/html,<html><body><h1>Test Page 1</h1></body></html>');
+                await isolatedPlugin.url('applicant2', 'data:text/html,<html><body><h1>Test Page 2</h1></body></html>');
+                
+                // Should create separate contexts (2 new ones from initial count)
+                expect(isolatedBrowser.contexts().length).to.equal(2);
+            } finally {
+                await isolatedPlugin.kill();
+                isolatedSandbox.restore();
+            }
         });
     });
 
@@ -75,19 +90,14 @@ describe('PlaywrightPlugin Core Functionality', () => {
         const applicant = 'test-applicant';
 
         beforeEach(async () => {
-            // Ensure plugin is initialized with mock page
-            await plugin.url(applicant, 'https://test.com');
-            await mockPage.setTitle('Test Page');
-            
-            // Setup mock page with elements
-            mockPage._addElement('#button', new MockElement({ text: 'Click me', enabled: true, visible: true }));
-            mockPage._addElement('#input', new MockElement({ value: 'initial', enabled: true, visible: true }));
-            mockPage._addElement('#text', new MockElement({ text: 'Sample text', enabled: true, visible: true }));
-            mockPage._addElement('#element', new MockElement({ text: 'Element', enabled: true, visible: true }));
+            // Ensure plugin is initialized
+            await plugin.url(applicant, 'data:text/html,<html><head><title>Test Page</title></head><body><h1>Test</h1></body></html>');
+            // The plugin creates its own pages internally, we can't access them directly
+            // Tests should verify behavior through public APIs only
         });
 
         it('should navigate to URL', async () => {
-            const url = 'https://example.com';
+            const url = 'data:text/html,<html><body><h1>Navigation Test</h1></body></html>';
             
             const result = await plugin.url(applicant, url);
             
@@ -97,16 +107,16 @@ describe('PlaywrightPlugin Core Functionality', () => {
 
         it('should get current URL when no URL provided', async () => {
             // First navigate to a URL to set current page URL
-            await plugin.url(applicant, 'https://current.com');
+            await plugin.url(applicant, 'data:text/html,<html><body><h1>Current Page</h1></body></html>');
             
             const result = await plugin.url(applicant, '');
             
-            expect(result).to.equal('https://current.com');
+            expect(result).to.equal('data:text/html,<html><body><h1>Current Page</h1></body></html>');
         });
 
         it('should refresh page', async () => {
             // First navigate to a page
-            await plugin.url(applicant, 'https://example.com');
+            await plugin.url(applicant, 'data:text/html,<html><body><h1>Refresh Test</h1></body></html>');
             
             // Refresh should not throw an error
             await plugin.refresh(applicant);
@@ -115,7 +125,7 @@ describe('PlaywrightPlugin Core Functionality', () => {
 
         it('should get page title', async () => {
             // Navigate to page first
-            await plugin.url(applicant, 'https://example.com');
+            await plugin.url(applicant, 'data:text/html,<html><head><title>Mock Page</title></head><body><h1>Title Test</h1></body></html>');
             
             const title = await plugin.getTitle(applicant);
             
@@ -164,7 +174,7 @@ describe('PlaywrightPlugin Core Functionality', () => {
     describe('Session Management', () => {
         it('should end session for applicant', async () => {
             const applicant = 'session-test-applicant';
-            await plugin.url(applicant, 'https://example.com');
+            await plugin.url(applicant, 'data:text/html,<html><body><h1>Session Test</h1></body></html>');
             const initialCount = mockBrowser.contexts().length;
             
             await plugin.end(applicant);
@@ -180,8 +190,8 @@ describe('PlaywrightPlugin Core Functionality', () => {
         });
 
         it('should kill all sessions', async () => {
-            await plugin.url('applicant1', 'https://example.com');
-            await plugin.url('applicant2', 'https://example.com');
+            await plugin.url('applicant1', 'data:text/html,<html><body><h1>Session 1</h1></body></html>');
+            await plugin.url('applicant2', 'data:text/html,<html><body><h1>Session 2</h1></body></html>');
             
             await plugin.kill();
             
@@ -209,7 +219,7 @@ describe('PlaywrightPlugin Core Functionality', () => {
             });
 
             try {
-                await invalidPlugin.url(applicant, 'https://example.com');
+                await invalidPlugin.url(applicant, 'data:text/html,<html><body><h1>Error Test</h1></body></html>');
                 expect.fail('Should have thrown error');
             } catch (error) {
                 expect(error instanceof Error ? error.message : String(error)).to.include('Unsupported browser');
