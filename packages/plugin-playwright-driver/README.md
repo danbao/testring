@@ -16,6 +16,51 @@ Modern browser automation plugin for testring using Playwright.
 npm install @testring/plugin-playwright-driver
 ```
 
+### 🚀 Automatic Browser Installation
+
+**自动安装模式**：浏览器会在 `npm install` 时自动安装，无需额外步骤！
+
+```bash
+# 自动安装所有浏览器 (chromium, firefox, webkit, msedge)
+npm install @testring/plugin-playwright-driver
+
+# 跳过浏览器安装
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install @testring/plugin-playwright-driver
+
+# 只安装特定浏览器
+PLAYWRIGHT_BROWSERS=chromium,msedge npm install @testring/plugin-playwright-driver
+
+# CI 环境强制安装浏览器
+PLAYWRIGHT_INSTALL_IN_CI=1 npm install @testring/plugin-playwright-driver
+```
+
+### Manual Browser Management
+
+如果需要手动管理浏览器：
+
+```bash
+# 手动安装所有浏览器
+npm run install-browsers
+
+# 卸载所有浏览器
+npm run uninstall-browsers
+
+# 使用 Playwright 命令安装特定浏览器
+npx playwright install msedge  # Microsoft Edge
+npx playwright install firefox # Firefox
+npx playwright install webkit  # Safari/WebKit
+```
+
+### Environment Variables
+
+控制浏览器安装行为的环境变量：
+
+| 环境变量 | 描述 | 示例 |
+|---------|------|------|
+| `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` | 跳过浏览器安装 | `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` |
+| `PLAYWRIGHT_BROWSERS` | 指定要安装的浏览器 | `PLAYWRIGHT_BROWSERS=chromium,firefox` |
+| `PLAYWRIGHT_INSTALL_IN_CI` | CI 环境强制安装 | `PLAYWRIGHT_INSTALL_IN_CI=1` |
+
 ## Usage
 
 ### Basic Configuration
@@ -25,7 +70,7 @@ npm install @testring/plugin-playwright-driver
 module.exports = {
     plugins: [
         ['@testring/plugin-playwright-driver', {
-            browserName: 'chromium', // 'chromium', 'firefox', or 'webkit'
+            browserName: 'chromium', // 'chromium', 'firefox', 'webkit', or 'msedge'
             launchOptions: {
                 headless: true,
                 args: ['--no-sandbox']
@@ -62,7 +107,7 @@ module.exports = {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `browserName` | string | `'chromium'` | Browser to use: `'chromium'`, `'firefox'`, or `'webkit'` |
+| `browserName` | string | `'chromium'` | Browser to use: `'chromium'`, `'firefox'`, `'webkit'`, or `'msedge'` |
 | `launchOptions` | object | `{}` | Playwright launch options |
 | `contextOptions` | object | `{}` | Browser context options |
 | `coverage` | boolean | `false` | Enable code coverage collection |
@@ -89,6 +134,7 @@ Most existing tests should work without modification.
 - **Chromium** - Latest stable version
 - **Firefox** - Latest stable version  
 - **WebKit** - Safari technology preview
+- **Microsoft Edge** - Latest stable version (requires `npx playwright install msedge`)
 
 ## Debugging
 

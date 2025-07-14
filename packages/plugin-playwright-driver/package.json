@@ -11,7 +11,10 @@
   "license": "MIT",
   "scripts": {
     "test": "mocha test/**/*.spec.ts --require ts-node/register --recursive",
-    "test:debug": "PLAYWRIGHT_DEBUG=1 mocha --config .mocharc.debug.json"
+    "test:debug": "PLAYWRIGHT_DEBUG=1 mocha --config .mocharc.debug.json",
+    "postinstall": "node scripts/install-browsers.js",
+    "install-browsers": "node scripts/install-browsers.js",
+    "uninstall-browsers": "npx playwright uninstall --all"
   },
   "dependencies": {
     "@testring/logger": "0.8.0",
