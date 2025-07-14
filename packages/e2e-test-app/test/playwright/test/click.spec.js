@@ -11,10 +11,12 @@ run(async (api) => {
     await app.assert.equal(outputText, 'success');
 
     try {
-        await app.clickCoordinates(app.root.halfHoveredButton, {x: 0, y: 0});
+        // This click is expected to fail as the button is covered by overlay
+        // Use a shorter timeout to avoid waiting 30 seconds
+        await app.clickCoordinates(app.root.halfHoveredButton, {x: 0, y: 0}, 2000);
         throw Error('Test failed');
     } catch (e) {
-        /* ignore */
+        /* ignore - expected failure */
     }
 
     await app.click(app.root.halfHoveredOverlay);
@@ -27,13 +29,15 @@ run(async (api) => {
     await app.assert.equal(halfHoveredOutputText, 'success');
 
     try {
+        // This click is expected to fail as the button is covered by overlay
+        // Use a shorter timeout to avoid waiting 30 seconds
         await app.clickCoordinates(app.root.partiallyHoveredButton, {
             x: 0,
             y: 0,
-        });
+        }, 2000);
         throw Error('Test failed');
     } catch (e) {
-        /* ignore */
+        /* ignore - expected failure */
     }
 
     await app.click(app.root.partiallyHoveredOverlay);

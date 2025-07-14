@@ -93,14 +93,16 @@ run(async (api) => {
     afterSetValue = await app.getValue(app.root.form.nameInput);
     await app.assert.equal(afterSetValue, 'testValueKeys');
     await app.click(app.root.form.nameInput);
-    await app.keys(['Control', 'A']);
+    // Use Meta+A (Command+A) on macOS instead of Control+A
+    const isMac = process.platform === 'darwin';
+    await app.keys([isMac ? 'Meta' : 'Control', 'A']);
     await app.keys(['Backspace']);
     afterClearValue = await app.getValue(app.root.form.nameInput);
     await app.assert.equal(afterClearValue, '');
 
     // addValue
     await app.addValue(app.root.form.nameInput, 'testValueAdd');
-    await app.addValue(app.root.form.nameInput, 123);
+    await app.addValue(app.root.form.nameInput, '123'); // Convert number to string
     afterSetValue = await app.getValue(app.root.form.nameInput);
     await app.assert.equal(afterSetValue, 'testValueAdd123');
 });

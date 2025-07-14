@@ -11,7 +11,7 @@ run(async (api) => {
     await app.assert.include(title, 'Example');
     
     // Test simple navigation methods
-    await app.url('https://httpbin.org/html');
+    await app.url('https://api.wordpress.org/secret-key/1.1/salt/');
     await app.refresh();
     
     // Test basic element methods

@@ -13,7 +13,13 @@ run(async (api) => {
     const text = await app.getText(app.root.text);
     await app.assert.equal(text, 'Text is here!');
 
-    // Explicitly trigger the mouseover event to add "Text 4"
+    // Get text without focus first, before any mouseover events
+    const textWithoutFocus = await app.getTextWithoutFocus(
+        app.root.textWithoutFocus,
+    );
+    await app.assert.equal(textWithoutFocus, 'Text without focus');
+
+    // Then explicitly trigger the mouseover event to add "Text 4" to texts element
     await app.execute(() => {
         const textsDiv = document.getElementById('texts');
         if (textsDiv && textsDiv.onmouseover) {
@@ -30,9 +36,4 @@ run(async (api) => {
         'Text 3',
         'Text 4',
     ]);
-
-    const textWithoutFocus = await app.getTextWithoutFocus(
-        app.root.textWithoutFocus,
-    );
-    await app.assert.equal(textWithoutFocus, 'Text without focus');
 });
