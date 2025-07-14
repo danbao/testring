@@ -1,5 +1,22 @@
 import { LaunchOptions, BrowserContextOptions } from 'playwright';
 
+export interface SeleniumGridConfig {
+    /**
+     * Selenium Grid Hub URL
+     */
+    gridUrl?: string;
+    
+    /**
+     * Additional capabilities to pass to Selenium Grid
+     */
+    gridCapabilities?: Record<string, any>;
+    
+    /**
+     * Additional headers to pass to Selenium Grid
+     */
+    gridHeaders?: Record<string, string>;
+}
+
 export interface PlaywrightPluginConfig {
     /**
      * Browser type to use: 'chromium', 'firefox', or 'webkit'
@@ -15,6 +32,11 @@ export interface PlaywrightPluginConfig {
      * Context options for browser context
      */
     contextOptions?: BrowserContextOptions;
+    
+    /**
+     * Selenium Grid configuration
+     */
+    seleniumGrid?: SeleniumGridConfig;
     
     /**
      * Client check interval in milliseconds

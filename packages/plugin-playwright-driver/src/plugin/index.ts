@@ -425,6 +425,51 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         }
     }
 
+    private isSeleniumGridEnabled(): boolean {
+        // 检查是否通过配置或环境变量启用了 Selenium Grid
+        return !!(
+            this.config.seleniumGrid?.gridUrl ||
+            process.env['SELENIUM_REMOTE_URL']
+        );
+    }
+
+    private setupSeleniumGridEnvironment(): void {
+        const gridConfig = this.config.seleniumGrid;
+        
+        if (!gridConfig) {
+            return;
+        }
+
+        // 设置 Selenium Grid URL
+        if (gridConfig.gridUrl && !process.env['SELENIUM_REMOTE_URL']) {
+            process.env['SELENIUM_REMOTE_URL'] = gridConfig.gridUrl;
+            this.logger.info(`Setting Selenium Grid URL: ${gridConfig.gridUrl}`);
+        }
+
+        // 设置 Selenium Grid Capabilities
+        if (gridConfig.gridCapabilities && !process.env['SELENIUM_REMOTE_CAPABILITIES']) {
+            process.env['SELENIUM_REMOTE_CAPABILITIES'] = JSON.stringify(gridConfig.gridCapabilities);
+            this.logger.debug(`Setting Selenium Grid capabilities: ${JSON.stringify(gridConfig.gridCapabilities)}`);
+        }
+
+        // 设置 Selenium Grid Headers
+        if (gridConfig.gridHeaders && !process.env['SELENIUM_REMOTE_HEADERS']) {
+            process.env['SELENIUM_REMOTE_HEADERS'] = JSON.stringify(gridConfig.gridHeaders);
+            this.logger.debug(`Setting Selenium Grid headers: ${JSON.stringify(gridConfig.gridHeaders)}`);
+        }
+
+        // 如果启用了 Selenium Grid，记录相关信息
+        if (this.isSeleniumGridEnabled()) {
+            const gridUrl = gridConfig.gridUrl || process.env['SELENIUM_REMOTE_URL'];
+            this.logger.info(`Selenium Grid mode enabled. Connecting to: ${gridUrl}`);
+            
+            const browserName = this.config.browserName || 'chromium';
+            if (browserName !== 'chromium' && browserName !== 'msedge') {
+                this.logger.warn(`Browser ${browserName} may not be supported with Selenium Grid. Only chromium and msedge are officially supported.`);
+            }
+        }
+    }
+
     private async getBrowser(): Promise<Browser> {
         if (this.browser) {
             return this.browser;
@@ -432,15 +477,26 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
 
         const browserName = this.config.browserName || 'chromium';
         const launchOptions = this.config.launchOptions || {};
+        
+        // 设置 Selenium Grid 环境变量（如果配置了）
+        this.setupSeleniumGridEnvironment();
 
         switch (browserName) {
             case 'chromium':
                 this.browser = await chromium.launch(launchOptions);
                 break;
             case 'firefox':
+                // Firefox 不支持 Selenium Grid
+                if (this.isSeleniumGridEnabled()) {
+                    throw new Error('Selenium Grid is not supported for Firefox. Only Chromium and Microsoft Edge are supported.');
+                }
                 this.browser = await firefox.launch(launchOptions);
                 break;
             case 'webkit':
+                // WebKit 不支持 Selenium Grid  
+                if (this.isSeleniumGridEnabled()) {
+                    throw new Error('Selenium Grid is not supported for WebKit. Only Chromium and Microsoft Edge are supported.');
+                }
                 this.browser = await webkit.launch(launchOptions);
                 break;
             case 'msedge':
@@ -1998,19 +2054,36 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
 
     public async gridTestSession(applicant: string): Promise<any> {
         await this.createClient(applicant);
+        
+        const isGridEnabled = this.isSeleniumGridEnabled();
+        const gridUrl = this.config.seleniumGrid?.gridUrl || process.env['SELENIUM_REMOTE_URL'];
+        
         return {
             sessionId: applicant,
-            localSelenium: true, // Keep backward compatibility with test expectations
-            localPlaywright: true,
+            localSelenium: !isGridEnabled,
+            localPlaywright: !isGridEnabled,
+            seleniumGrid: isGridEnabled,
+            gridUrl: gridUrl || null,
+            browserName: this.config.browserName || 'chromium',
+            gridCapabilities: this.config.seleniumGrid?.gridCapabilities || null
         };
     }
 
     public async getHubConfig(applicant: string): Promise<any> {
         await this.createClient(applicant);
+        
+        const isGridEnabled = this.isSeleniumGridEnabled();
+        const gridUrl = this.config.seleniumGrid?.gridUrl || process.env['SELENIUM_REMOTE_URL'];
+        
         return {
             sessionId: applicant,
-            localSelenium: true, // Keep backward compatibility with test expectations
-            localPlaywright: true,
+            localSelenium: !isGridEnabled,
+            localPlaywright: !isGridEnabled,
+            seleniumGrid: isGridEnabled,
+            gridUrl: gridUrl || null,
+            browserName: this.config.browserName || 'chromium',
+            gridCapabilities: this.config.seleniumGrid?.gridCapabilities || null,
+            gridHeaders: this.config.seleniumGrid?.gridHeaders || null
         };
     }
 

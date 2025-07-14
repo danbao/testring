@@ -103,6 +103,39 @@ module.exports = {
 };
 ```
 
+### Selenium Grid Configuration
+
+Connect to Selenium Grid for distributed testing:
+
+```javascript
+module.exports = {
+    plugins: [
+        ['@testring/plugin-playwright-driver', {
+            browserName: 'chromium', // Only 'chromium' and 'msedge' support Selenium Grid
+            seleniumGrid: {
+                gridUrl: 'http://selenium-hub:4444',
+                gridCapabilities: {
+                    'browserName': 'chrome',
+                    'browserVersion': 'latest',
+                    'platformName': 'linux'
+                },
+                gridHeaders: {
+                    'Authorization': 'Bearer your-token'
+                }
+            }
+        }]
+    ]
+};
+```
+
+Or use environment variables:
+
+```bash
+export SELENIUM_REMOTE_URL=http://selenium-hub:4444
+export SELENIUM_REMOTE_CAPABILITIES='{"browserName":"chrome","browserVersion":"latest"}'
+export SELENIUM_REMOTE_HEADERS='{"Authorization":"Bearer your-token"}'
+```
+
 ## Configuration Options
 
 | Option | Type | Default | Description |
@@ -110,10 +143,19 @@ module.exports = {
 | `browserName` | string | `'chromium'` | Browser to use: `'chromium'`, `'firefox'`, `'webkit'`, or `'msedge'` |
 | `launchOptions` | object | `{}` | Playwright launch options |
 | `contextOptions` | object | `{}` | Browser context options |
+| `seleniumGrid` | object | `{}` | Selenium Grid configuration (see below) |
 | `coverage` | boolean | `false` | Enable code coverage collection |
 | `video` | boolean | `false` | Enable video recording |
 | `trace` | boolean | `false` | Enable trace recording |
 | `clientTimeout` | number | `900000` | Client timeout in milliseconds |
+
+### Selenium Grid Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `seleniumGrid.gridUrl` | string | Selenium Grid Hub URL |
+| `seleniumGrid.gridCapabilities` | object | Additional capabilities for Selenium Grid |
+| `seleniumGrid.gridHeaders` | object | Additional headers for Grid requests |
 
 ## Migration from Selenium
 
@@ -131,10 +173,12 @@ Most existing tests should work without modification.
 
 ## Browser Support
 
-- **Chromium** - Latest stable version
+- **Chromium** - Latest stable version (✅ Selenium Grid support)
 - **Firefox** - Latest stable version  
 - **WebKit** - Safari technology preview
-- **Microsoft Edge** - Latest stable version (requires `npx playwright install msedge`)
+- **Microsoft Edge** - Latest stable version (✅ Selenium Grid support, requires `npx playwright install msedge`)
+
+**Note**: Selenium Grid integration is only supported with Chromium and Microsoft Edge browsers.
 
 ## Debugging
 
