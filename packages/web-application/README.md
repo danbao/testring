@@ -1,59 +1,68 @@
 # @testring/web-application
 
-Web 应用测试模块，作为 testring 框架的核心浏览器操作层，提供完整的 Web 应用自动化测试能力。该模块封装了丰富的浏览器操作方法、元素定位、断言机制和调试功能，是进行端到端 Web 测试的核心组件。
+Web application testing module that serves as the core browser operation layer for the testring framework, providing comprehensive web application automation testing capabilities. This module encapsulates rich browser operation methods, element location, assertion mechanisms, and debugging features, making it the essential component for end-to-end web testing.
 
 [![npm version](https://badge.fury.io/js/@testring/web-application.svg)](https://www.npmjs.com/package/@testring/web-application)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 功能概述
+## Overview
 
-Web 应用测试模块是 testring 框架的浏览器操作核心，提供了：
-- 完整的浏览器元素操作和交互
-- 高级的等待机制和同步策略
-- 内置断言系统和软断言支持
-- 智能的元素定位和路径管理
-- 截图和调试工具集成
-- 多窗口和标签页管理
-- Cookie 和会话管理
-- 文件上传和下载支持
+The web application testing module is the browser operation core of the testring framework, providing:
 
-## 主要特性
+- **Complete browser element operations and interactions** with comprehensive DOM manipulation
+- **Advanced waiting mechanisms and synchronization strategies** for reliable test execution
+- **Built-in assertion system with soft assertion support** for flexible test validation
+- **Intelligent element location and path management** using the element-path system
+- **Screenshot and debugging tools integration** for test analysis and troubleshooting
+- **Multi-window and tab management** for complex application testing
+- **Cookie and session management** for authentication and state handling
+- **File upload and download support** for comprehensive application testing
 
-### 元素操作
-- 点击、双击、拖拽等交互操作
-- 文本输入、选择和清除
-- 表单元素处理（输入框、下拉框、复选框）
-- 滚动和焦点管理
-- 元素属性和样式获取
+## Key Features
 
-### 等待机制
-- 智能等待元素存在、可见、可点击
-- 条件等待和自定义等待逻辑
-- 超时控制和重试机制
-- 页面加载等待和文档就绪检测
+### 🎯 Element Operations
+- Click, double-click, drag-and-drop, and other interaction operations
+- Text input, selection, and clearing with smart handling
+- Form element processing (input fields, dropdowns, checkboxes)
+- Scrolling and focus management for viewport control
+- Element attribute and style retrieval for validation
 
-### 断言系统
-- 内置同步和异步断言
-- 软断言支持，不中断测试执行
-- 断言成功和失败的自动截图
-- 丰富的断言方法和自定义消息
+### ⏱️ Waiting Mechanisms
+- Intelligent waiting for element existence, visibility, and clickability
+- Conditional waiting with custom logic and predicates
+- Timeout control and retry mechanisms for robust testing
+- Page load waiting and document ready state detection
 
-### 调试支持
-- 元素高亮和定位可视化
-- 调试断点和步骤日志
-- 开发工具集成和扩展支持
-- 详细的操作日志和错误追踪
+### ✅ Assertion System
+- Built-in synchronous and asynchronous assertions
+- Soft assertion support that doesn't interrupt test execution
+- Automatic screenshot capture on assertion success and failure
+- Rich assertion methods with custom error messages
 
-## 安装
+### 🔧 Debugging Support
+- Element highlighting and location visualization
+- Debug breakpoints and step-by-step logging
+- Developer tools integration and extension support
+- Detailed operation logs and error tracking
+
+## Installation
 
 ```bash
+# Using npm
 npm install @testring/web-application
+
+# Using yarn
+yarn add @testring/web-application
+
+# Using pnpm
+pnpm add @testring/web-application
 ```
 
-## 核心架构
+## Core Architecture
 
-### WebApplication 类
-主要的 Web 应用测试接口，继承自 `PluggableModule`：
+### WebApplication Class
+
+The main web application testing interface, extending `PluggableModule`:
 
 ```typescript
 class WebApplication extends PluggableModule {
@@ -62,42 +71,58 @@ class WebApplication extends PluggableModule {
     transport: ITransport,
     config: Partial<IWebApplicationConfig>
   )
-  
-  // 断言系统
+
+  // Assertion System
   public assert: AsyncAssertion
   public softAssert: AsyncAssertion
-  
-  // 元素路径管理
+
+  // Element Path Management
   public root: ElementPathProxy
-  
-  // 客户端和日志
+
+  // Client and Logging
   public get client(): WebClient
   public get logger(): LoggerClient
+
+  // Core Methods
+  public async openPage(url: string): Promise<void>
+  public async click(element: ElementPath): Promise<void>
+  public async setValue(element: ElementPath, value: string): Promise<void>
+  public async getText(element: ElementPath): Promise<string>
+  public async waitForExist(element: ElementPath, timeout?: number): Promise<void>
+  public async makeScreenshot(force?: boolean): Promise<string>
 }
 ```
 
-### 配置选项
+### Configuration Options
+
 ```typescript
 interface IWebApplicationConfig {
-  screenshotsEnabled: boolean;      // 是否启用截图
-  screenshotPath: string;           // 截图保存路径
-  devtool: IDevtoolConfig | null;   // 开发工具配置
-  seleniumConfig?: any;             // Selenium 配置
+  screenshotsEnabled: boolean;      // Enable screenshot capture
+  screenshotPath: string;           // Screenshot save path
+  devtool: IDevtoolConfig | null;   // Developer tools configuration
+  seleniumConfig?: any;             // Selenium configuration
+}
+
+interface IDevtoolConfig {
+  extensionId: string;              // Browser extension ID
+  httpPort: number;                 // HTTP server port
+  wsPort: number;                   // WebSocket server port
+  host: string;                     // Server host
 }
 ```
 
-## 基本用法
+## Basic Usage
 
-### 创建 Web 应用实例
+### Creating a Web Application Instance
 
 ```typescript
 import { WebApplication } from '@testring/web-application';
 import { transport } from '@testring/transport';
 
-// 创建 Web 应用测试实例
+// Create a web application test instance
 const webApp = new WebApplication(
-  'test-001',  // 测试唯一标识
-  transport,   // 传输层实例
+  'test-001',  // Unique test identifier
+  transport,   // Transport layer instance
   {
     screenshotsEnabled: true,
     screenshotPath: './screenshots/',
@@ -105,59 +130,104 @@ const webApp = new WebApplication(
   }
 );
 
-// 等待初始化完成
+// Wait for initialization to complete
 await webApp.initPromise;
 ```
 
-### 页面导航和基本操作
+### Page Navigation and Basic Operations
 
 ```typescript
-// 打开页面
+// Open a page
 await webApp.openPage('https://example.com');
 
-// 获取页面标题
+// Get page title
 const title = await webApp.getTitle();
-console.log('页面标题:', title);
+console.log('Page title:', title);
 
-// 刷新页面
+// Refresh the page
 await webApp.refresh();
 
-// 获取页面源码
+// Get page source
 const source = await webApp.getSource();
 
-// 执行 JavaScript
+// Execute JavaScript
 const result = await webApp.execute(() => {
   return document.readyState;
 });
+
+// Navigate back and forward
+await webApp.back();
+await webApp.forward();
+
+// Get current URL
+const currentUrl = await webApp.getUrl();
+console.log('Current URL:', currentUrl);
 ```
 
-### 元素定位和操作
+### Element Location and Interaction
 
 ```typescript
-// 使用元素路径
-const loginButton = webApp.root.button.contains('登录');
+// Using element paths
+const loginButton = webApp.root.button.contains('Login');
 const usernameInput = webApp.root.input.id('username');
 const passwordInput = webApp.root.input.type('password');
 
-// 等待元素存在
+// Wait for element to exist
 await webApp.waitForExist(loginButton);
 
-// 等待元素可见
+// Wait for element to be visible
 await webApp.waitForVisible(usernameInput);
 
-// 点击元素
+// Click an element
 await webApp.click(loginButton);
 
-// 输入文本
+// Input text
 await webApp.setValue(usernameInput, 'testuser@example.com');
 await webApp.setValue(passwordInput, 'password123');
 
-// 清除输入
+// Clear input
 await webApp.clearValue(usernameInput);
 
-// 获取元素文本
+// Get element text
 const buttonText = await webApp.getText(loginButton);
-console.log('按钮文本:', buttonText);
+console.log('Button text:', buttonText);
+
+// Check if element exists
+const exists = await webApp.isElementsExist(webApp.root.div.className('error-message'));
+console.log('Error message exists:', exists);
+
+// Check if element is visible
+const visible = await webApp.isVisible(webApp.root.div.className('success-message'));
+console.log('Success message visible:', visible);
+```
+
+### Using Assertions
+
+```typescript
+// Hard assertions (test stops on failure)
+await webApp.assert.equal(
+  await webApp.getTitle(),
+  'Example Domain',
+  'Page title should match expected value'
+);
+
+await webApp.assert.isTrue(
+  await webApp.isVisible(webApp.root.h1),
+  'Heading should be visible'
+);
+
+// Soft assertions (test continues on failure)
+await webApp.softAssert.contains(
+  await webApp.getText(webApp.root.p),
+  'for illustrative examples',
+  'Paragraph should contain expected text'
+);
+
+// Get soft assertion errors at the end of the test
+const softErrors = webApp.getSoftAssertionErrors();
+if (softErrors.length > 0) {
+  console.log('Soft assertion failures:', softErrors);
+}
 ```
 
 ## 高级元素操作
@@ -896,101 +966,254 @@ function createWebApp(environment: string) {
 const webApp = createWebApp(process.env.NODE_ENV || 'development');
 ```
 
-## 最佳实践
+## API Reference
 
-### 1. 元素定位策略
-- 优先使用稳定的定位器（ID、数据属性）
-- 避免依赖易变的CSS类名和文本内容
-- 使用语义化的元素路径
-- 建立页面对象模型封装元素定位
+### Core Methods
 
-### 2. 等待和同步
-- 合理设置超时时间，避免过长或过短
-- 使用显式等待而非固定延迟
-- 组合多种等待条件确保页面状态
-- 在关键操作前后添加适当的等待
+#### Navigation
+- `openPage(url: string): Promise<void>` - Navigate to a URL
+- `refresh(): Promise<void>` - Refresh the current page
+- `back(): Promise<void>` - Navigate back in browser history
+- `forward(): Promise<void>` - Navigate forward in browser history
+- `getTitle(): Promise<string>` - Get page title
+- `getUrl(): Promise<string>` - Get current URL
+- `getSource(): Promise<string>` - Get page source
 
-### 3. 断言和验证
-- 使用明确的断言消息便于调试
-- 合理使用软断言避免测试中断
-- 在断言失败时自动截图
-- 验证操作结果而非仅仅操作过程
+#### Element Interaction
+- `click(element: ElementPath): Promise<void>` - Click an element
+- `doubleClick(element: ElementPath): Promise<void>` - Double-click an element
+- `setValue(element: ElementPath, value: string): Promise<void>` - Set input value
+- `clearValue(element: ElementPath): Promise<void>` - Clear input value
+- `getText(element: ElementPath): Promise<string>` - Get element text
+- `getAttribute(element: ElementPath, attribute: string): Promise<string>` - Get element attribute
 
-### 4. 错误处理
-- 实现全面的错误捕获和处理
-- 在错误发生时记录详细信息
-- 提供友好的错误消息和解决建议
-- 建立重试机制处理间歇性问题
+#### Waiting Methods
+- `waitForExist(element: ElementPath, timeout?: number): Promise<void>` - Wait for element to exist
+- `waitForVisible(element: ElementPath, timeout?: number): Promise<void>` - Wait for element to be visible
+- `waitForClickable(element: ElementPath, timeout?: number): Promise<void>` - Wait for element to be clickable
+- `waitForEnabled(element: ElementPath, timeout?: number): Promise<void>` - Wait for element to be enabled
+- `waitUntil(condition: () => Promise<boolean>, timeout?: number, message?: string): Promise<void>` - Wait for custom condition
 
-### 5. 性能优化
-- 避免不必要的截图和日志
-- 使用批量操作减少网络开销
-- 合理使用并发操作
-- 优化元素定位策略
+#### State Checking
+- `isElementsExist(element: ElementPath): Promise<boolean>` - Check if element exists
+- `isVisible(element: ElementPath): Promise<boolean>` - Check if element is visible
+- `isEnabled(element: ElementPath): Promise<boolean>` - Check if element is enabled
+- `isClickable(element: ElementPath): Promise<boolean>` - Check if element is clickable
+- `isFocused(element: ElementPath): Promise<boolean>` - Check if element is focused
 
-## 故障排除
+#### Form Operations
+- `selectByValue(element: ElementPath, value: string): Promise<void>` - Select option by value
+- `selectByVisibleText(element: ElementPath, text: string): Promise<void>` - Select option by text
+- `selectByIndex(element: ElementPath, index: number): Promise<void>` - Select option by index
+- `setChecked(element: ElementPath, checked: boolean): Promise<void>` - Set checkbox state
+- `isChecked(element: ElementPath): Promise<boolean>` - Check if checkbox is checked
 
-### 常见问题
+#### Screenshots and Debugging
+- `makeScreenshot(force?: boolean): Promise<string>` - Take a screenshot
+- `enableScreenshots(): Promise<void>` - Enable screenshot capture
+- `disableScreenshots(): Promise<void>` - Disable screenshot capture
 
-#### 元素未找到
+### Assertion Methods
+
+#### Hard Assertions (AsyncAssertion)
+- `assert.equal(actual: any, expected: any, message?: string): Promise<void>`
+- `assert.notEqual(actual: any, expected: any, message?: string): Promise<void>`
+- `assert.isTrue(value: boolean, message?: string): Promise<void>`
+- `assert.isFalse(value: boolean, message?: string): Promise<void>`
+- `assert.contains(haystack: string, needle: string, message?: string): Promise<void>`
+- `assert.greaterThan(actual: number, expected: number, message?: string): Promise<void>`
+
+#### Soft Assertions
+- `softAssert.*` - Same methods as hard assertions but don't stop test execution
+- `getSoftAssertionErrors(): Array<Error>` - Get accumulated soft assertion errors
+
+## Best Practices
+
+### 1. Element Location Strategy
+- **Use stable locators**: Prefer IDs and data attributes over CSS classes
+- **Avoid brittle selectors**: Don't rely on changing text content or structure
+- **Use semantic element paths**: Create readable and maintainable selectors
+- **Implement Page Object Model**: Encapsulate element location in page objects
+
+### 2. Waiting and Synchronization
+- **Set appropriate timeouts**: Avoid too long or too short timeout values
+- **Use explicit waits**: Prefer explicit waits over fixed delays
+- **Combine wait conditions**: Ensure proper page state with multiple conditions
+- **Add strategic waits**: Include appropriate waits before and after critical operations
+
+### 3. Assertions and Verification
+- **Use clear assertion messages**: Provide helpful messages for debugging
+- **Use soft assertions wisely**: Avoid test interruption when appropriate
+- **Capture screenshots on failure**: Automatically document assertion failures
+- **Verify results, not just actions**: Check operation outcomes, not just execution
+
+### 4. Error Handling
+- **Implement comprehensive error handling**: Catch and handle all possible errors
+- **Log detailed error information**: Include context and debugging information
+- **Provide helpful error messages**: Give actionable error descriptions
+- **Implement retry mechanisms**: Handle intermittent issues gracefully
+
+### 5. Performance Optimization
+- **Minimize unnecessary operations**: Avoid excessive screenshots and logging
+- **Use batch operations**: Reduce network overhead with bulk operations
+- **Optimize element location**: Use efficient selector strategies
+- **Control concurrency**: Balance parallel execution with resource constraints
+
+## Common Patterns
+
+### Page Object Model
+
+```typescript
+class LoginPage {
+  constructor(private webApp: WebApplication) {}
+
+  // Element definitions
+  get usernameInput() { return this.webApp.root.input.name('username'); }
+  get passwordInput() { return this.webApp.root.input.name('password'); }
+  get loginButton() { return this.webApp.root.button.type('submit'); }
+  get errorMessage() { return this.webApp.root.div.className('error'); }
+
+  // Page actions
+  async login(username: string, password: string) {
+    await this.webApp.setValue(this.usernameInput, username);
+    await this.webApp.setValue(this.passwordInput, password);
+    await this.webApp.click(this.loginButton);
+  }
+
+  async waitForError() {
+    await this.webApp.waitForVisible(this.errorMessage, 5000);
+  }
+
+  async getErrorText() {
+    return await this.webApp.getText(this.errorMessage);
+  }
+}
+```
+
+### Test Helper Class
+
+```typescript
+class TestHelper {
+  constructor(private webApp: WebApplication) {}
+
+  async safeClick(element: ElementPath, timeout = 10000) {
+    try {
+      await this.webApp.waitForClickable(element, timeout);
+      await this.webApp.click(element);
+      return true;
+    } catch (error) {
+      await this.webApp.makeScreenshot(true);
+      console.error('Click failed:', error.message);
+      return false;
+    }
+  }
+
+  async waitForPageLoad() {
+    await this.webApp.waitUntil(async () => {
+      const readyState = await this.webApp.execute(() => document.readyState);
+      return readyState === 'complete';
+    }, 30000, 'Page failed to load');
+  }
+
+  async verifyElementText(element: ElementPath, expectedText: string) {
+    await this.webApp.waitForVisible(element);
+    const actualText = await this.webApp.getText(element);
+    await this.webApp.assert.equal(actualText, expectedText,
+      `Element text should be "${expectedText}" but was "${actualText}"`);
+  }
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### Element Not Found
 ```bash
 Error: Element not found
 ```
-解决方案：检查元素路径、增加等待时间、确认页面加载完成。
+**Solutions:**
+- Check element path syntax and selectors
+- Increase wait timeout values
+- Ensure page has fully loaded
+- Verify element exists in DOM
 
-#### 超时错误
+#### Timeout Errors
 ```bash
 Error: Timeout waiting for element
 ```
-解决方案：增加超时时间、优化等待条件、检查网络状况。
+**Solutions:**
+- Increase timeout values for slow operations
+- Optimize wait conditions
+- Check network connectivity and page performance
+- Use more specific wait conditions
 
-#### 元素不可交互
+#### Element Not Clickable
 ```bash
 Error: Element is not clickable
 ```
-解决方案：等待元素可点击、滚动到元素位置、检查元素是否被遮挡。
+**Solutions:**
+- Wait for element to become clickable
+- Scroll element into view
+- Check if element is covered by other elements
+- Ensure element is enabled and visible
 
-#### 断言失败
+#### Assertion Failures
 ```bash
 AssertionError: Expected true but got false
 ```
-解决方案：检查断言逻辑、确认页面状态、增加调试信息。
+**Solutions:**
+- Review assertion logic and expected values
+- Check page state and timing
+- Add debugging information and screenshots
+- Use soft assertions for non-critical checks
 
-### 调试技巧
+### Debug Tips
 
 ```typescript
-// 启用详细日志
+// Enable verbose logging
 const webApp = new WebApplication('debug-test', transport, {
   screenshotsEnabled: true,
   screenshotPath: './debug/',
-  devtool: { /* 调试配置 */ }
+  devtool: {
+    extensionId: 'debug-extension',
+    httpPort: 3000,
+    wsPort: 3001,
+    host: 'localhost'
+  }
 });
 
-// 调试元素定位
-console.log('元素路径:', webApp.root.button.text('提交').toString());
+// Debug element location
+const element = webApp.root.button.text('Submit');
+console.log('Element path:', element.toString());
 
-// 检查元素状态
-const element = webApp.root.input.name('email');
-console.log('元素存在:', await webApp.isElementsExist(element));
-console.log('元素可见:', await webApp.isVisible(element));
-console.log('元素启用:', await webApp.isEnabled(element));
+// Check element state
+console.log('Element exists:', await webApp.isElementsExist(element));
+console.log('Element visible:', await webApp.isVisible(element));
+console.log('Element enabled:', await webApp.isEnabled(element));
+
+// Debug page state
+console.log('Page title:', await webApp.getTitle());
+console.log('Page URL:', await webApp.getUrl());
+console.log('Page ready state:', await webApp.execute(() => document.readyState));
 ```
 
-## 依赖
+## Dependencies
 
-- `@testring/async-assert` - 异步断言系统
-- `@testring/element-path` - 元素路径管理
-- `@testring/fs-store` - 文件存储（截图）
-- `@testring/logger` - 日志记录
-- `@testring/transport` - 传输层通信
-- `@testring/utils` - 工具函数
+- **`@testring/async-assert`** - Asynchronous assertion system
+- **`@testring/element-path`** - Element path management
+- **`@testring/fs-store`** - File storage for screenshots
+- **`@testring/logger`** - Logging functionality
+- **`@testring/transport`** - Transport layer communication
+- **`@testring/utils`** - Utility functions
 
-## 相关模块
+## Related Modules
 
-- `@testring/plugin-selenium-driver` - Selenium WebDriver 插件
-- `@testring/browser-proxy` - 浏览器代理
-- `@testring/devtool-extension` - 调试工具扩展
+- **`@testring/plugin-selenium-driver`** - Selenium WebDriver plugin
+- **`@testring/plugin-playwright-driver`** - Playwright driver plugin
+- **`@testring/browser-proxy`** - Browser proxy service
+- **`@testring/devtool-extension`** - Developer tools extension
 
-## 许可证
+## License
 
-MIT License
+MIT License - see the [LICENSE](https://github.com/ringcentral/testring/blob/master/LICENSE) file for details.

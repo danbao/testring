@@ -6,79 +6,79 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ringcentral_testring&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ringcentral_testring)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ringcentral_testring&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=ringcentral_testring)
 
-基于 Node.js 的简单、强大的自动化 UI 测试框架。
+A simple, powerful automated UI testing framework based on Node.js.
 
-## 项目概述
+## Project Overview
 
-testring 是一个现代化的测试框架，专门为 Web 应用的自动化测试而设计。它提供了：
+testring is a modern testing framework specifically designed for automated testing of web applications. It provides:
 
-- 🚀 **高性能** - 多进程并行执行测试
-- 🔧 **可扩展** - 丰富的插件系统
-- 🌐 **多浏览器** - 支持 Chrome、Firefox、Safari、Edge
-- 📱 **现代化** - 支持 Selenium 和 Playwright 驱动
-- 🛠️ **开发友好** - 完整的开发工具链
+- 🚀 **High Performance** - Multi-process parallel test execution
+- 🔧 **Extensible** - Rich plugin system architecture
+- 🌐 **Multi-Browser** - Support for Chrome, Firefox, Safari, Edge
+- 📱 **Modern** - Support for both Selenium and Playwright drivers
+- 🛠️ **Developer Friendly** - Complete development toolchain
 
-## 项目结构
+## Project Structure
 
 ```
 testring/
-├── core/              # 核心模块 - 框架的基础功能
-│   ├── api/           # 测试 API 控制器
-│   ├── cli/           # 命令行界面
-│   ├── logger/        # 分布式日志系统
-│   ├── transport/     # 进程间通信
-│   ├── test-worker/   # 测试工作进程
-│   └── ...           # 其他核心模块
-├── packages/          # 扩展包 - 插件和工具
-│   ├── plugin-selenium-driver/    # Selenium 驱动插件
-│   ├── plugin-playwright-driver/  # Playwright 驱动插件
-│   ├── web-application/           # Web 应用测试
-│   ├── devtool-frontend/          # 开发工具前端
-│   └── ...                       # 其他扩展包
-├── docs/              # 文档目录
-├── utils/             # 构建和维护工具
-└── README.md          # 项目说明
+├── core/              # Core modules - Framework foundation
+│   ├── api/           # Test API controllers
+│   ├── cli/           # Command line interface
+│   ├── logger/        # Distributed logging system
+│   ├── transport/     # Inter-process communication
+│   ├── test-worker/   # Test worker processes
+│   └── ...           # Other core modules
+├── packages/          # Extension packages - Plugins and tools
+│   ├── plugin-selenium-driver/    # Selenium driver plugin
+│   ├── plugin-playwright-driver/  # Playwright driver plugin
+│   ├── web-application/           # Web application testing
+│   ├── devtool-frontend/          # Developer tools frontend
+│   └── ...                       # Other extension packages
+├── docs/              # Documentation directory
+├── utils/             # Build and maintenance tools
+└── README.md          # Project documentation
 ```
 
-### 核心模块 (core/)
+### Core Modules (core/)
 
-核心模块提供了框架的基础功能：
+Core modules provide the framework's foundational functionality:
 
-- **API 层** - 测试运行和控制接口
-- **CLI 工具** - 命令行界面和参数处理
-- **进程管理** - 多进程测试执行和通信
-- **文件系统** - 测试文件查找和读取
-- **日志系统** - 分布式日志记录和管理
-- **插件系统** - 可扩展的插件架构
+- **API Layer** - Test execution and control interfaces
+- **CLI Tools** - Command line interface and argument processing
+- **Process Management** - Multi-process test execution and communication
+- **File System** - Test file discovery and reading
+- **Logging System** - Distributed logging and management
+- **Plugin System** - Extensible plugin architecture
 
-### 扩展包 (packages/)
+### Extension Packages (packages/)
 
-扩展包提供了额外的功能和工具：
+Extension packages provide additional functionality and tools:
 
-- **浏览器驱动** - Selenium 和 Playwright 支持
-- **Web 测试** - Web 应用专用测试功能
-- **开发工具** - 调试和监控工具
-- **网络通信** - WebSocket 和 HTTP 支持
-- **文件处理** - 文件上传下载和存储
+- **Browser Drivers** - Selenium and Playwright support
+- **Web Testing** - Web application-specific testing features
+- **Developer Tools** - Debugging and monitoring tools
+- **Network Communication** - WebSocket and HTTP support
+- **File Handling** - File upload, download, and storage
 
-## 快速开始
+## Quick Start
 
-### 安装
+### Installation
 
 ```bash
-# 安装主框架
+# Install the main framework
 npm install testring
 
-# 安装 Selenium 驱动（推荐）
+# Install Selenium driver (recommended)
 npm install @testring/plugin-selenium-driver
 
-# 或安装 Playwright 驱动
+# Or install Playwright driver
 npm install @testring/plugin-playwright-driver
 ```
 
-### 基本配置
+### Basic Configuration
 
-创建 `.testringrc` 配置文件：
+Create a `.testringrc` configuration file:
 
 ```json
 {
@@ -91,97 +91,97 @@ npm install @testring/plugin-playwright-driver
 }
 ```
 
-### 编写测试
+### Writing Tests
 
 ```javascript
 // tests/example.spec.js
-describe('示例测试', () => {
-  it('应该能够访问首页', async () => {
+describe('Example Test', () => {
+  it('should be able to access the homepage', async () => {
     await browser.url('https://example.com');
-    
+
     const title = await browser.getTitle();
     expect(title).toBe('Example Domain');
   });
 });
 ```
 
-### 运行测试
+### Running Tests
 
 ```bash
-# 运行所有测试
+# Run all tests
 testring run
 
-# 运行特定测试
+# Run specific tests
 testring run --tests "./tests/login.spec.js"
 
-# 设置并行数
+# Set parallel execution
 testring run --workerLimit 4
 
-# 调试模式
+# Debug mode
 testring run --logLevel debug
 ```
 
-## 文档
+## Documentation
 
-详细文档请参考：
+For detailed documentation, please refer to:
 
-- [API 参考](docs/api.md) - 框架 API 说明
-- [配置参考](docs/config.md) - 完整配置选项
-- [插件手册](docs/plugin-handbook.md) - 插件开发指南
+- [API Reference](docs/api.md) - Framework API documentation
+- [Configuration Reference](docs/config.md) - Complete configuration options
+- [Plugin Handbook](docs/plugin-handbook.md) - Plugin development guide
 
-## 主要特性
+## Key Features
 
-### 多进程并行执行
-- 支持多个测试同时运行
-- 进程间隔离，避免测试干扰
-- 智能负载均衡
+### Multi-Process Parallel Execution
+- Support for running multiple tests simultaneously
+- Process isolation to prevent test interference
+- Intelligent load balancing
 
-### 多浏览器支持
-- Chrome、Firefox、Safari、Edge
-- Headless 模式支持
-- 移动端浏览器测试
+### Multi-Browser Support
+- Chrome, Firefox, Safari, Edge
+- Headless mode support
+- Mobile browser testing
 
-### 插件系统
-- 丰富的官方插件
-- 简单的插件开发 API
-- 社区插件支持
+### Plugin System
+- Rich official plugins
+- Simple plugin development API
+- Community plugin support
 
-### 开发工具
-- 可视化调试界面
-- 实时测试监控
-- 详细的测试报告
+### Development Tools
+- Visual debugging interface
+- Real-time test monitoring
+- Detailed test reports
 
-## 开发
+## Development
 
-### 项目设置
+### Project Setup
 ```bash
-# 克隆项目
+# Clone the project
 git clone https://github.com/ringcentral/testring.git
 
-# 安装依赖
+# Install dependencies
 npm install
 
-# 构建项目
+# Build the project
 npm run build
 
-# 运行测试
+# Run tests
 npm test
 ```
 
-### 贡献
+### Contributing
 
-欢迎贡献代码！请参考：
-1. Fork 项目
-2. 创建功能分支
-3. 提交更改
-4. 创建 Pull Request
+Contributions are welcome! Please follow these steps:
+1. Fork the project
+2. Create a feature branch
+3. Submit your changes
+4. Create a Pull Request
 
-## 许可证
+## License
 
-MIT License - 详见 [LICENSE](LICENSE) 文件。
+MIT License - See the [LICENSE](LICENSE) file for details.
 
-## 支持
+## Support
 
-- 📖 [文档](docs/)
-- 🐛 [问题反馈](https://github.com/ringcentral/testring/issues)
-- 💬 [讨论](https://github.com/ringcentral/testring/discussions)
+- 📖 [Documentation](docs/)
+- 🐛 [Issue Reporting](https://github.com/ringcentral/testring/issues)
+- 💬 [Discussions](https://github.com/ringcentral/testring/discussions)

@@ -1,153 +1,158 @@
 # @testring/devtool-backend
 
-开发者工具后端服务模块，作为 testring 框架的调试和开发工具核心，提供完整的测试调试、录制、重放和实时监控能力。该模块集成了 Web 服务器、WebSocket 通信、消息代理和前端界面，为测试开发和调试提供全面的解决方案。
+Developer tools backend service module that serves as the core debugging and development tool for the testring framework, providing comprehensive test debugging, recording, playback, and real-time monitoring capabilities. This module integrates a web server, WebSocket communication, message proxy, and frontend interface to provide a complete solution for test development and debugging.
 
 [![npm version](https://badge.fury.io/js/@testring/devtool-backend.svg)](https://www.npmjs.com/package/@testring/devtool-backend)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 功能概述
+## Overview
 
-开发者工具后端服务模块是 testring 框架的调试中心，提供了：
-- 完整的测试调试和录制服务器
-- 基于 Express 的 Web 服务和路由系统
-- WebSocket 实时通信和消息代理
-- 前端界面集成和静态资源服务
-- 测试进程的生命周期管理
-- 多进程协调和消息中继
-- 可扩展的插件系统和钩子机制
-- 测试执行状态的实时监控
+The developer tools backend service module is the debugging center of the testring framework, providing:
 
-## 主要特性
+- **Complete test debugging and recording server** for test development
+- **Express-based web service and routing system** for HTTP endpoints
+- **WebSocket real-time communication and message proxy** for bidirectional data flow
+- **Frontend interface integration and static resource serving** for UI components
+- **Test process lifecycle management** for controlling test execution
+- **Multi-process coordination and message relay** for distributed testing
+- **Extensible plugin system and hook mechanisms** for customization
+- **Real-time monitoring of test execution state** for observability
 
-### 服务器管理
-- 自动化的子进程创建和管理
-- 进程间消息传递和同步
-- 整合的日志系统和错误处理
-- 优雅的服务器启动和关闭管理
+## Key Features
 
-### 通信系统
-- 统一的消息传输层接口
-- 实时双向消息代理机制
-- 多渠道消息广播和定向发送
-- 全面的错误处理和重连机制
+### 🖥️ Server Management
+- Automated child process creation and management
+- Inter-process message passing and synchronization
+- Integrated logging system and error handling
+- Graceful server startup and shutdown management
 
-### 界面集成
-- 内置的前端界面和路由系统
-- 多种界面模式（编辑器、弹窗、主页）
-- 静态资源服务和缓存管理
-- 响应式设计和跨平台兼容
+### 📡 Communication System
+- Unified message transport layer interface
+- Real-time bidirectional message proxy mechanism
+- Multi-channel message broadcasting and directed sending
+- Comprehensive error handling and reconnection mechanisms
 
-### 扩展性
-- 完整的插件系统和生命周期钩子
-- 灵活的配置系统和可自定义选项
-- 多模块集成和协调能力
-- 向后兼容的 API 设计
+### 🎨 Interface Integration
+- Built-in frontend interface and routing system
+- Multiple interface modes (editor, popup, homepage)
+- Static resource serving and cache management
+- Responsive design and cross-platform compatibility
 
-## 安装
+### 🧩 Extensibility
+- Complete plugin system and lifecycle hooks
+- Flexible configuration system and customizable options
+- Multi-module integration and coordination capabilities
+- Backward-compatible API design
+
+## Installation
 
 ```bash
+# Using npm
 npm install @testring/devtool-backend
-```
 
-或使用 yarn：
-
-```bash
+# Using yarn
 yarn add @testring/devtool-backend
+
+# Using pnpm
+pnpm add @testring/devtool-backend
 ```
 
-## 核心架构
+## Core Architecture
 
-### DevtoolServerController 类
-主要的开发者工具服务控制器，继承自 `PluggableModule`：
+### DevtoolServerController Class
+
+The main developer tools service controller, extending `PluggableModule`:
 
 ```typescript
 class DevtoolServerController extends PluggableModule implements IDevtoolServerController {
   constructor(transport: ITransport)
-  
-  // 服务器管理
+
+  // Server Management
   public async init(): Promise<void>
   public async kill(): Promise<void>
-  
-  // 配置管理
+
+  // Configuration Management
   public getRuntimeConfiguration(): IDevtoolRuntimeConfiguration
-  
-  // 生命周期钩子
+
+  // Lifecycle Hooks
   private callHook<T>(hook: DevtoolPluginHooks, data?: T): Promise<T>
 }
 ```
 
-### 配置类型
+### Configuration Types
+
 ```typescript
 interface IDevtoolServerConfig {
-  host: string;                 // 服务器主机地址
-  httpPort: number;             // HTTP 服务端口
-  wsPort: number;               // WebSocket 服务端口
-  router: RouterConfig[];       // 路由配置
-  staticRoutes: StaticRoutes;   // 静态路由配置
+  host: string;                 // Server host address
+  httpPort: number;             // HTTP service port
+  wsPort: number;               // WebSocket service port
+  router: RouterConfig[];       // Route configuration
+  staticRoutes: StaticRoutes;   // Static route configuration
 }
 
 interface IDevtoolRuntimeConfiguration {
-  extensionId: string;  // 浏览器扩展 ID
-  httpPort: number;     // HTTP 服务端口
-  wsPort: number;       // WebSocket 服务端口
-  host: string;         // 服务器主机地址
+  extensionId: string;  // Browser extension ID
+  httpPort: number;     // HTTP service port
+  wsPort: number;       // WebSocket service port
+  host: string;         // Server host address
 }
 
 interface RouterConfig {
-  method: 'get' | 'post' | 'put' | 'delete'; // HTTP 方法
-  mask: string;         // 路由模式
-  handler: string;      // 处理器路径
+  method: 'get' | 'post' | 'put' | 'delete'; // HTTP method
+  mask: string;         // Route pattern
+  handler: string;      // Handler path
 }
 ```
 
-### 插件钩子
+### Plugin Hooks
+
 ```typescript
 enum DevtoolPluginHooks {
-  beforeStart = 'beforeStart',      // 服务器启动前
-  afterStart = 'afterStart',        // 服务器启动后
-  beforeStop = 'beforeStop',        // 服务器停止前
-  afterStop = 'afterStop'           // 服务器停止后
+  beforeStart = 'beforeStart',      // Before server starts
+  afterStart = 'afterStart',        // After server starts
+  beforeStop = 'beforeStop',        // Before server stops
+  afterStop = 'afterStop'           // After server stops
 }
 ```
 
-## 基本用法
+## Basic Usage
 
-### 创建开发者工具服务器
+### Creating a Developer Tools Server
 
 ```typescript
 import { DevtoolServerController } from '@testring/devtool-backend';
 import { transport } from '@testring/transport';
 
-// 创建开发者工具服务器
+// Create developer tools server
 const devtoolServer = new DevtoolServerController(transport);
 
-// 初始化并启动服务器
+// Initialize and start the server
 try {
   await devtoolServer.init();
-  console.log('开发者工具服务器启动成功');
-  
-  // 获取运行时配置
+  console.log('Developer tools server started successfully');
+
+  // Get runtime configuration
   const runtimeConfig = devtoolServer.getRuntimeConfiguration();
-  console.log('运行时配置:', runtimeConfig);
-  
-  // 开发者工具在以下地址可用
-  console.log(`开发者工具: http://${runtimeConfig.host}:${runtimeConfig.httpPort}`);
-  console.log(`WebSocket: ws://${runtimeConfig.host}:${runtimeConfig.wsPort}`);
-  
+  console.log('Runtime configuration:', runtimeConfig);
+
+  // Developer tools available at the following addresses
+  console.log(`Developer Tools UI: http://${runtimeConfig.host}:${runtimeConfig.httpPort}`);
+  console.log(`WebSocket Endpoint: ws://${runtimeConfig.host}:${runtimeConfig.wsPort}`);
+
 } catch (error) {
-  console.error('开发者工具服务器启动失败:', error);
+  console.error('Failed to start developer tools server:', error);
 }
 
-// 在适当的时候停止服务器
+// Shutdown server when appropriate
 process.on('SIGINT', async () => {
-  console.log('正在关闭开发者工具服务器...');
+  console.log('Shutting down developer tools server...');
   await devtoolServer.kill();
-  console.log('开发者工具服务器已关闭');
+  console.log('Developer tools server has been shut down');
   process.exit(0);
 });
 ```
 
-### 与测试进程集成
+### Integration with Test Processes
 
 ```typescript
 import { DevtoolServerController } from '@testring/devtool-backend';
@@ -891,24 +896,41 @@ transport.on('*', (messageType, messageData, sourceId) => {
 });
 ```
 
-## 依赖
+## API Reference
 
-- `@testring/pluggable-module` - 可插拔模块系统
-- `@testring/transport` - 传输层通信
-- `@testring/logger` - 日志系统
-- `@testring/devtool-frontend` - 前端界面
-- `@testring/devtool-extension` - 浏览器扩展
-- `express` - Web 服务器框架
-- `ws` - WebSocket 通信
-- `redux` - 状态管理
+### DevtoolServerController
 
-## 相关模块
+#### Methods
 
-- `@testring/devtool-frontend` - 开发者工具前端界面
-- `@testring/devtool-extension` - 浏览器扩展
-- `@testring/web-application` - Web 应用测试
-- `@testring/test-runner` - 测试运行器
+- **`init(): Promise<void>`** - Initialize and start the developer tools server
+- **`kill(): Promise<void>`** - Stop the server and cleanup resources
+- **`getRuntimeConfiguration(): IDevtoolRuntimeConfiguration`** - Get current server configuration
 
-## 许可证
+#### Plugin Hooks
 
-MIT License
+- **`beforeStart`** - Called before server initialization
+- **`afterStart`** - Called after server starts successfully
+- **`beforeStop`** - Called before server shutdown
+- **`afterStop`** - Called after server stops
+
+## Dependencies
+
+- **`@testring/pluggable-module`** - Pluggable module system
+- **`@testring/transport`** - Transport layer communication
+- **`@testring/logger`** - Logging system
+- **`@testring/devtool-frontend`** - Frontend interface
+- **`@testring/devtool-extension`** - Browser extension
+- **`express`** - Web server framework
+- **`ws`** - WebSocket communication
+- **`redux`** - State management
+
+## Related Modules
+
+- **`@testring/devtool-frontend`** - Developer tools frontend interface
+- **`@testring/devtool-extension`** - Browser extension
+- **`@testring/web-application`** - Web application testing
+- **`@testring/test-run-controller`** - Test run controller
+
+## License
+
+MIT License - see the [LICENSE](https://github.com/ringcentral/testring/blob/master/LICENSE) file for details.

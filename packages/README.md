@@ -1,97 +1,220 @@
-# Packages 扩展包
+# Extension Packages
 
-`packages/` 目录包含了 testring 测试框架的扩展包和插件，提供了框架的额外功能和集成能力。这些包主要用于浏览器驱动、Web 应用测试、开发工具等功能扩展。
+The `packages/` directory contains extension packages and plugins for the testring testing framework, providing additional functionality and integration capabilities. These packages are primarily used for browser drivers, web application testing, development tools, and other feature extensions.
 
-## 目录结构
+[![npm](https://img.shields.io/npm/v/@testring/plugin-selenium-driver.svg)](https://www.npmjs.com/package/@testring/plugin-selenium-driver)
+[![npm](https://img.shields.io/npm/v/@testring/plugin-playwright-driver.svg)](https://www.npmjs.com/package/@testring/plugin-playwright-driver)
+[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-### 浏览器驱动包
-- **`plugin-selenium-driver/`** - Selenium WebDriver 插件，支持多种浏览器自动化
-- **`plugin-playwright-driver/`** - Playwright 驱动插件，现代浏览器自动化解决方案
-- **`browser-proxy/`** - 浏览器代理服务，提供浏览器与测试框架的通信桥梁
+## Overview
 
-### Web 应用测试包
-- **`web-application/`** - Web 应用测试包，提供 Web 应用的测试功能
-- **`element-path/`** - 元素路径定位，提供 DOM 元素的精确定位功能
-- **`e2e-test-app/`** - 端到端测试应用，包含完整的测试用例和示例
+The extension packages provide specialized functionality that extends the core testring framework capabilities:
 
-### 开发工具包
-- **`devtool-frontend/`** - 开发工具前端，提供测试调试和监控界面
-- **`devtool-backend/`** - 开发工具后端，提供开发工具的后端服务
-- **`devtool-extension/`** - 开发工具扩展，浏览器扩展形式的开发工具
+- **🌐 Browser Automation** - Multiple browser driver support (Selenium, Playwright)
+- **🔧 Development Tools** - Comprehensive debugging and monitoring tools
+- **📡 Network Communication** - WebSocket and HTTP communication support
+- **📁 File Management** - File upload, download, and storage capabilities
+- **⚡ Modern Build Support** - ES6+ syntax transformation and modern tooling
+- **🧪 Testing Utilities** - Specialized testing tools and helpers
 
-### 网络和通信包
-- **`client-ws-transport/`** - WebSocket 传输客户端，支持 WebSocket 通信
-- **`http-api/`** - HTTP API 包，提供 HTTP 接口支持
+## Directory Structure
 
-### 文件和存储包
-- **`plugin-fs-store/`** - 文件系统存储插件，提供文件存储功能
-- **`download-collector-crx/`** - 下载收集器 Chrome 扩展，收集浏览器下载文件
+### Browser Driver Packages
+- **`plugin-selenium-driver/`** - Selenium WebDriver plugin supporting multiple browser automation
+- **`plugin-playwright-driver/`** - Playwright driver plugin for modern browser automation
+- **`browser-proxy/`** - Browser proxy service providing communication bridge between browsers and test framework
 
-### 构建和工具包
-- **`plugin-babel/`** - Babel 插件，支持 ES6+ 语法转换
-- **`test-utils/`** - 测试工具包，提供测试相关的实用工具函数
+### Web Application Testing Packages
+- **`web-application/`** - Web application testing package providing specialized web testing functionality
+- **`element-path/`** - Element path locator providing precise DOM element location capabilities
+- **`e2e-test-app/`** - End-to-end test application containing complete test cases and examples
 
-## 主要特性
+### Development Tool Packages
+- **`devtool-frontend/`** - Development tool frontend providing test debugging and monitoring interface
+- **`devtool-backend/`** - Development tool backend providing backend services for development tools
+- **`devtool-extension/`** - Development tool extension in browser extension format
 
-1. **浏览器支持** - 支持多种浏览器驱动（Selenium、Playwright）
-2. **Web 应用测试** - 专门针对 Web 应用的测试功能
-3. **开发工具** - 完整的开发和调试工具链
-4. **网络通信** - 多种网络通信方式支持
-5. **文件处理** - 文件上传、下载和存储功能
-6. **现代化构建** - 支持现代 JavaScript 语法和构建工具
+### Network and Communication Packages
+- **`client-ws-transport/`** - WebSocket transport client supporting WebSocket communication
+- **`http-api/`** - HTTP API package providing HTTP interface support
 
-## 插件分类
+### File and Storage Packages
+- **`plugin-fs-store/`** - File system storage plugin providing file storage functionality
+- **`download-collector-crx/`** - Download collector Chrome extension for collecting browser download files
 
-### 驱动插件
-- `plugin-selenium-driver` - 传统 Selenium 驱动
-- `plugin-playwright-driver` - 现代 Playwright 驱动
+### Build and Utility Packages
+- **`plugin-babel/`** - Babel plugin supporting ES6+ syntax transformation
+- **`test-utils/`** - Test utilities package providing testing-related utility functions
 
-### 功能插件
-- `plugin-babel` - 代码转换插件
-- `plugin-fs-store` - 文件存储插件
+## Key Features
 
-### 工具包
-- `browser-proxy` - 浏览器代理
-- `element-path` - 元素定位
-- `test-utils` - 测试工具
-- `http-api` - HTTP 接口
+### 🌐 Multi-Browser Support
+Support for multiple browser drivers including both traditional Selenium WebDriver and modern Playwright automation.
 
-### 开发工具
-- `devtool-frontend` - 前端界面
-- `devtool-backend` - 后端服务
-- `devtool-extension` - 浏览器扩展
+### 🔧 Comprehensive Development Tools
+Complete development and debugging toolchain with frontend interface, backend services, and browser extensions.
 
-### 应用和示例
-- `web-application` - Web 应用测试
-- `e2e-test-app` - E2E 测试示例
+### 📡 Flexible Network Communication
+Multiple network communication methods including WebSocket and HTTP API support.
 
-## 使用说明
+### 📁 Advanced File Handling
+File upload, download, and storage functionality with Chrome extension integration.
 
-这些包可以通过 npm 独立安装使用，也可以作为 testring 框架的插件使用。每个包都有独立的版本管理和发布周期。
+### ⚡ Modern JavaScript Support
+Support for modern JavaScript syntax and build tools through Babel integration.
 
-### 安装示例
+### 🧪 Rich Testing Utilities
+Comprehensive testing utilities and helper functions for enhanced test development.
+
+## Package Categories
+
+### 🚗 Driver Plugins
+- **`plugin-selenium-driver`** - Traditional Selenium WebDriver for cross-browser compatibility
+- **`plugin-playwright-driver`** - Modern Playwright driver for fast, reliable automation
+
+### 🔧 Functional Plugins
+- **`plugin-babel`** - Code transformation plugin for ES6+ syntax support
+- **`plugin-fs-store`** - File system storage plugin for persistent data management
+
+### 🛠️ Utility Packages
+- **`browser-proxy`** - Browser proxy for communication bridging
+- **`element-path`** - Element locator for precise DOM targeting
+- **`test-utils`** - Testing utilities and helper functions
+- **`http-api`** - HTTP interface support and API utilities
+
+### 🔍 Development Tools
+- **`devtool-frontend`** - Frontend interface for test monitoring and debugging
+- **`devtool-backend`** - Backend services for development tool infrastructure
+- **`devtool-extension`** - Browser extension for in-browser debugging
+
+### 📱 Applications and Examples
+- **`web-application`** - Web application testing framework
+- **`e2e-test-app`** - End-to-end testing examples and sample applications
+
+## Installation and Usage
+
+These packages can be installed independently via npm or used as plugins within the testring framework. Each package has independent version management and release cycles.
+
+### Installation Examples
+
 ```bash
-# 安装 Selenium 驱动插件
+# Install Selenium driver plugin
 npm install @testring/plugin-selenium-driver
 
-# 安装 Playwright 驱动插件
+# Install Playwright driver plugin
 npm install @testring/plugin-playwright-driver
 
-# 安装 Web 应用测试包
+# Install Web application testing package
 npm install @testring/web-application
+
+# Install Babel plugin for ES6+ support
+npm install @testring/plugin-babel
+
+# Install development tools
+npm install @testring/devtool-frontend @testring/devtool-backend
 ```
 
-### 插件配置示例
+### Plugin Configuration
+
+#### Basic Configuration (.testringrc)
 ```json
 {
   "plugins": [
     "@testring/plugin-selenium-driver",
-    "@testring/plugin-playwright-driver",
     "@testring/plugin-babel"
-  ]
+  ],
+  "selenium": {
+    "browsers": ["chrome", "firefox"]
+  }
 }
 ```
 
-## 开发和扩展
+#### Advanced Configuration with Playwright
+```json
+{
+  "plugins": [
+    "@testring/plugin-playwright-driver",
+    "@testring/plugin-fs-store"
+  ],
+  "playwright": {
+    "browsers": ["chromium", "firefox", "webkit"],
+    "headless": true
+  }
+}
+```
 
-如果需要开发新的插件或扩展包，可以参考现有包的结构和实现方式。每个包都遵循统一的项目结构和开发规范。 
+#### Development Tools Configuration
+```json
+{
+  "plugins": [
+    "@testring/plugin-selenium-driver",
+    "@testring/devtool-backend"
+  ],
+  "devtool": {
+    "enabled": true,
+    "port": 8080
+  }
+}
+```
+
+## Development and Extension
+
+### Creating New Packages
+
+To develop new plugins or extension packages, follow the existing package structure and development standards:
+
+#### Standard Package Structure
+```
+package-name/
+├── src/
+│   ├── index.ts          # Main entry point
+│   ├── interfaces/       # TypeScript interfaces
+│   ├── services/         # Core services
+│   └── utils/           # Utility functions
+├── test/
+│   └── *.spec.ts        # Test files
+├── dist/                # Compiled output
+├── package.json         # Package configuration
+├── tsconfig.json        # TypeScript configuration
+├── tsconfig.build.json  # Build configuration
+└── README.md           # Package documentation
+```
+
+#### Development Guidelines
+
+1. **Follow TypeScript standards** - All packages must include proper type definitions
+2. **Implement plugin interface** - Use the standard plugin API for framework integration
+3. **Include comprehensive tests** - Unit and integration tests are required
+4. **Document APIs** - Provide clear documentation and usage examples
+5. **Version compatibility** - Ensure compatibility with core framework versions
+
+### Plugin Development API
+
+```typescript
+import { PluginAPI } from '@testring/plugin-api';
+
+export class MyPlugin {
+    constructor(private api: PluginAPI) {}
+
+    async init() {
+        // Plugin initialization logic
+    }
+
+    async beforeTest() {
+        // Pre-test hooks
+    }
+
+    async afterTest() {
+        // Post-test hooks
+    }
+}
+```
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Follow the coding standards and testing requirements
+4. Submit a pull request with detailed description
+
+Each package follows unified project structure and development standards, making it easy to understand, maintain, and extend the framework capabilities.

@@ -1,64 +1,67 @@
 # @testring/plugin-babel
 
-Babel 编译插件模块，作为 testring 框架的代码转换核心，提供完整的 JavaScript 和 TypeScript 代码编译、转换和优化能力。该插件基于 Babel 7.x 版本，支持现代 JavaScript 语法转换、模块系统处理、源码映射和自定义转换规则，为测试环境提供灵活强大的代码编译解决方案。
+Babel compilation plugin module that serves as the code transformation core for the testring framework, providing comprehensive JavaScript and TypeScript code compilation, transformation, and optimization capabilities. This plugin is based on Babel 7.x and supports modern JavaScript syntax transformation, module system processing, source mapping, and custom transformation rules, delivering a flexible and powerful code compilation solution for testing environments.
 
 [![npm version](https://badge.fury.io/js/@testring/plugin-babel.svg)](https://www.npmjs.com/package/@testring/plugin-babel)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 功能概述
+## Overview
 
-Babel 编译插件模块是 testring 框架的代码转换核心，提供了：
-- 完整的 ES6+ 到 ES5 语法转换支持
-- 智能的模块系统转换（ES6 modules 转 CommonJS）
-- 灵活的 Babel 插件和预设配置系统
-- 高效的异步代码编译和缓存机制
-- 详细的源码映射和调试信息支持
-- 自定义转换规则和插件扩展能力
-- 与 testring 测试工作器的深度集成
-- 性能优化的编译流程和内存管理
+The Babel compilation plugin module is the code transformation core of the testring framework, providing:
 
-## 主要特性
+- **Complete ES6+ to ES5 syntax transformation** with full modern JavaScript support
+- **Intelligent module system conversion** (ES6 modules to CommonJS) for Node.js compatibility
+- **Flexible Babel plugin and preset configuration** system for customizable transformations
+- **Efficient asynchronous code compilation** with intelligent caching mechanisms
+- **Detailed source mapping and debugging** information support for development
+- **Custom transformation rules** and plugin extension capabilities
+- **Deep integration with testring test workers** for seamless test execution
+- **Performance-optimized compilation** pipeline with memory management
 
-### 代码转换
-- 支持最新的 ECMAScript 语法特性
-- 智能的模块导入导出转换
-- 可配置的转换选项和优化级别
-- 保持源码结构和注释的完整性
+## Key Features
 
-### 插件系统
-- 内置常用的 Babel 插件和预设
-- 支持自定义插件链和转换规则
-- 灵活的插件配置和参数传递
-- 与第三方 Babel 生态的无缝集成
+### 🔄 Code Transformation
+- Support for the latest ECMAScript syntax features and proposals
+- Intelligent module import/export transformation for compatibility
+- Configurable transformation options and optimization levels
+- Preservation of source code structure and comments
 
-### 性能优化
-- 高效的异步编译处理
-- 智能的编译缓存和重用机制
-- 最小化的内存占用和 CPU 使用
-- 优化的文件系统访问和 I/O 操作
+### 🧩 Plugin System
+- Built-in common Babel plugins and presets for immediate use
+- Support for custom plugin chains and transformation rules
+- Flexible plugin configuration with parameter passing
+- Seamless integration with third-party Babel ecosystem
 
-### 开发体验
-- 详细的编译错误信息和诊断
-- 完整的源码映射和调试支持
-- 灵活的配置选项和环境适配
-- 与现代开发工具的良好集成
+### ⚡ Performance Optimization
+- Efficient asynchronous compilation processing for fast builds
+- Intelligent compilation caching and reuse mechanisms
+- Minimized memory footprint and CPU usage
+- Optimized file system access and I/O operations
 
-## 安装
+### 🛠️ Development Experience
+- Detailed compilation error messages and diagnostics
+- Complete source mapping and debugging support
+- Flexible configuration options and environment adaptation
+- Excellent integration with modern development tools
+
+## Installation
 
 ```bash
+# Using npm
 npm install @testring/plugin-babel
-```
 
-或使用 yarn：
-
-```bash
+# Using yarn
 yarn add @testring/plugin-babel
+
+# Using pnpm
+pnpm add @testring/plugin-babel
 ```
 
-## 核心架构
+## Core Architecture
 
-### BabelPlugin 函数
-主要的插件注册接口，集成到 testring 测试工作器：
+### BabelPlugin Function
+
+The main plugin registration interface that integrates with the testring test worker:
 
 ```typescript
 function babelPlugin(
@@ -67,7 +70,8 @@ function babelPlugin(
 ): void
 ```
 
-### 内置插件配置
+### Built-in Plugin Configuration
+
 ```typescript
 export const babelPlugins = [
   [
@@ -79,57 +83,58 @@ export const babelPlugins = [
 ];
 ```
 
-### Babel 配置选项
+### Babel Configuration Options
+
 ```typescript
 interface BabelTransformOptions {
-  sourceFileName?: string;  // 源文件名
-  sourceMaps?: boolean;     // 是否生成源码映射
-  sourceRoot?: string;      // 源码根目录
-  plugins?: any[];          // Babel 插件列表
-  presets?: any[];          // Babel 预设列表
-  filename?: string;        // 当前文件名
-  compact?: boolean;        // 是否压缩输出
-  minified?: boolean;       // 是否最小化
-  comments?: boolean;       // 是否保留注释
+  sourceFileName?: string;  // Source file name
+  sourceMaps?: boolean;     // Generate source maps
+  sourceRoot?: string;      // Source root directory
+  plugins?: any[];          // Babel plugins list
+  presets?: any[];          // Babel presets list
+  filename?: string;        // Current file name
+  compact?: boolean;        // Compress output
+  minified?: boolean;       // Minify code
+  comments?: boolean;       // Preserve comments
 }
 ```
 
-## 基本用法
+## Basic Usage
 
-### 插件注册和配置
+### Plugin Registration and Configuration
 
 ```typescript
 import babelPlugin from '@testring/plugin-babel';
 import { PluginAPI } from '@testring/plugin-api';
 
-// 基本插件注册
+// Basic plugin registration
 function registerBabelPlugin(pluginAPI: PluginAPI) {
-  // 使用默认配置
+  // Use default configuration
   babelPlugin(pluginAPI);
 }
 
-// 带自定义配置的注册
+// Registration with custom configuration
 function registerBabelPluginWithConfig(pluginAPI: PluginAPI) {
   babelPlugin(pluginAPI, {
-    // 启用源码映射
+    // Enable source maps
     sourceMaps: true,
-    
-    // 保留注释
+
+    // Preserve comments
     comments: true,
-    
-    // 添加自定义插件
+
+    // Add custom plugins
     plugins: [
-      // 支持装饰器语法
+      // Support for decorator syntax
       ['@babel/plugin-proposal-decorators', { legacy: true }],
-      // 支持类属性
+      // Support for class properties
       ['@babel/plugin-proposal-class-properties', { loose: true }],
-      // 支持可选链操作符
+      // Support for optional chaining operator
       '@babel/plugin-proposal-optional-chaining',
-      // 支持空值合并操作符
+      // Support for nullish coalescing operator
       '@babel/plugin-proposal-nullish-coalescing-operator'
     ],
-    
-    // 添加预设
+
+    // Add presets
     presets: [
       [
         '@babel/preset-env',
@@ -137,7 +142,7 @@ function registerBabelPluginWithConfig(pluginAPI: PluginAPI) {
           targets: {
             node: '14'
           },
-          modules: false // 保持 ES6 模块
+          modules: false // Preserve ES6 modules
         }
       ],
       '@babel/preset-typescript'
@@ -145,7 +150,7 @@ function registerBabelPluginWithConfig(pluginAPI: PluginAPI) {
   });
 }
 
-// 环境特定配置
+// Environment-specific configuration
 function registerBabelPluginForEnvironment(pluginAPI: PluginAPI, env: string) {
   const configs = {
     development: {
@@ -153,40 +158,40 @@ function registerBabelPluginForEnvironment(pluginAPI: PluginAPI, env: string) {
       comments: true,
       compact: false,
       plugins: [
-        // 开发环境插件
+        // Development environment plugins
         '@babel/plugin-transform-runtime'
       ]
     },
-    
+
     production: {
       sourceMaps: false,
       comments: false,
       compact: true,
       minified: true,
       plugins: [
-        // 生产环境优化插件
+        // Production environment optimization plugins
         'babel-plugin-transform-remove-console',
         'babel-plugin-transform-remove-debugger'
       ]
     },
-    
+
     test: {
       sourceMaps: true,
       comments: true,
       plugins: [
-        // 测试环境插件
+        // Test environment plugins
         '@babel/plugin-transform-modules-commonjs',
-        'babel-plugin-istanbul' // 代码覆盖率
+        'babel-plugin-istanbul' // Code coverage
       ]
     }
   };
-  
+
   const config = configs[env] || configs.development;
   babelPlugin(pluginAPI, config);
 }
 
-// 在测试框架中使用
-const pluginAPI = new PluginAPI(/* 配置参数 */);
+// Usage in test framework
+const pluginAPI = new PluginAPI(/* configuration parameters */);
 registerBabelPluginWithConfig(pluginAPI);
 ```
 
@@ -843,19 +848,220 @@ babelPlugin(pluginAPI, config);
 console.log(`Babel 插件注册耗时: ${Date.now() - startTime}ms`);
 ```
 
-## 依赖
+## API Reference
 
-- `@babel/core` - Babel 核心编译器
-- `@babel/plugin-transform-modules-commonjs` - 模块转换插件
-- `@testring/plugin-api` - 插件 API 接口
-- `@types/babel__core` - Babel 类型定义
+### Main Function
 
-## 相关模块
+#### babelPlugin
 
-- `@testring/plugin-api` - 插件开发接口
-- `@testring/test-worker` - 测试工作器
-- `@testring/test-runner` - 测试运行器
+```typescript
+function babelPlugin(
+  pluginAPI: PluginAPI,
+  config?: babelCore.TransformOptions | null
+): void
+```
 
-## 许可证
+Registers the Babel compilation plugin with the testring framework.
 
-MIT License
+**Parameters:**
+- `pluginAPI: PluginAPI` - The plugin API instance for registration
+- `config?: babelCore.TransformOptions | null` - Optional Babel configuration
+
+### Built-in Configuration
+
+#### Default Plugins
+
+```typescript
+export const babelPlugins = [
+  [
+    '@babel/plugin-transform-modules-commonjs',
+    {
+      strictMode: false,
+    },
+  ],
+];
+```
+
+### Configuration Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `sourceFileName` | `string` | Source file name for debugging |
+| `sourceMaps` | `boolean` | Generate source maps |
+| `sourceRoot` | `string` | Source root directory |
+| `plugins` | `any[]` | Array of Babel plugins |
+| `presets` | `any[]` | Array of Babel presets |
+| `filename` | `string` | Current file name |
+| `compact` | `boolean` | Compress output |
+| `minified` | `boolean` | Minify code |
+| `comments` | `boolean` | Preserve comments |
+
+## Best Practices
+
+### 1. Configuration Management
+- **Use environment variables** to differentiate between build environments
+- **Establish clear plugin priorities** and dependency relationships
+- **Implement configuration version control** and change tracking
+- **Provide good balance** between default and custom configurations
+
+### 2. Performance Optimization
+- **Enable Babel caching** to improve repeated compilation speed
+- **Choose plugins and presets wisely** to avoid unnecessary transformations
+- **Use parallel compilation** for processing large numbers of files
+- **Monitor compilation time** and memory usage
+
+### 3. Error Handling
+- **Provide detailed compilation error** information and location
+- **Implement friendly error recovery** and retry mechanisms
+- **Log warnings and hints** during compilation process
+- **Establish error categorization** and common problem solutions
+
+### 4. Debugging Support
+- **Maintain accurate source mapping** information
+- **Preserve comments and debug info** in development environment
+- **Provide detailed logs** of compilation process
+- **Support breakpoint debugging** and source code viewing
+
+### 5. Compatibility
+- **Ensure compatibility** with different Babel versions
+- **Handle syntax differences** between JavaScript versions
+- **Support mainstream build tools** and testing frameworks
+- **Provide smooth upgrade paths** and migration guides
+
+## Common Patterns
+
+### Environment-Specific Configuration
+
+```typescript
+const getEnvironmentConfig = (env: string) => {
+  const baseConfig = {
+    plugins: [
+      ['@babel/plugin-transform-modules-commonjs', { strictMode: false }]
+    ]
+  };
+
+  const envConfigs = {
+    development: {
+      ...baseConfig,
+      sourceMaps: true,
+      comments: true,
+      plugins: [
+        ...baseConfig.plugins,
+        '@babel/plugin-transform-runtime'
+      ]
+    },
+
+    test: {
+      ...baseConfig,
+      sourceMaps: true,
+      plugins: [
+        ...baseConfig.plugins,
+        'babel-plugin-istanbul'
+      ]
+    },
+
+    production: {
+      ...baseConfig,
+      sourceMaps: false,
+      comments: false,
+      compact: true,
+      minified: true
+    }
+  };
+
+  return envConfigs[env] || envConfigs.development;
+};
+```
+
+### TypeScript Integration
+
+```typescript
+const typeScriptConfig = {
+  presets: [
+    ['@babel/preset-typescript', {
+      allowNamespaces: true,
+      allowDeclareFields: true
+    }],
+    ['@babel/preset-env', {
+      targets: { node: '14' }
+    }]
+  ],
+  plugins: [
+    ['@babel/plugin-transform-modules-commonjs', { strictMode: false }],
+    ['@babel/plugin-proposal-decorators', { legacy: true }],
+    ['@babel/plugin-proposal-class-properties', { loose: true }]
+  ]
+};
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Compilation failures**:
+   ```
+   SyntaxError: Unexpected token
+   ```
+   - Check Babel configuration and plugin versions
+   - Verify syntax support and compatibility
+
+2. **Module import errors**:
+   ```
+   Error: Cannot resolve module
+   ```
+   - Check module transformation configuration
+   - Verify path resolution and file extensions
+
+3. **Source map issues**:
+   ```
+   Source map error
+   ```
+   - Check source map configuration
+   - Verify file paths and compilation options
+
+4. **Performance problems**:
+   ```
+   Babel compilation is slow
+   ```
+   - Enable caching mechanisms
+   - Optimize plugin configuration
+   - Use parallel processing
+
+### Debug Tips
+
+```typescript
+// Enable verbose logging
+process.env.BABEL_ENV = 'debug';
+
+// Check Babel configuration
+babelPlugin(pluginAPI, {
+  ...config,
+  // Output detailed information
+  verbose: true,
+  // Preserve intermediate results
+  auxiliaryCommentBefore: '/* Babel compiled */',
+  auxiliaryCommentAfter: '/* End Babel */',
+});
+
+// Monitor compilation performance
+const startTime = Date.now();
+babelPlugin(pluginAPI, config);
+console.log(`Babel plugin registration took: ${Date.now() - startTime}ms`);
+```
+
+## Dependencies
+
+- **`@babel/core`** - Babel core compiler
+- **`@babel/plugin-transform-modules-commonjs`** - Module transformation plugin
+- **`@testring/plugin-api`** - Plugin API interface
+- **`@types/babel__core`** - Babel type definitions
+
+## Related Modules
+
+- **`@testring/plugin-api`** - Plugin development interface
+- **`@testring/test-worker`** - Test worker for code execution
+- **`@testring/test-run-controller`** - Test run controller
+
+## License
+
+MIT License - see the [LICENSE](https://github.com/ringcentral/testring/blob/master/LICENSE) file for details.

@@ -1,120 +1,167 @@
-# Core 核心模块
+# Core Modules
 
-`core/` 目录包含了 testring 测试框架的核心模块，提供了框架的基础功能和核心服务。这些模块实现了测试运行、进程管理、文件系统操作、日志记录等关键功能。
+The `core/` directory contains the core modules of the testring testing framework, providing the foundation functionality and essential services. These modules implement key features such as test execution, process management, file system operations, logging, and more.
 
-## 目录结构
+[![npm version](https://badge.fury.io/js/testring.svg)](https://www.npmjs.com/package/testring)
+[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
+[![Node.js](https://img.shields.io/badge/Node.js->=14.0.0-brightgreen)](https://nodejs.org/)
 
-### 核心运行模块
-- **`api/`** - 测试 API 控制器，提供测试运行的主要接口
-- **`cli/`** - 命令行界面，处理命令行参数和用户交互
-- **`testring/`** - 主要的 testring 入口模块
+## Overview
 
-### 测试执行模块
-- **`test-worker/`** - 测试工作进程，负责在独立进程中执行测试
-- **`test-run-controller/`** - 测试运行控制器，管理测试队列和执行流程
-- **`sandbox/`** - 沙箱环境，为测试提供隔离的执行环境
+The core modules form the backbone of the testring framework, providing:
 
-### 进程和通信模块
-- **`child-process/`** - 子进程管理，提供进程创建和管理功能
-- **`transport/`** - 传输层，处理进程间通信
+- **Multi-process test execution** with parallel processing capabilities
+- **Plugin architecture** for extensible functionality
+- **Distributed logging** system for comprehensive monitoring
+- **File system abstraction** for test discovery and management
+- **Inter-process communication** for coordinated test execution
+- **Configuration management** with flexible parameter handling
 
-### 文件系统模块
-- **`fs-reader/`** - 文件系统读取器，负责查找和读取测试文件
-- **`fs-store/`** - 文件系统存储，提供文件存储和缓存功能
+## Directory Structure
 
-### 配置和工具模块
-- **`cli-config/`** - 命令行配置解析器，处理配置文件和参数
-- **`logger/`** - 日志系统，提供分布式日志记录功能
-- **`types/`** - TypeScript 类型定义，为整个框架提供类型支持
-- **`utils/`** - 实用工具函数集合
+### Core Runtime Modules
+- **`api/`** - Test API controller providing the main interface for test execution
+- **`cli/`** - Command-line interface handling CLI arguments and user interaction
+- **`testring/`** - Main testring entry module and framework orchestrator
 
-### 插件和扩展模块
-- **`plugin-api/`** - 插件 API，为插件开发提供接口
-- **`pluggable-module/`** - 可插拔模块基类，支持钩子和插件机制
+### Test Execution Modules
+- **`test-worker/`** - Test worker processes responsible for executing tests in isolated environments
+- **`test-run-controller/`** - Test run controller managing test queues and execution flow
+- **`sandbox/`** - Sandbox environment providing isolated execution contexts for tests
 
-### 开发和调试模块
-- **`async-assert/`** - 异步断言库，提供测试断言功能
-- **`async-breakpoints/`** - 异步断点，用于调试和流程控制
-- **`dependencies-builder/`** - 依赖构建器，管理模块依赖关系
+### Process and Communication Modules
+- **`child-process/`** - Child process management providing process creation and lifecycle management
+- **`transport/`** - Transport layer handling inter-process communication and message routing
 
-## 主要特性
+### File System Modules
+- **`fs-reader/`** - File system reader responsible for discovering and reading test files
+- **`fs-store/`** - File system store providing file storage and caching capabilities
 
-1. **模块化设计** - 每个核心功能都独立为一个模块，便于维护和扩展
-2. **插件支持** - 通过插件 API 支持功能扩展
-3. **异步处理** - 全面支持异步操作和并发执行
-4. **进程管理** - 完整的子进程管理和通信机制
-5. **配置灵活** - 支持多种配置方式和环境参数
-6. **日志记录** - 分布式日志系统，支持多进程日志聚合
+### Configuration and Utility Modules
+- **`cli-config/`** - CLI configuration parser handling configuration files and command-line parameters
+- **`logger/`** - Distributed logging system providing comprehensive logging across multiple processes
+- **`types/`** - TypeScript type definitions providing type safety for the entire framework
+- **`utils/`** - Collection of utility functions and helper methods
 
-## 使用说明
+### Plugin and Extension Modules
+- **`plugin-api/`** - Plugin API providing interfaces for plugin development and integration
+- **`pluggable-module/`** - Pluggable module base class supporting hooks and plugin mechanisms
 
-这些核心模块主要供框架内部使用，开发者通常不需要直接使用这些模块。如果需要扩展框架功能，建议通过插件 API 来实现。
+### Development and Debugging Modules
+- **`async-assert/`** - Asynchronous assertion library providing testing assertion capabilities
+- **`async-breakpoints/`** - Asynchronous breakpoints for debugging and flow control
+- **`dependencies-builder/`** - Dependency builder managing module dependency relationships
 
-## 模块间依赖关系
+## Key Features
 
-### 架构概览
+### 🏗️ Modular Architecture
+Each core functionality is isolated into independent modules, making the framework easy to maintain, test, and extend.
 
-Core 模块采用分层架构设计，共分为 10 个层次，从底层的基础类型定义到顶层的入口模块，形成清晰的依赖层次：
+### 🔌 Plugin Support
+Comprehensive plugin API enables functionality extension without modifying core code.
 
-### 详细分层架构
+### ⚡ Asynchronous Processing
+Full support for asynchronous operations and concurrent execution across all modules.
 
-#### 🔷 基础层（Layer 0）
-- **types** - 最基础的 TypeScript 类型定义，只依赖 Node.js 类型，为整个框架提供类型支持
-- **async-breakpoints** - 异步断点系统，独立模块，用于调试和流程控制
+### 🔄 Process Management
+Complete child process management and communication mechanisms for reliable multi-process execution.
 
-#### 🔶 工具层（Layer 1）
-- **utils** - 通用工具函数集合，依赖 `types`
-- **pluggable-module** - 插件框架基础，依赖 `types`
-- **async-assert** - 异步断言库，依赖 `types`
+### ⚙️ Flexible Configuration
+Support for multiple configuration methods including files, environment variables, and CLI parameters.
 
-#### 🔷 基础设施层（Layer 2）
-- **child-process** - 子进程管理，依赖 `types` + `utils`
-- **transport** - 传输层，依赖 `child-process` + `types` + `utils`
-- **dependencies-builder** - 依赖分析构建，依赖 `types` + `utils`
+### 📊 Distributed Logging
+Advanced logging system supporting multi-process log aggregation and real-time monitoring.
 
-#### 🔶 中间层（Layer 3）
-- **logger** - 分布式日志系统，依赖 `pluggable-module` + `transport` + `types` + `utils`
-- **fs-reader** - 文件读取器，依赖 `logger` + `pluggable-module` + `types`
+## Usage Guidelines
 
-#### 🔷 配置存储层（Layer 4）
-- **cli-config** - 配置管理，依赖 `logger` + `types` + `utils`
-- **fs-store** - 文件存储系统，依赖 `cli-config` + `logger` + `pluggable-module` + `transport` + `types` + `utils`
+These core modules are primarily intended for internal framework use. Developers typically don't need to interact with these modules directly. For extending framework functionality, it's recommended to use the plugin API instead of modifying core modules.
 
-#### 🔶 API 层（Layer 5）
-- **api** - 测试 API 控制器，依赖 `async-breakpoints` + `logger` + `transport` + `types` + `utils`
-- **plugin-api** - 插件 API 接口，依赖 `fs-store` + `logger` + `types` + `utils`
+### For Framework Users
+- Use the main `testring` package for test execution
+- Configure through `.testringrc` or CLI parameters
+- Extend functionality through official plugins
 
-#### 🔷 高级功能层（Layer 6）
-- **sandbox** - 代码沙箱，依赖 `api` + `types` + `utils`
-- **test-run-controller** - 测试运行控制器，依赖 `fs-store` + `logger` + `pluggable-module` + `types` + `utils`
+### For Plugin Developers
+- Utilize the `plugin-api` module for creating extensions
+- Follow the `pluggable-module` patterns for consistency
+- Reference `types` module for TypeScript definitions
 
-#### 🔶 执行层（Layer 7）
-- **test-worker** - 测试工作进程（最复杂的包），几乎依赖所有其他核心包：
+## Module Dependencies and Architecture
+
+### Architecture Overview
+
+The core modules follow a layered architecture design with 10 distinct layers, from foundational type definitions at the bottom to the main entry module at the top, forming a clear dependency hierarchy that ensures maintainability and prevents circular dependencies.
+
+### Detailed Layered Architecture
+
+#### 🔷 Foundation Layer (Layer 0)
+- **types** - Core TypeScript type definitions, depends only on Node.js types, provides type safety for the entire framework
+- **async-breakpoints** - Asynchronous breakpoint system, standalone module for debugging and flow control
+
+#### 🔶 Utility Layer (Layer 1)
+- **utils** - Common utility functions collection, depends on `types`
+- **pluggable-module** - Plugin framework foundation, depends on `types`
+- **async-assert** - Asynchronous assertion library, depends on `types`
+
+#### 🔷 Infrastructure Layer (Layer 2)
+- **child-process** - Child process management, depends on `types` + `utils`
+- **transport** - Transport layer for inter-process communication, depends on `child-process` + `types` + `utils`
+- **dependencies-builder** - Dependency analysis and building, depends on `types` + `utils`
+
+#### 🔶 Service Layer (Layer 3)
+- **logger** - Distributed logging system, depends on `pluggable-module` + `transport` + `types` + `utils`
+- **fs-reader** - File system reader, depends on `logger` + `pluggable-module` + `types`
+
+#### 🔷 Configuration and Storage Layer (Layer 4)
+- **cli-config** - Configuration management, depends on `logger` + `types` + `utils`
+- **fs-store** - File system storage, depends on `cli-config` + `logger` + `pluggable-module` + `transport` + `types` + `utils`
+
+#### 🔶 API Layer (Layer 5)
+- **api** - Test API controller, depends on `async-breakpoints` + `logger` + `transport` + `types` + `utils`
+- **plugin-api** - Plugin API interface, depends on `fs-store` + `logger` + `types` + `utils`
+
+#### 🔷 Advanced Features Layer (Layer 6)
+- **sandbox** - Code sandbox environment, depends on `api` + `types` + `utils`
+- **test-run-controller** - Test execution controller, depends on `fs-store` + `logger` + `pluggable-module` + `types` + `utils`
+
+#### 🔶 Execution Layer (Layer 7)
+- **test-worker** - Test worker processes (most complex package), depends on almost all other core packages:
   - `api` + `async-breakpoints` + `child-process` + `dependencies-builder`
   - `fs-reader` + `fs-store` + `logger` + `pluggable-module`
   - `sandbox` + `transport` + `types` + `utils`
 
-#### 🔷 接口层（Layer 8）
-- **cli** - 命令行接口，集成多个高层包：
+#### 🔷 Interface Layer (Layer 8)
+- **cli** - Command-line interface, integrates multiple high-level packages:
   - `cli-config` + `fs-reader` + `fs-store` + `logger` + `plugin-api`
   - `test-run-controller` + `test-worker` + `transport` + `types`
 
-#### 🔶 入口层（Layer 9）
-- **testring** - 主入口包，依赖 `api` + `cli`，作为整个框架的统一入口
+#### 🔶 Entry Layer (Layer 9)
+- **testring** - Main entry package, depends on `api` + `cli`, serves as the unified framework entry point
 
-### 关键依赖特点
+### Key Dependency Characteristics
 
-1. **严格分层**: 依赖关系呈现清晰的分层结构，每层只依赖下层模块，避免循环依赖
-2. **types 基础**: `types` 包是最基础的依赖，被几乎所有包引用，确保类型安全
-3. **核心集成**: `test-worker` 是最复杂的包，集成了大部分核心功能，负责实际测试执行
-4. **接口统一**: `cli` 包作为主要接口，整合了测试执行所需的各种组件
-5. **模块化设计**: 每个包职责单一，接口清晰，便于独立开发、测试和维护
-6. **插件友好**: 通过 `pluggable-module` 和 `plugin-api` 提供完整的插件扩展机制
+#### 🏗️ Strict Layering
+Dependencies follow a clear layered structure where each layer only depends on lower layers, preventing circular dependencies and ensuring clean architecture.
 
-### 依赖关系图
+#### 🔒 Type Safety Foundation
+The `types` package serves as the foundational dependency referenced by almost all packages, ensuring type safety throughout the framework.
+
+#### 🎯 Core Integration
+The `test-worker` is the most complex package, integrating most core functionality and responsible for actual test execution.
+
+#### 🔌 Unified Interface
+The `cli` package serves as the primary interface, integrating all components needed for test execution.
+
+#### 📦 Modular Design
+Each package has a single responsibility with clear interfaces, enabling independent development, testing, and maintenance.
+
+#### 🧩 Plugin-Friendly Architecture
+Complete plugin extension mechanism provided through `pluggable-module` and `plugin-api` packages.
+
+### Dependency Graph
 
 ```
-testring (入口)
+testring (Entry Point)
 ├── api
 └── cli
     ├── cli-config
@@ -123,7 +170,7 @@ testring (入口)
     ├── logger
     ├── plugin-api
     ├── test-run-controller
-    ├── test-worker (最复杂)
+    ├── test-worker (Most Complex)
     │   ├── api
     │   ├── async-breakpoints
     │   ├── child-process
@@ -140,4 +187,96 @@ testring (入口)
     └── types
 ```
 
-这种分层架构确保了代码的可维护性和可扩展性，同时避免了循环依赖的问题，为 testring 框架提供了稳定可靠的基础架构。 
+## Installation and Development
+
+### Prerequisites
+
+- **Node.js** >= 14.0.0
+- **npm** >= 6.0.0 or **yarn** >= 1.0.0
+- **TypeScript** >= 4.0.0 (for development)
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/ringcentral/testring.git
+
+# Navigate to the project directory
+cd testring
+
+# Install dependencies
+npm install
+
+# Build all core modules
+npm run build
+
+# Run tests
+npm run test:unit
+```
+
+### Building Individual Modules
+
+```bash
+# Build all core modules
+npm run build:main
+
+# Build with watch mode for development
+npm run build:main:watch
+
+# Type checking
+npm run build:types:check
+```
+
+## Testing
+
+### Running Tests
+
+```bash
+# Run all unit tests
+npm run test:unit
+
+# Run tests with coverage
+npm run test:unit:coverage
+
+# Run specific module tests
+cd core/[module-name]
+npm test
+```
+
+### Test Structure
+
+Each core module includes comprehensive tests:
+- Unit tests for individual functions and classes
+- Integration tests for module interactions
+- Type checking tests for TypeScript definitions
+
+## Contributing
+
+### Development Guidelines
+
+1. **Follow the layered architecture** - Ensure new modules respect the dependency hierarchy
+2. **Maintain type safety** - All modules must include proper TypeScript definitions
+3. **Write comprehensive tests** - Include unit and integration tests for new functionality
+4. **Document APIs** - Provide clear documentation for public interfaces
+5. **Follow coding standards** - Use ESLint configuration and formatting guidelines
+
+### Adding New Core Modules
+
+1. Create module directory in `core/`
+2. Follow the standard package structure:
+   ```
+   module-name/
+   ├── src/
+   │   ├── index.ts
+   │   └── ...
+   ├── test/
+   │   └── *.spec.ts
+   ├── package.json
+   ├── tsconfig.json
+   ├── tsconfig.build.json
+   └── README.md
+   ```
+3. Update dependency graph and documentation
+4. Add appropriate tests and type definitions
+
+This layered architecture ensures code maintainability and extensibility while preventing circular dependencies, providing a stable and reliable foundation for the testring framework.

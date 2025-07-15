@@ -1,64 +1,67 @@
 # @testring/http-api
 
-HTTP API 测试模块，作为 testring 框架的核心网络请求层，提供完整的 HTTP/HTTPS 接口测试能力。该模块封装了丰富的 HTTP 操作方法、Cookie 管理、请求队列和错误处理机制，是进行 API 自动化测试的核心组件。
+HTTP API testing module that serves as the core network request layer for the testring framework, providing comprehensive HTTP/HTTPS interface testing capabilities. This module encapsulates rich HTTP operation methods, cookie management, request queuing, and error handling mechanisms, making it the essential component for API automation testing.
 
 [![npm version](https://badge.fury.io/js/@testring/http-api.svg)](https://www.npmjs.com/package/@testring/http-api)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 功能概述
+## Overview
 
-HTTP API 测试模块是 testring 框架的网络请求核心，提供了：
-- 完整的 HTTP 方法支持（GET、POST、PUT、DELETE 等）
-- 智能请求队列和节流控制
-- Cookie 会话管理和自动处理
-- 请求响应拦截和处理
-- 错误处理和重试机制
-- 请求参数验证和格式化
-- 完整响应或仅响应体返回选择
-- 基于传输层的消息通信
+The HTTP API testing module is the network request core of the testring framework, providing:
 
-## 主要特性
+- **Complete HTTP method support** (GET, POST, PUT, DELETE, etc.) with full REST API capabilities
+- **Intelligent request queuing and throttling** for controlled API testing
+- **Cookie session management** with automatic handling and persistence
+- **Request/response interceptors** for preprocessing and postprocessing
+- **Error handling and retry mechanisms** for robust API testing
+- **Request parameter validation** and automatic formatting
+- **Flexible response handling** with full response or body-only options
+- **Transport layer integration** for distributed testing environments
 
-### HTTP 请求
-- 支持所有标准 HTTP 方法
-- 自动请求参数验证
-- 灵活的请求配置选项
-- 完整的请求/响应生命周期管理
+## Key Features
 
-### Cookie 管理
-- 自动 Cookie 存储和发送
-- 跨请求 Cookie 会话保持
-- 手动 Cookie 操作支持
-- 基于 URL 的 Cookie 作用域管理
+### 🌐 HTTP Request Support
+- All standard HTTP methods with comprehensive options
+- Automatic request parameter validation and formatting
+- Flexible request configuration with headers, body, and query parameters
+- Complete request/response lifecycle management
 
-### 请求队列
-- 智能请求排队机制
-- 可配置的请求节流控制
-- 并发请求管理
-- 队列状态监控
+### 🍪 Cookie Management
+- Automatic cookie storage and transmission across requests
+- Cross-request cookie session persistence
+- Manual cookie manipulation support
+- URL-based cookie scope management with domain handling
 
-### 传输层集成
-- 基于 testring 传输层架构
-- 进程间消息通信支持
-- 统一的消息广播机制
-- 详细的请求日志记录
+### 📋 Request Queuing
+- Intelligent request queuing mechanism for controlled execution
+- Configurable request throttling to prevent server overload
+- Concurrent request management with customizable limits
+- Queue status monitoring and debugging capabilities
 
-## 安装
+### 🔄 Transport Layer Integration
+- Built on testring's transport layer architecture
+- Inter-process message communication support
+- Unified message broadcasting mechanism
+- Detailed request logging and monitoring
+
+## Installation
 
 ```bash
+# Using npm
 npm install @testring/http-api
-```
 
-或使用 yarn：
-
-```bash
+# Using yarn
 yarn add @testring/http-api
+
+# Using pnpm
+pnpm add @testring/http-api
 ```
 
-## 核心架构
+## Core Architecture
 
-### HttpClient 类
-主要的 HTTP 客户端接口，继承自 `AbstractHttpClient`：
+### HttpClient Class
+
+The main HTTP client interface, extending `AbstractHttpClient`:
 
 ```typescript
 class HttpClient extends AbstractHttpClient {
@@ -66,68 +69,89 @@ class HttpClient extends AbstractHttpClient {
     transport: ITransport,
     params?: Partial<HttpClientParams>
   )
-  
-  // HTTP 方法
+
+  // HTTP Methods
   public get(options: IHttpRequest, cookieJar?: IHttpCookieJar): Promise<any>
   public post(options: IHttpRequest, cookieJar?: IHttpCookieJar): Promise<any>
   public put(options: IHttpRequest, cookieJar?: IHttpCookieJar): Promise<any>
   public delete(options: IHttpRequest, cookieJar?: IHttpCookieJar): Promise<any>
   public send(options: IHttpRequest, cookieJar?: IHttpCookieJar): Promise<any>
-  
-  // Cookie 管理
+
+  // Cookie Management
   public createCookieJar(): IHttpCookieJar
 }
 ```
 
-### 配置选项
+### Configuration Options
+
 ```typescript
 interface HttpClientParams {
-  httpThrottle: number;  // 请求节流间隔（毫秒）
+  httpThrottle: number;  // Request throttling interval (milliseconds)
 }
 
 interface IHttpRequest {
-  url: string;                    // 请求 URL
-  method?: string;                // HTTP 方法
-  headers?: Record<string, any>;  // 请求头
-  body?: any;                     // 请求体
-  json?: boolean;                 // 是否 JSON 格式
-  form?: Record<string, any>;     // 表单数据
-  qs?: Record<string, any>;       // 查询参数
-  timeout?: number;               // 超时时间
-  resolveWithFullResponse?: boolean;  // 返回完整响应
-  simple?: boolean;               // 简单模式
-  cookies?: string[];             // Cookie 列表
+  url: string;                    // Request URL
+  method?: string;                // HTTP method
+  headers?: Record<string, any>;  // Request headers
+  body?: any;                     // Request body
+  json?: boolean;                 // JSON format flag
+  form?: Record<string, any>;     // Form data
+  qs?: Record<string, any>;       // Query parameters
+  timeout?: number;               // Timeout duration
+  resolveWithFullResponse?: boolean;  // Return full response
+  simple?: boolean;               // Simple mode
+  cookies?: string[];             // Cookie list
 }
 ```
 
-## 基本用法
+### Cookie Management
 
-### 创建 HTTP 客户端
+```typescript
+interface IHttpCookieJar {
+  setCookie(cookie: string | Cookie, url: string): void;
+  getCookies(url: string): Cookie[];
+  createCookie(options: CookieOptions): Cookie;
+}
+
+interface CookieOptions {
+  key: string;
+  value: string;
+  domain?: string;
+  path?: string;
+  httpOnly?: boolean;
+  secure?: boolean;
+  maxAge?: number;
+}
+```
+
+## Basic Usage
+
+### Creating HTTP Client
 
 ```typescript
 import { HttpClient } from '@testring/http-api';
 import { transport } from '@testring/transport';
 
-// 创建 HTTP 客户端实例
+// Create HTTP client instance
 const httpClient = new HttpClient(transport, {
-  httpThrottle: 100  // 请求间隔 100ms
+  httpThrottle: 100  // Request interval 100ms
 });
 
-// 创建 Cookie 会话
+// Create cookie session
 const cookieJar = httpClient.createCookieJar();
 ```
 
-### GET 请求
+### GET Requests
 
 ```typescript
-// 简单 GET 请求
+// Simple GET request
 const response = await httpClient.get({
   url: 'https://api.example.com/users'
 });
 
-console.log('用户列表:', response);
+console.log('User list:', response);
 
-// 带查询参数的 GET 请求
+// GET request with query parameters
 const users = await httpClient.get({
   url: 'https://api.example.com/users',
   qs: {
@@ -137,7 +161,7 @@ const users = await httpClient.get({
   }
 });
 
-// 带请求头的 GET 请求
+// GET request with headers
 const userData = await httpClient.get({
   url: 'https://api.example.com/user/profile',
   headers: {
@@ -147,15 +171,15 @@ const userData = await httpClient.get({
   }
 }, cookieJar);
 
-// 获取完整响应信息
+// Get full response information
 const fullResponse = await httpClient.get({
   url: 'https://api.example.com/status',
   resolveWithFullResponse: true
 });
 
-console.log('状态码:', fullResponse.statusCode);
-console.log('响应头:', fullResponse.headers);
-console.log('响应体:', fullResponse.body);
+console.log('Status code:', fullResponse.statusCode);
+console.log('Response headers:', fullResponse.headers);
+console.log('Response body:', fullResponse.body);
 ```
 
 ### POST 请求
@@ -919,22 +943,208 @@ console.log('完整响应:', {
 });
 ```
 
-## 依赖
+## API Reference
 
-- `@testring/logger` - 日志记录
-- `@testring/transport` - 传输层通信
-- `@testring/types` - 类型定义
-- `@testring/utils` - 工具函数
-- `request` - HTTP 请求库
-- `request-promise-native` - Promise 化的请求
-- `tough-cookie` - Cookie 管理
+### HttpClient Methods
 
-## 相关模块
+#### HTTP Request Methods
 
-- `@testring/web-application` - Web 应用测试
-- `@testring/client-ws-transport` - WebSocket 传输
-- `@testring/test-utils` - 测试工具
+- **`get(options: IHttpRequest, cookieJar?: IHttpCookieJar): Promise<any>`** - Execute GET request
+- **`post(options: IHttpRequest, cookieJar?: IHttpCookieJar): Promise<any>`** - Execute POST request
+- **`put(options: IHttpRequest, cookieJar?: IHttpCookieJar): Promise<any>`** - Execute PUT request
+- **`delete(options: IHttpRequest, cookieJar?: IHttpCookieJar): Promise<any>`** - Execute DELETE request
+- **`send(options: IHttpRequest, cookieJar?: IHttpCookieJar): Promise<any>`** - Execute request with custom method
 
-## 许可证
+#### Cookie Management
 
-MIT License
+- **`createCookieJar(): IHttpCookieJar`** - Create new cookie jar for session management
+
+### IHttpRequest Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `url` | `string` | Request URL (required) |
+| `method` | `string` | HTTP method (GET, POST, etc.) |
+| `headers` | `Record<string, any>` | Request headers |
+| `body` | `any` | Request body data |
+| `json` | `boolean` | Automatically stringify body as JSON |
+| `form` | `Record<string, any>` | Form data for POST requests |
+| `qs` | `Record<string, any>` | Query string parameters |
+| `timeout` | `number` | Request timeout in milliseconds |
+| `resolveWithFullResponse` | `boolean` | Return full response object |
+| `simple` | `boolean` | Reject promise on HTTP error status |
+
+### Cookie Jar Methods
+
+- **`setCookie(cookie: string | Cookie, url: string): void`** - Set cookie for URL
+- **`getCookies(url: string): Cookie[]`** - Get cookies for URL
+- **`createCookie(options: CookieOptions): Cookie`** - Create cookie object
+
+## Best Practices
+
+### 1. Session Management
+- **Use cookie jars consistently**: Create one cookie jar per test session and reuse it
+- **Handle authentication properly**: Store and reuse authentication tokens/cookies
+- **Clean up sessions**: Clear cookies between independent test scenarios
+- **Manage cookie scope**: Be aware of domain and path restrictions
+
+### 2. Request Configuration
+- **Set appropriate timeouts**: Configure timeouts based on expected response times
+- **Use proper headers**: Include necessary headers like Content-Type and Accept
+- **Handle different data formats**: Use `json: true` for JSON APIs, `form` for form data
+- **Validate request parameters**: Ensure required parameters are present
+
+### 3. Error Handling
+- **Implement retry logic**: Handle transient network failures with exponential backoff
+- **Categorize errors**: Distinguish between network errors, HTTP errors, and application errors
+- **Log request details**: Include URL, method, and relevant headers in error logs
+- **Validate responses**: Check response format and required fields
+
+### 4. Performance Optimization
+- **Use request throttling**: Prevent overwhelming the server with `httpThrottle`
+- **Batch requests appropriately**: Group related requests to minimize overhead
+- **Reuse connections**: Use the same HttpClient instance for multiple requests
+- **Monitor response times**: Track API performance and identify bottlenecks
+
+### 5. Security Considerations
+- **Protect sensitive data**: Avoid logging passwords, tokens, or personal information
+- **Use HTTPS**: Always use secure connections for sensitive operations
+- **Validate SSL certificates**: Don't disable certificate validation in production
+- **Handle authentication securely**: Store and transmit credentials safely
+
+## Common Patterns
+
+### API Testing Session
+
+```typescript
+class APITestSession {
+  private httpClient: HttpClient;
+  private cookieJar: IHttpCookieJar;
+  private authToken?: string;
+
+  constructor(transport: ITransport, baseUrl: string) {
+    this.httpClient = new HttpClient(transport, { httpThrottle: 100 });
+    this.cookieJar = this.httpClient.createCookieJar();
+  }
+
+  async authenticate(username: string, password: string) {
+    const response = await this.httpClient.post({
+      url: '/auth/login',
+      json: true,
+      body: { username, password }
+    }, this.cookieJar);
+
+    this.authToken = response.token;
+    return response;
+  }
+
+  async authenticatedRequest(options: IHttpRequest) {
+    return this.httpClient.send({
+      ...options,
+      headers: {
+        ...options.headers,
+        'Authorization': `Bearer ${this.authToken}`
+      }
+    }, this.cookieJar);
+  }
+}
+```
+
+### Request Retry Wrapper
+
+```typescript
+async function requestWithRetry(
+  httpClient: HttpClient,
+  options: IHttpRequest,
+  maxRetries = 3,
+  cookieJar?: IHttpCookieJar
+) {
+  let lastError: Error;
+
+  for (let i = 0; i <= maxRetries; i++) {
+    try {
+      return await httpClient.send(options, cookieJar);
+    } catch (error) {
+      lastError = error as Error;
+      if (i < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
+      }
+    }
+  }
+
+  throw lastError!;
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Connection refused (ECONNREFUSED)**:
+   - Check if the target server is running
+   - Verify the URL and port number
+   - Check firewall and network connectivity
+
+2. **Request timeout (ETIMEDOUT)**:
+   - Increase timeout value in request options
+   - Check network latency and server response time
+   - Verify server is not overloaded
+
+3. **Authentication failures (401 Unauthorized)**:
+   - Verify credentials and authentication method
+   - Check token expiration and refresh logic
+   - Ensure cookies are properly maintained
+
+4. **SSL/TLS errors**:
+   - Verify SSL certificate validity
+   - Check certificate chain and CA certificates
+   - Consider certificate pinning for security
+
+### Debug Tips
+
+```typescript
+// Enable detailed logging
+const debugClient = new HttpClient(transport, { httpThrottle: 0 });
+
+// Log request details
+console.log('Making request:', {
+  url: options.url,
+  method: options.method,
+  headers: options.headers
+});
+
+// Check cookie state
+console.log('Current cookies:', cookieJar.getCookies('https://api.example.com'));
+
+// Use full response for debugging
+const fullResponse = await debugClient.get({
+  url: 'https://api.example.com/debug',
+  resolveWithFullResponse: true
+});
+
+console.log('Full response:', {
+  statusCode: fullResponse.statusCode,
+  headers: fullResponse.headers,
+  body: fullResponse.body
+});
+```
+
+## Dependencies
+
+- **`@testring/logger`** - Logging functionality
+- **`@testring/transport`** - Transport layer communication
+- **`@testring/types`** - TypeScript type definitions
+- **`@testring/utils`** - Utility functions
+- **`request`** - HTTP request library
+- **`request-promise-native`** - Promise-based HTTP requests
+- **`tough-cookie`** - Cookie management
+
+## Related Modules
+
+- **`@testring/web-application`** - Web application testing utilities
+- **`@testring/client-ws-transport`** - WebSocket transport layer
+- **`@testring/test-utils`** - Testing utility functions
+
+## License
+
+MIT License - see the [LICENSE](https://github.com/ringcentral/testring/blob/master/LICENSE) file for details.

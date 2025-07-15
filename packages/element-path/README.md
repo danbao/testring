@@ -1,64 +1,67 @@
 # @testring/element-path
 
-元素路径管理模块，作为 testring 框架的核心元素定位系统，提供强大的元素选择器和 XPath 生成能力。该模块实现了灵活的元素定位策略、智能的查询解析、链式调用语法和动态代理机制，是进行精确元素定位和操作的基础组件。
+Element path management module that serves as the core element location system for the testring framework, providing powerful element selectors and XPath generation capabilities. This module implements flexible element location strategies, intelligent query parsing, fluent chaining syntax, and dynamic proxy mechanisms for precise element location and manipulation.
 
 [![npm version](https://badge.fury.io/js/@testring/element-path.svg)](https://www.npmjs.com/package/@testring/element-path)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 功能概述
+## Overview
 
-元素路径管理模块是 testring 框架的元素定位核心，提供了：
-- 丰富的元素选择器语法和查询模式
-- 智能的 XPath 自动生成和优化
-- 链式调用语法支持流畅的元素定位
-- 动态代理机制实现灵活的属性访问
-- 文本内容和属性组合查询能力
-- 子查询和层级关系定位支持
-- 索引选择和精确定位功能
-- 可扩展的流程（Flow）系统
+The element path management module is the element location core of the testring framework, providing:
 
-## 主要特性
+- **Rich element selector syntax** with multiple query patterns and matching modes
+- **Intelligent XPath generation** with automatic optimization and complex condition support
+- **Fluent chaining syntax** for readable and maintainable element location expressions
+- **Dynamic proxy mechanism** for flexible property access and runtime path construction
+- **Text content and attribute queries** with powerful combination capabilities
+- **Sub-queries and hierarchical relationships** for complex element location scenarios
+- **Index selection and precise targeting** for specific element instances
+- **Extensible Flow system** for custom element interaction patterns
 
-### 元素选择器
-- 精确匹配、前缀、后缀、包含等多种匹配模式
-- 通配符和模式组合支持
-- 自定义属性名称和查询规则
-- 文本内容匹配和等值比较
+## Key Features
 
-### XPath 生成
-- 自动 XPath 表达式构建和优化
-- 复杂条件组合和嵌套查询
-- 兼容 XPath 1.0 标准的函数模拟
-- 高效的元素定位路径生成
+### 🎯 Element Selectors
+- Multiple matching modes: exact, prefix, suffix, contains, and wildcard patterns
+- Custom attribute names and query rules for different testing frameworks
+- Text content matching with exact and partial comparison
+- Pattern combination support for complex selection criteria
 
-### 链式语法
-- 流畅的方法链调用接口
-- 动态属性访问和元素导航
-- 类型安全的 TypeScript 支持
-- 可读性强的元素路径表达式
+### 🔧 XPath Generation
+- Automatic XPath expression building with intelligent optimization
+- Complex condition combinations and nested query support
+- XPath 1.0 standard compatibility with function simulation
+- Efficient element location path generation for fast DOM queries
 
-### 代理机制
-- 智能的属性拦截和处理
-- 运行时元素路径构建
-- 灵活的扩展和自定义能力
-- 向后兼容的 API 设计
+### ⛓️ Fluent Chaining Syntax
+- Method chaining interface for readable element path construction
+- Dynamic property access with TypeScript type safety
+- Element navigation with intuitive dot notation
+- Highly readable element path expressions
 
-## 安装
+### 🔄 Dynamic Proxy Mechanism
+- Intelligent property interception and runtime processing
+- Flexible extension and customization capabilities
+- Backward-compatible API design
+- Runtime element path construction with lazy evaluation
+
+## Installation
 
 ```bash
+# Using npm
 npm install @testring/element-path
-```
 
-或使用 yarn：
-
-```bash
+# Using yarn
 yarn add @testring/element-path
+
+# Using pnpm
+pnpm add @testring/element-path
 ```
 
-## 核心架构
+## Core Architecture
 
-### ElementPath 类
-主要的元素路径管理接口，提供完整的路径构建和查询功能：
+### ElementPath Class
+
+The main element path management interface providing complete path construction and query functionality:
 
 ```typescript
 class ElementPath {
@@ -69,168 +72,170 @@ class ElementPath {
     attributeName?: string;
     parent?: ElementPath | null;
   })
-  
-  // 路径生成方法
+
+  // Path Generation Methods
   public toString(allowMultipleNodesInResult?: boolean): string
   public getElementPathChain(): NodePath[]
   public getReversedChain(withRoot?: boolean): string
-  
-  // 子元素生成
+
+  // Child Element Generation
   public generateChildElementsPath(key: string | number): ElementPath
   public generateChildByXpath(element: { id: string; xpath: string }): ElementPath
-  
-  // 查询配置
+
+  // Query Configuration
   public getSearchOptions(): SearchObject
   public getElementType(): string | symbol
 }
 ```
 
-### ElementPathProxy 类型
-增强的代理接口，提供动态属性访问：
+### ElementPathProxy Type
+
+Enhanced proxy interface providing dynamic property access:
 
 ```typescript
 type ElementPathProxy = ElementPath & {
   xpath: (id: string, xpath: string) => ElementPathProxy;
   __getInstance: () => ElementPath;
   __getReversedChain: ElementPath['getReversedChain'];
-  [key: string]: ElementPathProxy; // 动态属性访问
+  [key: string]: ElementPathProxy; // Dynamic property access
 };
 ```
 
-### 查询配置
+### Search Configuration
+
 ```typescript
 interface SearchObject {
-  // 掩码匹配
-  anyKey?: boolean;           // 通配符匹配 (*)
-  prefix?: string;            // 前缀匹配 (foo*)
-  suffix?: string;            // 后缀匹配 (*foo)
-  exactKey?: string;          // 精确匹配 (foo)
-  containsKey?: string;       // 包含匹配 (*foo*)
-  parts?: string[];           // 分段匹配 (foo*bar)
-  
-  // 文本匹配
-  containsText?: string;      // 包含文本 {text}
-  equalsText?: string;        // 等于文本 ={text}
-  
-  // 高级选项
-  subQuery?: SearchMaskObject & SearchTextObject; // 子查询
-  index?: number;             // 索引选择
-  xpath?: string;             // 自定义 XPath
-  id?: string;                // 元素标识
+  // Mask Matching
+  anyKey?: boolean;           // Wildcard matching (*)
+  prefix?: string;            // Prefix matching (foo*)
+  suffix?: string;            // Suffix matching (*foo)
+  exactKey?: string;          // Exact matching (foo)
+  containsKey?: string;       // Contains matching (*foo*)
+  parts?: string[];           // Segment matching (foo*bar)
+
+  // Text Matching
+  containsText?: string;      // Contains text {text}
+  equalsText?: string;        // Equals text ={text}
+
+  // Advanced Options
+  subQuery?: SearchMaskObject & SearchTextObject; // Sub-query
+  index?: number;             // Index selection
+  xpath?: string;             // Custom XPath
+  id?: string;                // Element identifier
 }
 ```
 
-## 基本用法
+## Basic Usage
 
-### 创建元素路径
+### Creating Element Paths
 
 ```typescript
 import { createElementPath } from '@testring/element-path';
 
-// 创建根元素路径
+// Create root element path
 const root = createElementPath();
 
-// 带配置选项的创建
+// Create with configuration options
 const rootWithOptions = createElementPath({
-  flows: {}, // 自定义流程配置
-  strictMode: true // 严格模式
+  flows: {}, // Custom flow configuration
+  strictMode: true // Strict mode
 });
 
-// 获取原始实例
+// Get the underlying instance
 const elementPath = root.__getInstance();
-console.log('元素类型:', elementPath.getElementType());
+console.log('Element type:', elementPath.getElementType());
 ```
 
-### 基础元素选择
+### Basic Element Selection
 
 ```typescript
-// 精确匹配
+// Exact matching
 const loginButton = root.button;
 const submitBtn = root.submit;
 const userPanel = root.userPanel;
 
-// 使用自定义属性访问
+// Using custom property access
 const customElement = root['my-custom-element'];
 const dynamicElement = root['element-' + Date.now()];
 
-// 检查生成的 XPath
-console.log('登录按钮 XPath:', loginButton.toString());
-// 输出: (//*[@data-test-automation-id='button'])[1]
+// Check generated XPath
+console.log('Login button XPath:', loginButton.toString());
+// Output: (//*[@data-test-automation-id='button'])[1]
 
-console.log('提交按钮 XPath:', submitBtn.toString());
-// 输出: (//*[@data-test-automation-id='submit'])[1]
+console.log('Submit button XPath:', submitBtn.toString());
+// Output: (//*[@data-test-automation-id='submit'])[1]
 ```
 
-### 链式元素导航
+### Chained Element Navigation
 
 ```typescript
-// 多级元素路径
+// Multi-level element paths
 const userMenu = root.header.navigation.userMenu;
 const profileLink = root.sidebar.userPanel.profileLink;
 const settingsButton = root.main.content.settings.button;
 
-// 获取完整的元素路径链
+// Get complete element path chain
 const pathChain = userMenu.__getInstance().getElementPathChain();
-console.log('路径链:', pathChain);
+console.log('Path chain:', pathChain);
 
-// 获取反向链式表示
+// Get reversed chain representation
 const reversedChain = userMenu.__getReversedChain();
-console.log('反向链:', reversedChain);
-// 输出: root.header.navigation.userMenu
+console.log('Reversed chain:', reversedChain);
+// Output: root.header.navigation.userMenu
 ```
 
-## 高级查询语法
+## Advanced Query Syntax
 
-### 通配符和模式匹配
+### Wildcard and Pattern Matching
 
 ```typescript
-// 通配符匹配 (*)
+// Wildcard matching (*)
 const anyButton = root['*'];
-console.log('通配符 XPath:', anyButton.toString());
-// 输出: (//*[@data-test-automation-id])[1]
+console.log('Wildcard XPath:', anyButton.toString());
+// Output: (//*[@data-test-automation-id])[1]
 
-// 前缀匹配 (btn*)
+// Prefix matching (btn*)
 const btnElements = root['btn*'];
-console.log('前缀匹配 XPath:', btnElements.toString());
-// 输出: (//*[starts-with(@data-test-automation-id, 'btn')])[1]
+console.log('Prefix matching XPath:', btnElements.toString());
+// Output: (//*[starts-with(@data-test-automation-id, 'btn')])[1]
 
-// 后缀匹配 (*button)
+// Suffix matching (*button)
 const buttonElements = root['*button'];
-console.log('后缀匹配 XPath:', buttonElements.toString());
-// 输出: (//*[substring(@data-test-automation-id, string-length(@data-test-automation-id) - string-length('button') + 1) = 'button'])[1]
+console.log('Suffix matching XPath:', buttonElements.toString());
+// Output: (//*[substring(@data-test-automation-id, string-length(@data-test-automation-id) - string-length('button') + 1) = 'button'])[1]
 
-// 包含匹配 (*menu*)
+// Contains matching (*menu*)
 const menuElements = root['*menu*'];
-console.log('包含匹配 XPath:', menuElements.toString());
-// 输出: (//*[contains(@data-test-automation-id,'menu')])[1]
+console.log('Contains matching XPath:', menuElements.toString());
+// Output: (//*[contains(@data-test-automation-id,'menu')])[1]
 
-// 分段匹配 (user*panel)
+// Segment matching (user*panel)
 const userPanelElements = root['user*panel'];
-console.log('分段匹配 XPath:', userPanelElements.toString());
-// 输出: (//*[substring(@data-test-automation-id, string-length(@data-test-automation-id) - string-length('panel') + 1) = 'panel' and starts-with(@data-test-automation-id, 'user') and string-length(@data-test-automation-id) > 9])[1]
+console.log('Segment matching XPath:', userPanelElements.toString());
+// Output: (//*[substring(@data-test-automation-id, string-length(@data-test-automation-id) - string-length('panel') + 1) = 'panel' and starts-with(@data-test-automation-id, 'user') and string-length(@data-test-automation-id) > 9])[1]
 ```
 
-### 文本内容查询
+### Text Content Queries
 
 ```typescript
-// 包含指定文本的元素 {text}
-const submitButton = root['button{提交}'];
-console.log('包含文本 XPath:', submitButton.toString());
-// 输出: (//*[@data-test-automation-id='button' and contains(., "提交")])[1]
+// Elements containing specific text {text}
+const submitButton = root['button{Submit}'];
+console.log('Contains text XPath:', submitButton.toString());
+// Output: (//*[@data-test-automation-id='button' and contains(., "Submit")])[1]
 
-// 文本完全匹配的元素 ={text}
-const exactTextButton = root['button={登录}'];
-console.log('精确文本 XPath:', exactTextButton.toString());
-// 输出: (//*[@data-test-automation-id='button' and . = "登录"])[1]
+// Elements with exact text match ={text}
+const exactTextButton = root['button={Login}'];
+console.log('Exact text XPath:', exactTextButton.toString());
+// Output: (//*[@data-test-automation-id='button' and . = "Login"])[1]
 
-// 仅文本查询（不限制属性）
-const anyElementWithText = root['{点击这里}'];
-const anyElementExactText = root['={确认}'];
+// Text-only queries (no attribute restriction)
+const anyElementWithText = root['{Click here}'];
+const anyElementExactText = root['={Confirm}'];
 
-// 组合查询：前缀 + 文本
-const prefixTextElement = root['btn*{保存}'];
-const suffixTextElement = root['*button{取消}'];
-const containsTextElement = root['*menu*{设置}'];
+// Combined queries: prefix + text
+const prefixTextElement = root['btn*{Save}'];
+const suffixTextElement = root['*button{Cancel}'];
+const containsTextElement = root['*menu*{Settings}'];
 ```
 
 ### 子查询和层级关系
@@ -967,6 +972,169 @@ try {
 }
 ```
 
-## 许可证
+## API Reference
 
-MIT License
+### Main Functions
+
+#### createElementPath
+
+```typescript
+function createElementPath(options?: {
+  flows?: FlowsObject;
+  strictMode?: boolean;
+}): ElementPathProxy
+```
+
+Creates a new element path proxy with optional configuration.
+
+#### proxify
+
+```typescript
+function proxify(elementPath: ElementPath, strictMode: boolean): ElementPathProxy
+```
+
+Wraps an ElementPath instance with a proxy for dynamic property access.
+
+### ElementPath Methods
+
+- **`toString(allowMultipleNodesInResult?: boolean): string`** - Generate XPath expression
+- **`getElementPathChain(): NodePath[]`** - Get the complete path chain
+- **`getReversedChain(withRoot?: boolean): string`** - Get human-readable path representation
+- **`generateChildElementsPath(key: string | number): ElementPath`** - Create child element path
+- **`getSearchOptions(): SearchObject`** - Get current search configuration
+- **`getElementType(): string | symbol`** - Get element type identifier
+
+### ElementPathProxy Properties
+
+- **`xpath(id: string, xpath: string): ElementPathProxy`** - Create element with custom XPath
+- **`__getInstance(): ElementPath`** - Get underlying ElementPath instance
+- **`__getReversedChain: ElementPath['getReversedChain']`** - Get reversed chain representation
+- **`[key: string]: ElementPathProxy`** - Dynamic property access for element navigation
+
+## Query Syntax Reference
+
+### Basic Patterns
+
+| Pattern | Description | Example | Generated XPath |
+|---------|-------------|---------|-----------------|
+| `element` | Exact match | `root.button` | `//*[@data-test-automation-id='button']` |
+| `*` | Any element | `root['*']` | `//*[@data-test-automation-id]` |
+| `prefix*` | Prefix match | `root['btn*']` | `//*[starts-with(@data-test-automation-id, 'btn')]` |
+| `*suffix` | Suffix match | `root['*button']` | `//*[substring(@data-test-automation-id, ...)]` |
+| `*contains*` | Contains match | `root['*menu*']` | `//*[contains(@data-test-automation-id, 'menu')]` |
+
+### Text Queries
+
+| Pattern | Description | Example | Generated XPath |
+|---------|-------------|---------|-----------------|
+| `{text}` | Contains text | `root['button{Save}']` | `//*[@data-test-automation-id='button' and contains(., "Save")]` |
+| `={text}` | Exact text | `root['button={Login}']` | `//*[@data-test-automation-id='button' and . = "Login"]` |
+| `{text}` only | Any element with text | `root['{Click here}']` | `//*[contains(., "Click here")]` |
+
+### Sub-queries
+
+| Pattern | Description | Example |
+|---------|-------------|---------|
+| `parent(child)` | Parent with child | `root['form(button{Submit})']` |
+| `parent(child{text})` | Parent with child containing text | `root['panel(input{Username})']` |
+
+### Index Selection
+
+| Pattern | Description | Example |
+|---------|-------------|---------|
+| `element[n]` | Nth element (0-based) | `root.button[0]` |
+| `element[n]` | Multiple indices | `root.input[1].button[0]` |
+
+## Best Practices
+
+### 1. Element Selector Design
+- **Use stable identifiers**: Prefer `data-test-automation-id` over CSS classes or structure-dependent selectors
+- **Avoid deep nesting**: Keep element paths reasonably shallow for maintainability
+- **Use meaningful names**: Choose descriptive element identifiers that reflect their purpose
+- **Establish naming conventions**: Maintain consistent naming patterns across your test suite
+
+### 2. Query Optimization
+- **Prefer exact matches**: Use exact matching when possible for better performance
+- **Minimize wildcard usage**: Wildcards can be slower than specific selectors
+- **Use sub-queries wisely**: Sub-queries are powerful but can impact performance
+- **Cache frequently used paths**: Store commonly used element paths in variables
+
+### 3. Maintainability
+- **Organize with Page Objects**: Use page object pattern to group related elements
+- **Document complex queries**: Add comments for non-obvious selector patterns
+- **Validate XPath output**: Regularly check generated XPath expressions
+- **Version control element maps**: Track changes to element identifiers
+
+### 4. Error Handling
+- **Validate element paths**: Check that generated XPath is syntactically correct
+- **Handle missing elements**: Implement proper error handling for element not found scenarios
+- **Use timeouts appropriately**: Set reasonable timeouts for element location
+- **Log debugging information**: Include element path details in error messages
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Invalid query syntax**:
+   ```
+   TypeError: Invalid query key
+   ```
+   - Check bracket matching and special character escaping
+   - Verify text query syntax `{text}` or `={text}`
+
+2. **XPath generation errors**:
+   ```
+   Error: Both start and end parts must be defined
+   ```
+   - Ensure segment matching syntax is correct
+   - Check wildcard usage in pattern matching
+
+3. **Index out of range**:
+   ```
+   Error: Can not select index element from already sliced element
+   ```
+   - Avoid using index on already indexed elements
+   - Use index only on the final element in the chain
+
+4. **Flow not found**:
+   ```
+   TypeError: Flow xxx is not a function
+   ```
+   - Verify flow configuration and naming
+   - Check that flows are properly registered
+
+### Debug Tips
+
+```typescript
+// Enable detailed debugging
+const debugElement = root.complexElement;
+console.log('Element info:', {
+  xpath: debugElement.toString(),
+  searchOptions: debugElement.__getInstance().getSearchOptions(),
+  elementType: debugElement.__getInstance().getElementType(),
+  pathChain: debugElement.__getInstance().getElementPathChain()
+});
+
+// Validate query syntax
+try {
+  const testElement = root['valid{syntax}'][0];
+  console.log('Query valid:', testElement.toString());
+} catch (error) {
+  console.error('Query syntax error:', error.message);
+}
+```
+
+## Dependencies
+
+- **`@testring/types`** - TypeScript type definitions
+- **`@testring/utils`** - Utility functions and helpers
+
+## Related Modules
+
+- **`@testring/web-application`** - Web application testing utilities
+- **`@testring/plugin-selenium-driver`** - Selenium WebDriver integration
+- **`@testring/plugin-playwright-driver`** - Playwright integration
+
+## License
+
+MIT License - see the [LICENSE](https://github.com/ringcentral/testring/blob/master/LICENSE) file for details.

@@ -1,41 +1,307 @@
 # @testring/browser-proxy
 
-提供浏览器代理进程，用于在主进程与浏览器插件之间转发消息。该模块会启动独立的 Node
-子进程，并通过 `@testring/transport` 与主框架通信。
+Browser proxy service that provides a communication bridge between the main test process and browser plugins. This module spawns independent Node.js child processes and communicates with the main framework through `@testring/transport`.
 
-## 功能概述
-- 管理浏览器端插件的生命周期
-- 提供 WebSocket 通道转发消息
-- 支持在独立进程中运行代理以减少主进程负载
-- 支持在不同浏览器环境下运行代理脚本
-- 可按插件名称启动多个代理实例
-- 代理进程可在调试模式下启动，便于开发
+[![npm version](https://badge.fury.io/js/@testring/browser-proxy.svg)](https://www.npmjs.com/package/@testring/browser-proxy)
+[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 安装
+## Overview
+
+The browser proxy acts as an intermediary layer between the testring framework and browser automation plugins, enabling:
+
+- **Process Isolation** - Runs browser operations in separate processes to reduce main process load
+- **Plugin Management** - Manages browser plugin lifecycles and configurations
+- **Message Forwarding** - Provides reliable message routing between processes
+- **Multi-Instance Support** - Supports multiple proxy instances for different plugins
+- **Debug Support** - Enables debugging mode for development and troubleshooting
+
+## Key Features
+
+### 🔄 Process Management
+- Spawns and manages independent Node.js child processes for browser operations
+- Handles process lifecycle including startup, execution, and cleanup
+- Supports both local and remote worker configurations
+
+### 📡 Communication Bridge
+- Provides reliable message forwarding between main process and browser plugins
+- Implements command-response pattern for synchronous operations
+- Supports asynchronous event broadcasting
+
+### 🔌 Plugin Integration
+- Seamless integration with browser automation plugins (Selenium, Playwright)
+- Dynamic plugin loading and configuration
+- Standardized plugin interface for consistent behavior
+
+### 🛠️ Development Support
+- Debug mode for enhanced development experience
+- Comprehensive logging and error handling
+- Worker pool management for optimal resource utilization
+
+## Installation
+
 ```bash
+# Using npm
 npm install --save-dev @testring/browser-proxy
-```
-或使用 yarn:
-```bash
+
+# Using yarn
 yarn add @testring/browser-proxy --dev
+
+# Using pnpm
+pnpm add @testring/browser-proxy --dev
 ```
 
-## 基本用法
+## Basic Usage
+
+### Creating a Browser Proxy Controller
+
 ```typescript
 import { browserProxyControllerFactory } from '@testring/browser-proxy';
 import { transport } from '@testring/transport';
 
+// Create controller instance
 const controller = browserProxyControllerFactory(transport);
-// 在插件中注册或启动浏览器代理
-```
-该模块通常与浏览器自动化插件一起使用，负责在浏览器与 Node.js 进程之间传递命令和事件。
 
-## 示例
+// Initialize the controller
+await controller.init();
+```
+
+### Plugin Registration
+
 ```typescript
-import { browserProxyControllerFactory } from '@testring/browser-proxy';
+import { BrowserProxyAPI } from '@testring/plugin-api';
 
+// In your plugin
+class MyBrowserPlugin {
+    constructor(api: BrowserProxyAPI) {
+        // Register browser proxy plugin
+        api.proxyPlugin('./path/to/browser-plugin', {
+            workerLimit: 2,
+            debug: false
+        });
+    }
+}
+```
+
+### Executing Browser Commands
+
+```typescript
+import { BrowserProxyActions } from '@testring/types';
+
+// Execute browser commands through the proxy
+const result = await controller.execute('test-session-1', {
+    action: BrowserProxyActions.click,
+    args: ['#submit-button', { timeout: 5000 }]
+});
+
+// Navigate to URL
+await controller.execute('test-session-1', {
+    action: BrowserProxyActions.url,
+    args: ['https://example.com']
+});
+
+// Wait for element
+await controller.execute('test-session-1', {
+    action: BrowserProxyActions.waitForExist,
+    args: ['#loading-indicator', 10000]
+});
+```
+
+## Configuration
+
+### Worker Configuration
+
+```typescript
+interface IBrowserProxyWorkerConfig {
+    plugin: string;           // Plugin path or name
+    config: {
+        workerLimit?: number | 'local';  // Number of workers or 'local' mode
+        debug?: boolean;                 // Enable debug mode
+        timeout?: number;                // Command timeout in milliseconds
+        retries?: number;                // Number of retry attempts
+    };
+}
+```
+
+### Debug Mode
+
+```typescript
 const controller = browserProxyControllerFactory(transport);
 
-// 启动代理并加载自定义插件
-const proxy = await controller.start('my-plugin', { debug: true });
+// Enable debug mode for detailed logging
+await controller.init();
+
+// Execute with debug information
+const result = await controller.execute('debug-session', {
+    action: BrowserProxyActions.click,
+    args: ['#debug-button']
+});
 ```
+
+## Advanced Usage
+
+### Custom Plugin Implementation
+
+```typescript
+import { IBrowserProxyPlugin } from '@testring/types';
+
+class CustomBrowserPlugin implements IBrowserProxyPlugin {
+    async click(applicant: string, selector: string, options?: any): Promise<any> {
+        // Custom click implementation
+        console.log(`Clicking ${selector} for ${applicant}`);
+        // ... browser automation logic
+        return { success: true };
+    }
+
+    async url(applicant: string, url: string): Promise<any> {
+        // Custom navigation implementation
+        console.log(`Navigating to ${url} for ${applicant}`);
+        // ... navigation logic
+        return { currentUrl: url };
+    }
+
+    async waitForExist(applicant: string, selector: string, timeout: number): Promise<any> {
+        // Custom wait implementation
+        console.log(`Waiting for ${selector} (timeout: ${timeout}ms)`);
+        // ... wait logic
+        return { found: true };
+    }
+
+    async end(applicant: string): Promise<any> {
+        // Cleanup for specific session
+        console.log(`Ending session for ${applicant}`);
+        return { ended: true };
+    }
+
+    kill(): void {
+        // Global cleanup
+        console.log('Killing browser plugin');
+    }
+}
+
+// Export plugin factory
+module.exports = (config: any) => new CustomBrowserPlugin();
+```
+
+### Worker Pool Management
+
+```typescript
+// Configure worker pool
+const controller = browserProxyControllerFactory(transport);
+
+// Set worker limit
+await controller.init(); // Uses plugin configuration
+
+// Execute commands across multiple workers
+const promises = [
+    controller.execute('session-1', { action: BrowserProxyActions.url, args: ['https://site1.com'] }),
+    controller.execute('session-2', { action: BrowserProxyActions.url, args: ['https://site2.com'] }),
+    controller.execute('session-3', { action: BrowserProxyActions.url, args: ['https://site3.com'] })
+];
+
+const results = await Promise.all(promises);
+```
+
+## API Reference
+
+### BrowserProxyController
+
+#### Methods
+
+- **`init(): Promise<void>`** - Initialize the controller and load plugins
+- **`execute(applicant: string, command: IBrowserProxyCommand): Promise<any>`** - Execute browser command
+- **`kill(): Promise<void>`** - Terminate all workers and cleanup resources
+
+### browserProxyControllerFactory
+
+Factory function that creates a new `BrowserProxyController` instance.
+
+```typescript
+function browserProxyControllerFactory(transport: ITransport): BrowserProxyController
+```
+
+## Integration with Testing Frameworks
+
+### With Selenium Driver
+
+```typescript
+// In your test configuration
+{
+  "plugins": [
+    "@testring/plugin-selenium-driver"
+  ],
+  "selenium": {
+    "browsers": ["chrome"],
+    "workerLimit": 2
+  }
+}
+```
+
+### With Playwright Driver
+
+```typescript
+// In your test configuration
+{
+  "plugins": [
+    "@testring/plugin-playwright-driver"
+  ],
+  "playwright": {
+    "browsers": ["chromium"],
+    "workerLimit": 3
+  }
+}
+```
+
+## Error Handling
+
+```typescript
+try {
+    const result = await controller.execute('test-session', {
+        action: BrowserProxyActions.click,
+        args: ['#non-existent-element']
+    });
+} catch (error) {
+    console.error('Browser command failed:', error);
+    // Handle error appropriately
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Plugin Loading Errors**
+   - Ensure plugin path is correct
+   - Verify plugin exports a factory function
+   - Check plugin dependencies are installed
+
+2. **Worker Spawn Failures**
+   - Check Node.js version compatibility
+   - Verify sufficient system resources
+   - Review debug logs for detailed error information
+
+3. **Communication Timeouts**
+   - Increase timeout values in configuration
+   - Check network connectivity for remote workers
+   - Monitor system resource usage
+
+### Debug Logging
+
+Enable debug mode for detailed logging:
+
+```typescript
+const controller = browserProxyControllerFactory(transport);
+// Debug information will be logged automatically when debug: true in config
+```
+
+## Dependencies
+
+- `@testring/child-process` - Child process management
+- `@testring/logger` - Logging functionality
+- `@testring/pluggable-module` - Plugin architecture
+- `@testring/transport` - Inter-process communication
+- `@testring/types` - TypeScript type definitions
+- `@testring/utils` - Utility functions
+
+## License
+
+MIT License - see the [LICENSE](https://github.com/ringcentral/testring/blob/master/LICENSE) file for details.

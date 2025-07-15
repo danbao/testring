@@ -1,114 +1,118 @@
 # @testring/test-utils
 
-测试工具集模块，作为 testring 框架的测试辅助核心，提供完整的测试模拟对象、文件操作工具和单元测试支持能力。该模块集成了传输层模拟、测试工作器模拟、浏览器代理模拟和文件系统操作工具，为测试开发和测试自动化提供全面的解决方案。
+Test utilities module that serves as the testing assistance core for the testring framework, providing comprehensive test mock objects, file operation tools, and unit testing support capabilities. This module integrates transport layer mocking, test worker simulation, browser proxy mocking, and file system operation tools, delivering a complete solution for test development and test automation.
 
 [![npm version](https://badge.fury.io/js/@testring/test-utils.svg)](https://www.npmjs.com/package/@testring/test-utils)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 功能概述
+## Overview
 
-测试工具集模块是 testring 框架的测试辅助核心，提供了：
-- 完整的传输层模拟和消息通信模拟
-- 智能的测试工作器模拟和生命周期管理
-- 全面的浏览器代理控制器模拟
-- 高效的文件系统操作和路径解析工具
-- **插件兼容性测试工具 (PluginCompatibilityTester)**
-- **完整的单元测试套件和集成测试**
-- 类型安全的 TypeScript 支持和接口定义
-- 灵活的测试场景配置和模拟参数
-- 并发安全和错误处理机制
-- 面向对象的模拟设计和可扩展架构
+The test utilities module is the testing assistance core of the testring framework, providing:
 
-## 主要特性
+- **Complete transport layer mocking** with message communication simulation
+- **Intelligent test worker simulation** with lifecycle management
+- **Comprehensive browser proxy controller mocking** for browser automation testing
+- **Efficient file system operations** and path resolution tools
+- **Plugin compatibility testing tools (PluginCompatibilityTester)** for browser driver validation
+- **Complete unit test suite and integration tests** with comprehensive coverage
+- **Type-safe TypeScript support** with interface definitions
+- **Flexible test scenario configuration** with mock parameters
+- **Concurrency safety and error handling** mechanisms
+- **Object-oriented mock design** with extensible architecture
 
-### 传输层模拟
-- 完整的 ITransport 接口实现和模拟
-- 支持各种消息类型和传输模式
-- 事件驱动的消息处理和监听机制
-- 多进程间通信模拟和测试支持
+## Key Features
 
-### 测试工作器模拟
-- 完整的测试工作器生命周期模拟
-- 可配置的执行延迟和失败情景
-- 详细的执行统计和状态追踪
-- 并发执行和资源管理模拟
+### 🚌 Transport Layer Mocking
+- Complete ITransport interface implementation and simulation
+- Support for various message types and transport modes
+- Event-driven message processing and listening mechanisms
+- Multi-process inter-communication mocking and testing support
 
-### 浏览器代理模拟
-- 完整的浏览器代理控制器模拟
-- 支持各种浏览器操作和事件模拟
-- 灵活的测试场景配置和模拟参数
-- 错误注入和异常情景测试支持
+### 👷 Test Worker Simulation
+- Complete test worker lifecycle simulation
+- Configurable execution delays and failure scenarios
+- Detailed execution statistics and state tracking
+- Concurrent execution and resource management simulation
 
-### 文件系统工具
-- 高效的文件读取和路径解析工具
-- 支持异步文件操作和错误处理
-- 灵活的路径配置和相对路径支持
-- 跨平台兼容性和编码支持
+### 🌐 Browser Proxy Mocking
+- Complete browser proxy controller simulation
+- Support for various browser operations and event simulation
+- Flexible test scenario configuration with mock parameters
+- Error injection and exception scenario testing support
 
-### 插件兼容性测试
-- **PluginCompatibilityTester** - 浏览器代理插件兼容性测试工具
-- 支持 Selenium 和 Playwright 驱动程序兼容性测试
-- 完整的 IBrowserProxyPlugin 接口方法验证
-- 可配置的测试跳过和自定义超时设置
-- 详细的测试结果报告和错误处理
+### 📁 File System Tools
+- Efficient file reading and path resolution utilities
+- Support for asynchronous file operations with error handling
+- Flexible path configuration with relative path support
+- Cross-platform compatibility and encoding support
 
-### 单元测试套件
-- **完整的单元测试覆盖** - 包含所有核心功能的单元测试
-- **集成测试示例** - 展示如何使用测试工具的集成测试
-- **使用示例和文档** - 详细的使用模式和最佳实践
-- **Mock 工具集** - 可重用的模拟对象和测试辅助工具
+### 🔌 Plugin Compatibility Testing
+- **PluginCompatibilityTester** - Browser proxy plugin compatibility testing tool
+- Support for Selenium and Playwright driver compatibility testing
+- Complete IBrowserProxyPlugin interface method verification
+- Configurable test skipping and custom timeout settings
+- Detailed test result reporting and error handling
 
-## 安装
+### 🧪 Unit Test Suite
+- **Complete unit test coverage** - Including all core functionality unit tests
+- **Integration test examples** - Demonstrating how to use test utilities
+- **Usage examples and documentation** - Detailed usage patterns and best practices
+- **Mock toolkit** - Reusable mock objects and testing helper tools
 
-```bash
-npm install @testring/test-utils
-```
-
-或使用 yarn：
+## Installation
 
 ```bash
-yarn add @testring/test-utils
+# Using npm
+npm install --save-dev @testring/test-utils
+
+# Using yarn
+yarn add --dev @testring/test-utils
+
+# Using pnpm
+pnpm add --save-dev @testring/test-utils
 ```
 
-## 核心架构
+## Core Architecture
 
-### TransportMock 类
-传输层模拟实现，继承自 `EventEmitter`：
+### TransportMock Class
+
+Transport layer mock implementation, extending `EventEmitter`:
 
 ```typescript
 class TransportMock extends EventEmitter implements ITransport {
-  // 消息广播方法
+  // Message Broadcasting Methods
   public broadcast<T>(messageType: string, payload: T): void
   public broadcastFrom<T>(messageType: string, payload: T, processID: string): void
   public broadcastLocal<T>(messageType: string, payload: T): void
   public broadcastUniversally<T>(messageType: string, payload: T): void
-  
-  // 消息发送和监听
+
+  // Message Sending and Listening
   public send<T>(src: string, messageType: string, payload: T): Promise<void>
   public on<T>(messageType: string, callback: (m: T, source?: string) => void): Function
   public once<T>(messageType: string, callback: (m: T, source?: string) => void): Function
   public onceFrom<T>(processID: string, messageType: string, callback: Function): Function
-  
-  // 进程管理
+
+  // Process Management
   public registerChild(processID: string, process: IWorkerEmitter): void
   public isChildProcess(): boolean
 }
 ```
 
-### TestWorkerMock 类
-测试工作器模拟实现：
+### TestWorkerMock Class
+
+Test worker mock implementation:
 
 ```typescript
 class TestWorkerMock implements ITestWorker {
   constructor(
-    shouldFail?: boolean,     // 是否模拟失败
-    executionDelay?: number   // 执行延迟时间
+    shouldFail?: boolean,     // Whether to simulate failure
+    executionDelay?: number   // Execution delay time
   )
-  
-  // 核心方法
+
+  // Core Methods
   public spawn(): ITestWorkerInstance
-  
-  // 模拟控制方法
+
+  // Mock Control Methods
   public $getSpawnedCount(): number
   public $getKillCallsCount(): number
   public $getExecutionCallsCount(): number
@@ -120,21 +124,69 @@ class TestWorkerMockInstance implements ITestWorkerInstance {
   public getWorkerID(): string
   public execute(): Promise<void>
   public kill(): Promise<void>
-  
-  // 测试状态查询
+
+  // Test State Queries
   public $getKillCallsCount(): number
   public $getExecuteCallsCount(): number
   public $getErrorInstance(): any
 }
 ```
 
-### 文件工具函数
+### File Utility Functions
+
 ```typescript
-// 文件路径解析工厂
+// File Path Resolution Factory
 function fileResolverFactory(...root: string[]): (...file: string[]) => string
 
-// 文件读取工厂
+// File Reading Factory
 function fileReaderFactory(...root: string[]): (source: string) => Promise<string>
+```
+
+### PluginCompatibilityTester Class
+
+Browser plugin compatibility testing tool:
+
+```typescript
+class PluginCompatibilityTester {
+  constructor(
+    plugin: IBrowserProxyPlugin,
+    config?: CompatibilityTestConfig
+  )
+
+  // Test Methods
+  public testMethodImplementation(): Promise<void>
+  public testBasicNavigation(): Promise<void>
+  public testElementQueries(): Promise<void>
+  public testFormInteractions(): Promise<void>
+  public testJavaScriptExecution(): Promise<void>
+  public testScreenshots(): Promise<void>
+  public testWaitOperations(): Promise<void>
+  public testSessionManagement(): Promise<void>
+  public testErrorHandling(): Promise<void>
+
+  // Run All Tests
+  public runAllTests(): Promise<{
+    passed: number;
+    failed: number;
+    skipped: number;
+    results: Array<{
+      name: string;
+      status: 'passed' | 'failed' | 'skipped';
+      error?: Error;
+    }>;
+  }>
+}
+
+interface CompatibilityTestConfig {
+  pluginName?: string;
+  skipTests?: string[];
+  customTimeouts?: {
+    waitForExist?: number;
+    waitForVisible?: number;
+    executeAsync?: number;
+    [key: string]: number | undefined;
+  };
+}
 ```
 
 ## 基本用法
@@ -843,106 +895,265 @@ npm run test
 - 配置选项完全相同
 - 原始文件位置 (`test-utils/plugin-compatibility-tester.ts`) 得到保留
 
-## 最佳实践
+## API Reference
 
-### 1. 模拟设计
-- 使用真实的接口实现而非简单的模拟
-- 提供可配置的模拟行为和参数
-- 实现错误注入和异常情景测试
-- 模拟真实的时间延迟和网络状况
+### TransportMock
 
-### 2. 测试隔离
-- 保证测试之间的独立性和可重复性
-- 及时清理测试资源和状态
-- 避免全局状态和跨测试依赖
-- 使用适当的清理和重置机制
+```typescript
+class TransportMock extends EventEmitter implements ITransport {
+  // Constructor
+  constructor()
 
-### 3. 性能考虑
-- 合理使用模拟对象避免内存泄漏
-- 优化文件操作和 I/O 操作的性能
-- 控制并发测试的数量和资源使用
-- 监控测试执行时间和资源消耗
+  // Broadcasting Methods
+  broadcast<T>(messageType: string, payload: T): void
+  broadcastFrom<T>(messageType: string, payload: T, processID: string): void
+  broadcastLocal<T>(messageType: string, payload: T): void
+  broadcastUniversally<T>(messageType: string, payload: T): void
 
-### 4. 错误处理
-- 提供清晰的错误信息和调试信息
-- 实现适当的错误恢复和重试机制
-- 区分模拟错误和实际测试错误
-- 记录详细的错误日志和上下文信息
+  // Message Sending
+  send<T>(src: string, messageType: string, payload: T): Promise<void>
 
-### 5. 可维护性
-- 提供清晰的 API 文档和使用示例
-- 使用描述性的命名和注释
-- 实现对模拟状态的内省和调试支持
-- 提供版本兼容性和升级指南
+  // Event Listeners
+  on<T>(messageType: string, callback: (m: T, source?: string) => void): Function
+  once<T>(messageType: string, callback: (m: T, source?: string) => void): Function
+  onceFrom<T>(processID: string, messageType: string, callback: Function): Function
 
-## 故障排除
+  // Process Management
+  registerChild(processID: string, process: IWorkerEmitter): void
+  isChildProcess(): boolean
+}
+```
 
-### 常见问题
+### TestWorkerMock
 
-#### 模拟对象不工作
+```typescript
+class TestWorkerMock implements ITestWorker {
+  // Constructor
+  constructor(shouldFail?: boolean, executionDelay?: number)
+
+  // Core Methods
+  spawn(): ITestWorkerInstance
+
+  // Mock Control Methods
+  $getSpawnedCount(): number
+  $getKillCallsCount(): number
+  $getExecutionCallsCount(): number
+  $getInstanceName(): string
+  $getErrorInstance(): any
+}
+
+class TestWorkerMockInstance implements ITestWorkerInstance {
+  // Core Methods
+  getWorkerID(): string
+  execute(): Promise<void>
+  kill(): Promise<void>
+
+  // Mock Control Methods
+  $getKillCallsCount(): number
+  $getExecuteCallsCount(): number
+  $getErrorInstance(): any
+}
+```
+
+### File Utilities
+
+```typescript
+// File Path Resolution Factory
+function fileResolverFactory(...root: string[]): (...file: string[]) => string
+
+// File Reading Factory
+function fileReaderFactory(...root: string[]): (source: string) => Promise<string>
+```
+
+### PluginCompatibilityTester
+
+```typescript
+class PluginCompatibilityTester {
+  // Constructor
+  constructor(plugin: IBrowserProxyPlugin, config?: CompatibilityTestConfig)
+
+  // Individual Test Methods
+  testMethodImplementation(): Promise<void>
+  testBasicNavigation(): Promise<void>
+  testElementQueries(): Promise<void>
+  testFormInteractions(): Promise<void>
+  testJavaScriptExecution(): Promise<void>
+  testScreenshots(): Promise<void>
+  testWaitOperations(): Promise<void>
+  testSessionManagement(): Promise<void>
+  testErrorHandling(): Promise<void>
+
+  // Run All Tests
+  runAllTests(): Promise<{
+    passed: number;
+    failed: number;
+    skipped: number;
+    results: Array<{
+      name: string;
+      status: 'passed' | 'failed' | 'skipped';
+      error?: Error;
+    }>;
+  }>
+}
+
+interface CompatibilityTestConfig {
+  pluginName?: string;
+  skipTests?: string[];
+  customTimeouts?: {
+    waitForExist?: number;
+    waitForVisible?: number;
+    executeAsync?: number;
+    [key: string]: number | undefined;
+  };
+}
+```
+
+## Best Practices
+
+### 1. Mock Design
+- **Use real interface implementations** rather than simple stubs
+- **Provide configurable mock behavior** and parameters
+- **Implement error injection** and exception scenario testing
+- **Simulate realistic time delays** and network conditions
+
+### 2. Test Isolation
+- **Ensure independence and repeatability** between tests
+- **Clean up test resources and state** promptly
+- **Avoid global state** and cross-test dependencies
+- **Use appropriate cleanup and reset mechanisms**
+
+### 3. Performance Considerations
+- **Use mock objects judiciously** to avoid memory leaks
+- **Optimize file operations** and I/O performance
+- **Control concurrent test count** and resource usage
+- **Monitor test execution time** and resource consumption
+
+### 4. Error Handling
+- **Provide clear error messages** and debugging information
+- **Implement appropriate error recovery** and retry mechanisms
+- **Distinguish between mock errors** and actual test errors
+- **Log detailed error information** and context
+
+### 5. Maintainability
+- **Provide clear API documentation** and usage examples
+- **Use descriptive naming** and comments
+- **Implement introspection** and debugging support for mock state
+- **Provide version compatibility** and upgrade guides
+
+## Troubleshooting
+
+### Common Issues
+
+#### Mock Object Not Working
 ```bash
 Error: Mock method not implemented
 ```
-解决方案：检查模拟对象的接口实现、方法调用、类型匹配。
+**Solution**: Check mock object interface implementation, method calls, and type matching.
 
-#### 文件读取失败
+#### File Reading Failure
 ```bash
 ENOENT: no such file or directory
 ```
-解决方案：检查文件路径、工作目录、文件权限、路径解析。
+**Solution**: Check file paths, working directory, file permissions, and path resolution.
 
-#### 内存泄漏
+#### Memory Leaks
 ```bash
 MaxListenersExceededWarning
 ```
-解决方案：检查事件监听器清理、对象释放、内存管理。
+**Solution**: Check event listener cleanup, object disposal, and memory management.
 
-#### 并发问题
+#### Concurrency Issues
 ```bash
 Race condition in test execution
 ```
-解决方案：检查并发控制、状态管理、异步操作同步。
+**Solution**: Check concurrency control, state management, and asynchronous operation synchronization.
 
-### 调试技巧
+### Debugging Tips
 
 ```typescript
-// 启用详细日志
+// Enable verbose logging
 const transportMock = new TransportMock();
 
-// 监听所有消息
+// Listen to all messages
 transportMock.on('*', (payload, source) => {
-  console.log('消息事件:', { payload, source });
+  console.log('Message event:', { payload, source });
 });
 
-// 检查模拟状态
+// Check mock state
 const worker = new TestWorkerMock(false, 100);
-console.log('工作器统计:', {
+console.log('Worker statistics:', {
   spawned: worker.$getSpawnedCount(),
   executions: worker.$getExecutionCallsCount(),
   kills: worker.$getKillCallsCount()
 });
 
-// 文件读取调试
+// File reading debugging
 const readFile = fileReaderFactory(__dirname);
 readFile('test.txt')
-  .then(content => console.log('文件内容:', content))
-  .catch(error => console.error('读取错误:', error));
+  .then(content => console.log('File content:', content))
+  .catch(error => console.error('Reading error:', error));
 ```
 
-## 依赖
+## Integration with Testing Frameworks
 
-- `@testring/types` - 类型定义
-- `events` - Node.js 事件系统
-- `fs` - Node.js 文件系统
-- `path` - Node.js 路径处理
+### Jest Integration
 
-## 相关模块
+```typescript
+// jest.config.js
+module.exports = {
+  setupFilesAfterEnv: ['./test/setup.js']
+};
 
-- `@testring/transport` - 真实传输层实现
-- `@testring/test-worker` - 真实测试工作器实现
-- `@testring/browser-proxy` - 浏览器代理实现
-- `@testring/test-runner` - 测试运行器
+// test/setup.js
+const { TransportMock, TestWorkerMock } = require('@testring/test-utils');
 
-## 许可证
+// Make mocks available globally
+global.TransportMock = TransportMock;
+global.TestWorkerMock = TestWorkerMock;
 
-MIT License
+// Setup before each test
+beforeEach(() => {
+  global.transportMock = new TransportMock();
+});
+
+// Cleanup after each test
+afterEach(() => {
+  global.transportMock.removeAllListeners();
+});
+```
+
+### Mocha Integration
+
+```typescript
+// test/mocha-setup.js
+const { TransportMock, TestWorkerMock } = require('@testring/test-utils');
+
+// Setup before each test
+beforeEach(function() {
+  this.transportMock = new TransportMock();
+  this.testWorker = new TestWorkerMock(false, 0);
+});
+
+// Cleanup after each test
+afterEach(function() {
+  this.transportMock.removeAllListeners();
+});
+```
+
+## Dependencies
+
+- **`@testring/types`** - TypeScript type definitions
+- **`events`** - Node.js event system
+- **`fs`** - Node.js file system
+- **`path`** - Node.js path handling
+
+## Related Modules
+
+- **`@testring/transport`** - Real transport layer implementation
+- **`@testring/test-worker`** - Real test worker implementation
+- **`@testring/browser-proxy`** - Browser proxy implementation
+- **`@testring/test-runner`** - Test runner
+
+## License
+
+MIT License - see the [LICENSE](https://github.com/ringcentral/testring/blob/master/LICENSE) file for details.
