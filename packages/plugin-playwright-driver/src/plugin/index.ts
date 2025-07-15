@@ -36,6 +36,7 @@ class PlaywrightCleanupManager {
     private pluginInstances: Set<PlaywrightPlugin> = new Set();
     private registryFile: string;
     private isGlobalCleanupRegistered = false;
+    private static isProcessListenersRegistered = false;
 
     private constructor() {
         this.registryFile = path.join(os.tmpdir(), 'testring-playwright-processes.json');
@@ -101,68 +102,76 @@ class PlaywrightCleanupManager {
         // 启动时清理可能存在的孤儿进程
         this.cleanupOrphanProcessesOnStartup();
 
-        const cleanup = async () => {
-            try {
-                // 首先尝试优雅地关闭所有插件实例
-                const cleanupPromises = Array.from(this.pluginInstances).map(plugin => 
-                    plugin.globalCleanup().catch(() => {})
-                );
-                
-                await Promise.race([
-                    Promise.all(cleanupPromises),
-                    new Promise(resolve => setTimeout(resolve, TIMEOUTS.PAGE_LOAD)) // 页面加载超时
-                ]);
+        // 只在第一次创建实例时注册进程监听器
+        if (!PlaywrightCleanupManager.isProcessListenersRegistered) {
+            PlaywrightCleanupManager.isProcessListenersRegistered = true;
 
-                // 然后清理注册的进程和发现的进程
-                await this.forceCleanupAllPlaywrightProcesses();
-                
-                // 清理注册表文件
+            // 增加进程监听器限制以避免警告
+            process.setMaxListeners(200);
+
+            const cleanup = async () => {
                 try {
-                    if (fs.existsSync(this.registryFile)) {
-                        fs.unlinkSync(this.registryFile);
+                    // 首先尝试优雅地关闭所有插件实例
+                    const cleanupPromises = Array.from(this.pluginInstances).map(plugin =>
+                        plugin.globalCleanup().catch(() => {})
+                    );
+
+                    await Promise.race([
+                        Promise.all(cleanupPromises),
+                        new Promise(resolve => setTimeout(resolve, TIMEOUTS.PAGE_LOAD)) // 页面加载超时
+                    ]);
+
+                    // 然后清理注册的进程和发现的进程
+                    await this.forceCleanupAllPlaywrightProcesses();
+
+                    // 清理注册表文件
+                    try {
+                        if (fs.existsSync(this.registryFile)) {
+                            fs.unlinkSync(this.registryFile);
+                        }
+                    } catch (error) {
+                        // Ignore cleanup errors
                     }
                 } catch (error) {
-                    // Ignore cleanup errors
+                    // Ignore cleanup errors during shutdown
                 }
-            } catch (error) {
-                // Ignore cleanup errors during shutdown
-            }
-        };
+            };
 
-        // 注册多种退出事件
-        process.on('exit', () => {
-            // 在 exit 事件中只能执行同步操作
-            this.forceCleanupAllPlaywrightProcessesSync();
-        });
+            // 只注册一次进程监听器
+            process.once('exit', () => {
+                // 在 exit 事件中只能执行同步操作
+                this.forceCleanupAllPlaywrightProcessesSync();
+            });
 
-        process.on('SIGINT', () => {
-            console.log('[Playwright Cleanup Manager] Received SIGINT, cleaning up...');
-            this.forceCleanupAllPlaywrightProcessesSync();
-            process.exit(0);
-        });
+            process.once('SIGINT', () => {
+                console.log('[Playwright Cleanup Manager] Received SIGINT, cleaning up...');
+                this.forceCleanupAllPlaywrightProcessesSync();
+                process.exit(0);
+            });
 
-        process.on('SIGTERM', () => {
-            console.log('[Playwright Cleanup Manager] Received SIGTERM, cleaning up...');
-            this.forceCleanupAllPlaywrightProcessesSync();
-            process.exit(0);
-        });
+            process.once('SIGTERM', () => {
+                console.log('[Playwright Cleanup Manager] Received SIGTERM, cleaning up...');
+                this.forceCleanupAllPlaywrightProcessesSync();
+                process.exit(0);
+            });
 
-        process.on('uncaughtException', (error) => {
-            console.error('Uncaught exception, cleaning up Playwright processes:', error);
-            this.forceCleanupAllPlaywrightProcessesSync();
-            process.exit(1);
-        });
+            process.once('uncaughtException', (error) => {
+                console.error('Uncaught exception, cleaning up Playwright processes:', error);
+                this.forceCleanupAllPlaywrightProcessesSync();
+                process.exit(1);
+            });
 
-        process.on('unhandledRejection', (reason, promise) => {
-            console.error('Unhandled rejection, cleaning up Playwright processes:', reason);
-            this.forceCleanupAllPlaywrightProcessesSync();
-            process.exit(1);
-        });
+            process.once('unhandledRejection', (reason, promise) => {
+                console.error('Unhandled rejection, cleaning up Playwright processes:', reason);
+                this.forceCleanupAllPlaywrightProcessesSync();
+                process.exit(1);
+            });
 
-        // 当主进程要关闭时，清理子进程
-        process.on('beforeExit', () => {
-            this.forceCleanupAllPlaywrightProcessesSync();
-        });
+            // 当主进程要关闭时，清理子进程
+            process.once('beforeExit', () => {
+                this.forceCleanupAllPlaywrightProcessesSync();
+            });
+        }
     }
 
     private async forceCleanupAllPlaywrightProcesses(): Promise<void> {

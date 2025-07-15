@@ -12,6 +12,8 @@
 - 智能的测试工作器模拟和生命周期管理
 - 全面的浏览器代理控制器模拟
 - 高效的文件系统操作和路径解析工具
+- **插件兼容性测试工具 (PluginCompatibilityTester)**
+- **完整的单元测试套件和集成测试**
 - 类型安全的 TypeScript 支持和接口定义
 - 灵活的测试场景配置和模拟参数
 - 并发安全和错误处理机制
@@ -42,6 +44,19 @@
 - 支持异步文件操作和错误处理
 - 灵活的路径配置和相对路径支持
 - 跨平台兼容性和编码支持
+
+### 插件兼容性测试
+- **PluginCompatibilityTester** - 浏览器代理插件兼容性测试工具
+- 支持 Selenium 和 Playwright 驱动程序兼容性测试
+- 完整的 IBrowserProxyPlugin 接口方法验证
+- 可配置的测试跳过和自定义超时设置
+- 详细的测试结果报告和错误处理
+
+### 单元测试套件
+- **完整的单元测试覆盖** - 包含所有核心功能的单元测试
+- **集成测试示例** - 展示如何使用测试工具的集成测试
+- **使用示例和文档** - 详细的使用模式和最佳实践
+- **Mock 工具集** - 可重用的模拟对象和测试辅助工具
 
 ## 安装
 
@@ -702,6 +717,131 @@ async function runAdvancedScenarios() {
 
 runAdvancedScenarios().catch(console.error);
 ```
+
+## PluginCompatibilityTester 使用指南
+
+### 基本用法
+
+```typescript
+import { PluginCompatibilityTester, CompatibilityTestConfig } from '../../../test-utils/plugin-compatibility-tester';
+
+// 配置兼容性测试
+const config: CompatibilityTestConfig = {
+    pluginName: 'my-browser-plugin',
+    skipTests: ['screenshots'], // 可选：跳过特定测试
+    customTimeouts: {           // 可选：自定义超时设置
+        waitForExist: 10000,
+        waitForVisible: 8000
+    }
+};
+
+// 创建测试器实例
+const tester = new PluginCompatibilityTester(plugin, config);
+
+// 运行单个测试方法
+await tester.testMethodImplementation();
+await tester.testBasicNavigation();
+await tester.testElementQueries();
+
+// 或运行所有测试
+const results = await tester.runAllTests();
+console.log(`通过: ${results.passed}, 失败: ${results.failed}, 跳过: ${results.skipped}`);
+```
+
+### 可用的测试方法
+
+- `testMethodImplementation()` - 验证所有必需的 IBrowserProxyPlugin 方法已实现
+- `testBasicNavigation()` - 测试 URL 导航、页面标题、刷新和源码获取
+- `testElementQueries()` - 测试元素存在性和可见性检查
+- `testFormInteractions()` - 测试表单输入操作
+- `testJavaScriptExecution()` - 测试 JavaScript 执行能力
+- `testScreenshots()` - 测试截图功能
+- `testWaitOperations()` - 测试等待操作
+- `testSessionManagement()` - 测试多会话处理
+- `testErrorHandling()` - 测试错误场景
+
+### 配置选项
+
+#### skipTests 跳过测试
+测试名称应为小写且无空格的格式：
+```typescript
+skipTests: [
+    'methodimplementation',  // 跳过方法实现测试
+    'basicnavigation',       // 跳过基本导航测试
+    'elementqueries',        // 跳过元素查询测试
+    'forminteractions',      // 跳过表单交互测试
+    'javascriptexecution',   // 跳过 JavaScript 执行测试
+    'screenshots',           // 跳过截图测试
+    'waitoperations',        // 跳过等待操作测试
+    'sessionmanagement',     // 跳过会话管理测试
+    'errorhandling'          // 跳过错误处理测试
+]
+```
+
+#### customTimeouts 自定义超时
+```typescript
+customTimeouts: {
+    waitForExist: 10000,     // 元素存在等待超时（毫秒）
+    waitForVisible: 8000,    // 元素可见等待超时（毫秒）
+    executeAsync: 15000      // 异步执行超时（毫秒）
+}
+```
+
+## 单元测试
+
+本包现在包含了 PluginCompatibilityTester 的完整单元测试：
+
+### 测试文件结构
+
+```
+test/
+├── plugin-compatibility-tester.spec.ts      # PluginCompatibilityTester 类的单元测试
+├── plugin-compatibility-integration.spec.ts # 使用 PluginCompatibilityTester 的集成测试
+├── plugin-compatibility-usage.spec.ts       # 使用示例和文档测试
+├── mocks/
+│   └── browser-proxy-plugin.mock.ts         # 测试用的模拟实现
+└── setup.ts                                 # 测试环境设置
+```
+
+### 运行测试
+
+```bash
+# 仅运行此包的测试
+cd packages/test-utils
+npm test
+
+# 运行所有项目测试（包含此包）
+npm run test
+```
+
+### 测试覆盖范围
+
+单元测试覆盖了：
+- 构造函数和配置处理
+- 各个测试方法的功能
+- 错误处理场景
+- 跳过测试功能
+- 与实际插件实现的集成
+- 使用模式和示例
+
+## 迁移说明
+
+原始的 `test-utils/plugin-compatibility-tester.ts` 文件已转换为适当的单元测试。功能保持不变，但现在已经过适当测试并集成到项目的测试套件中。
+
+### 变更内容
+
+1. **添加了单元测试** - PluginCompatibilityTester 类的全面单元测试
+2. **添加了集成测试** - 演示如何与实际插件一起使用 PluginCompatibilityTester 的测试
+3. **添加了模拟工具** - 用于测试的可重用模拟实现
+4. **更新了包配置** - 添加了测试脚本和依赖项
+5. **与项目测试集成** - 测试现在作为 `npm run test` 的一部分运行
+
+### 保持不变的内容
+
+- PluginCompatibilityTester 类 API 保持不变
+- 所有测试方法的工作方式完全相同
+- 配置选项完全相同
+- 原始文件位置 (`test-utils/plugin-compatibility-tester.ts`) 得到保留
 
 ## 最佳实践
 
