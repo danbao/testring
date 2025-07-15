@@ -51,10 +51,10 @@ jobs:
 
         echo ""
         echo "=== E2E Test Coverage Summary ==="
-        if [ -f "./c8-cov-lcov/lcov.info" ]; then
+        if [ -f "./c8-cov/lcov.info" ]; then
           echo "✅ E2E test coverage report generated"
           # Display basic coverage info
-          grep -E "^(SF|LF|LH)" ./c8-cov-lcov/lcov.info | head -20
+          grep -E "^(SF|LF|LH)" ./c8-cov/lcov.info | head -20
         else
           echo "❌ E2E test coverage file not found"
         fi
@@ -72,7 +72,7 @@ jobs:
       if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
       uses: coverallsapp/github-action@master
       with:
-        path-to-lcov: './c8-cov-lcov/lcov.info'
+        path-to-lcov: './c8-cov/lcov.info'
         github-token: ${{ secrets.GITHUB_TOKEN }}
         flag-name: e2e-tests
         parallel: true
