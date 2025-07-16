@@ -492,9 +492,9 @@ server.getHook(fsStoreServerHooks.ON_RELEASE)?.readHook(
 );
 ```
 
-## 配置和自定义
+## Configuration and Customization
 
-### 服务器配置
+### Server Configuration
 
 ```typescript
 const server = new FSStoreServer(
@@ -503,7 +503,7 @@ const server = new FSStoreServer(
 );
 ```
 
-### 客户端配置
+### Client Configuration
 
 ```typescript
 const client = new FSStoreClient('production-fs-store');
@@ -525,7 +525,7 @@ const fileOptions = {
 const file = new FSStoreFile(fileOptions);
 ```
 
-### 自定义文件类型工厂
+### Custom File Type Factory
 
 ```typescript
 import { FSStoreFile, FSStoreType, FSFileUniqPolicy } from '@testring/fs-store';
@@ -557,9 +557,9 @@ const jsonFile = createJSONFileFactory({ fileName: 'config.json' });
 await jsonFile.write(Buffer.from(JSON.stringify({ test: true })));
 ```
 
-## 多进程文件共享
+## Multi-Process File Sharing
 
-### 主进程设置
+### Main Process Setup
 
 ```typescript
 // main.js
@@ -571,7 +571,7 @@ const server = new FSStoreServer(10, 'shared-fs');
 console.log('文件存储服务器已启动');
 ```
 
-### 工作进程使用
+### Worker Process Usage
 
 ```typescript
 // worker.js
@@ -591,9 +591,9 @@ await file.append(Buffer.from(`时间: ${new Date().toISOString()}\n`));
 console.log('工作进程文件路径:', file.getFullPath());
 ```
 
-## 错误处理和调试
+## Error Handling and Debugging
 
-### 错误处理模式
+### Error Handling Patterns
 
 ```typescript
 import { FSStoreFile } from '@testring/fs-store';
@@ -635,7 +635,7 @@ class SafeFileOperations {
 }
 ```
 
-### 调试和监控
+### Debugging and Monitoring
 
 ```typescript
 import { FSStoreServer, FSStoreClient } from '@testring/fs-store';
@@ -699,9 +699,9 @@ class DebuggableFileStore {
 }
 ```
 
-## 性能优化
+## Performance Optimization
 
-### 文件操作批处理
+### File Operation Batching
 
 ```typescript
 class BatchFileOperations {
@@ -745,7 +745,7 @@ for (let i = 0; i < 100; i++) {
 await batchOps.executeAll();
 ```
 
-### 文件缓存策略
+### File Caching Strategy
 
 ```typescript
 class CachedFileStore {
@@ -788,62 +788,62 @@ class CachedFileStore {
 }
 ```
 
-## 最佳实践
+## Best Practices
 
-### 1. 文件生命周期管理
-- 总是在完成操作后释放文件资源
-- 使用事务确保复杂操作的原子性
-- 定期清理不再需要的文件
+### 1. File Lifecycle Management
+- Always release file resources after completing operations
+- Use transactions to ensure atomicity of complex operations
+- Regularly clean up files that are no longer needed
 
-### 2. 并发控制
-- 合理设置服务器的线程数量
-- 使用文件锁避免并发写入冲突
-- 在多进程环境中使用统一的命名策略
+### 2. Concurrency Control
+- Set server thread count appropriately
+- Use file locks to avoid concurrent write conflicts
+- Use unified naming strategies in multi-process environments
 
-### 3. 错误处理
-- 实现完善的错误处理和重试机制
-- 监控文件操作的性能和成功率
-- 记录详细的操作日志便于调试
+### 3. Error Handling
+- Implement comprehensive error handling and retry mechanisms
+- Monitor file operation performance and success rates
+- Record detailed operation logs for debugging
 
-### 4. 性能优化
-- 使用批处理减少频繁的文件操作
-- 实现文件内容缓存机制
-- 避免不必要的文件锁定
+### 4. Performance Optimization
+- Use batching to reduce frequent file operations
+- Implement file content caching mechanisms
+- Avoid unnecessary file locking
 
-### 5. 资源管理
-- 定期清理临时文件
-- 监控磁盘使用情况
-- 实现文件大小限制和清理策略
+### 5. Resource Management
+- Regularly clean up temporary files
+- Monitor disk usage
+- Implement file size limits and cleanup strategies
 
-## 故障排除
+## Troubleshooting
 
-### 常见问题
+### Common Issues
 
-#### 文件锁定冲突
+#### File Lock Conflicts
 ```bash
 Error: impossible to lock
 ```
-解决方案：检查是否有其他进程正在使用文件，等待或强制释放锁。
+Solution: Check if other processes are using the file, wait or force release the lock.
 
-#### 权限不足
+#### Insufficient Permissions
 ```bash
 Error: no access
 ```
-解决方案：检查文件权限，确保进程有读写权限。
+Solution: Check file permissions, ensure the process has read/write permissions.
 
-#### 文件不存在
+#### File Does Not Exist
 ```bash
 Error: NOEXIST
 ```
-解决方案：确认文件路径正确，检查文件是否已被删除。
+Solution: Confirm the file path is correct, check if the file has been deleted.
 
-#### 服务器未初始化
+#### Server Not Initialized
 ```bash
 Error: Server not initialized
 ```
-解决方案：确保 FSStoreServer 已正确初始化并启动。
+Solution: Ensure FSStoreServer has been properly initialized and started.
 
-### 调试技巧
+### Debugging Tips
 
 ```typescript
 // 启用详细日志
@@ -859,20 +859,20 @@ debugServer.getHook('ON_RELEASE')?.readHook('debug', (context) => {
 });
 ```
 
-## 依赖
+## Dependencies
 
-- `@testring/transport` - 进程间通信
-- `@testring/logger` - 日志记录
-- `@testring/pluggable-module` - 插件系统
-- `@testring/types` - 类型定义
-- `@testring/utils` - 工具函数
+- `@testring/transport` - Inter-process communication
+- `@testring/logger` - Logging functionality
+- `@testring/pluggable-module` - Plugin system
+- `@testring/types` - Type definitions
+- `@testring/utils` - Utility functions
 
-## 相关模块
+## Related Modules
 
-- `@testring/plugin-fs-store` - 文件存储插件
-- `@testring/test-utils` - 测试工具
-- `@testring/cli-config` - 配置管理
+- `@testring/plugin-fs-store` - File storage plugin
+- `@testring/test-utils` - Testing utilities
+- `@testring/cli-config` - Configuration management
 
-## 许可证
+## License
 
 MIT License
