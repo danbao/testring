@@ -1,127 +1,127 @@
-# testring 工具脚本集
+# testring Utility Scripts Collection
 
-`utils/` 目录包含了 testring 项目的构建和维护工具脚本，提供完整的项目自动化管理、开发流程支持和 CI/CD 集成能力。这些工具脚本是 testring 单体仓库（monorepo）管理的核心组件，支持多包项目的标准化开发和发布流程。
+The `utils/` directory contains build and maintenance utility scripts for the testring project, providing complete project automation management, development workflow support, and CI/CD integration capabilities. These utility scripts are core components of testring monorepo management, supporting standardized development and release workflows for multi-package projects.
 
 [![Node.js](https://img.shields.io/badge/Node.js->=14.0.0-brightgreen)](https://nodejs.org/)
 [![Lerna](https://img.shields.io/badge/Lerna-Compatible-blue)](https://lerna.js.org/)
 [![CI/CD](https://img.shields.io/badge/CI/CD-Ready-success)](https://github.com/features/actions)
 
-## 功能概述
+## Overview
 
-工具脚本集是 testring 项目的自动化管理核心，提供了：
-- 完整的包文件管理和模板化系统
-- 智能的依赖版本检查和验证机制
-- 高效的构建产物清理和环境重置
-- 自动化的 README 生成和文档维护
-- 批量发布和版本管理支持
-- 灵活的 CI/CD 集成和配置管理
-- 模板化的项目结构和配置文件
-- 跨平台兼容性和错误处理机制
+The utility scripts collection is the automation management core of the testring project, providing:
+- Complete package file management and templating system
+- Intelligent dependency version checking and validation mechanisms
+- Efficient build artifact cleanup and environment reset
+- Automated README generation and documentation maintenance
+- Batch publishing and version management support
+- Flexible CI/CD integration and configuration management
+- Templated project structure and configuration files
+- Cross-platform compatibility and error handling mechanisms
 
-## 主要特性
+## Key Features
 
-### 包管理自动化
-- 标准化的包文件添加和配置管理
-- 智能的依赖版本检查和冲突检测
-- 自动化的 README 生成和文档同步
-- 模板化的项目结构和配置文件管理
+### Package Management Automation
+- Standardized package file addition and configuration management
+- Intelligent dependency version checking and conflict detection
+- Automated README generation and documentation synchronization
+- Templated project structure and configuration file management
 
-### 构建和发布流程
-- 高效的构建产物清理和环境重置
-- 批量发布和版本管理支持
-- 智能的包依赖关系分析和发布顺序
-- 完整的错误处理和回滚机制
+### Build and Release Workflow
+- Efficient build artifact cleanup and environment reset
+- Batch publishing and version management support
+- Intelligent package dependency analysis and release ordering
+- Complete error handling and rollback mechanisms
 
-### CI/CD 集成
-- 完整的持续集成和持续部署支持
-- 可配置的发布流程和环境管理
-- 自动化的测试和验证流程
-- 灵活的包排除和包含机制
+### CI/CD Integration
+- Complete continuous integration and continuous deployment support
+- Configurable release workflows and environment management
+- Automated testing and validation workflows
+- Flexible package exclusion and inclusion mechanisms
 
-### 跨平台兼容性
-- 支持 Windows、macOS 和 Linux 操作系统
-- 智能的路径处理和文件系统操作
-- 完整的错误处理和异常恢复
-- 统一的命令行接口和参数处理
+### Cross-Platform Compatibility
+- Support for Windows, macOS, and Linux operating systems
+- Intelligent path handling and file system operations
+- Complete error handling and exception recovery
+- Unified command-line interface and parameter processing
 
-## 目录结构
+## Directory Structure
 
 ```
 utils/
-├── README.md                           # 工具脚本集说明文档
-├── add-package-files.js               # 包文件添加脚本
-├── check-packages-versions.js         # 依赖版本检查脚本
-├── cleanup.js                         # 构建产物清理脚本
-├── generate-readme.js                 # README 生成脚本
-├── override-eslint-config-ringcentral.js # ESLint 配置覆盖脚本
-├── publish.js                         # 包发布脚本
-├── ts-mocha.js                        # TypeScript Mocha 测试脚本
-└── templates/                         # 模板文件目录
-    ├── tsconfig.json                  # TypeScript 配置模板
-    ├── .mocharc.json                  # Mocha 配置模板
-    ├── .npmignore                     # npm 忽略文件模板
-    └── .npmrc                         # npm 配置模板
+├── README.md                           # Utility scripts collection documentation
+├── add-package-files.js               # Package file addition script
+├── check-packages-versions.js         # Dependency version checking script
+├── cleanup.js                         # Build artifact cleanup script
+├── generate-readme.js                 # README generation script
+├── override-eslint-config-ringcentral.js # ESLint configuration override script
+├── publish.js                         # Package publishing script
+├── ts-mocha.js                        # TypeScript Mocha test script
+└── templates/                         # Template files directory
+    ├── tsconfig.json                  # TypeScript configuration template
+    ├── .mocharc.json                  # Mocha configuration template
+    ├── .npmignore                     # npm ignore file template
+    └── .npmrc                         # npm configuration template
 ```
 
-## 核心脚本功能
+## Core Script Functions
 
-### add-package-files.js - 包文件添加脚本
+### add-package-files.js - Package File Addition Script
 
-自动为新包或现有包添加标准的项目文件和配置模板。
+Automatically adds standard project files and configuration templates for new or existing packages.
 
-**功能特性：**
-- 自动复制模板文件到目标目录
-- 智能检查文件是否存在，避免覆盖现有文件
-- 支持多种配置文件类型（TypeScript、Mocha、npm 等）
-- 跨平台路径处理和文件系统操作
+**Features:**
+- Automatically copies template files to target directory
+- Intelligently checks if files exist to avoid overwriting existing files
+- Supports multiple configuration file types (TypeScript, Mocha, npm, etc.)
+- Cross-platform path handling and file system operations
 
-**核心逻辑：**
+**Core Logic:**
 ```javascript
-// 文件创建逻辑
+// File creation logic
 function createFile(filename) {
     const input = path.join(TEMPLATES_FOLDER, filename);
     const output = path.join(cwd, filename);
-    
-    // 仅在文件不存在时创建
+
+    // Create only if file doesn't exist
     if (!existsSync(output)) {
         copyFileSync(input, output);
     }
 }
 ```
 
-**支持的模板文件：**
-- `tsconfig.json` - TypeScript 编译配置
-- `.mocharc.json` - Mocha 测试框架配置
-- `.npmignore` - npm 发布忽略文件
-- `.npmrc` - npm 配置文件
+**Supported Template Files:**
+- `tsconfig.json` - TypeScript compilation configuration
+- `.mocharc.json` - Mocha test framework configuration
+- `.npmignore` - npm publish ignore file
+- `.npmrc` - npm configuration file
 
-**使用示例：**
+**Usage Example:**
 ```bash
-# 在包目录中执行
+# Execute in package directory
 node ../utils/add-package-files.js
 
-# 或通过 npm script
+# Or through npm script
 npm run add-package-files
 ```
 
-### check-packages-versions.js - 依赖版本检查脚本
+### check-packages-versions.js - Dependency Version Checking Script
 
-检查项目中所有依赖包的版本号是否符合精确版本规范，确保构建的一致性和可重现性。
+Checks whether all dependency package version numbers in the project comply with exact version specifications, ensuring build consistency and reproducibility.
 
-**功能特性：**
-- 检查 dependencies、devDependencies、peerDependencies 中的版本号
-- 识别非精确版本号（使用 ^、~、<、>、| 等符号）
-- 支持命令行输出和程序化检查
-- 自动退出码处理，集成 CI/CD 流程
+**Features:**
+- Checks version numbers in dependencies, devDependencies, peerDependencies
+- Identifies non-exact version numbers (using ^, ~, <, >, | symbols)
+- Supports command-line output and programmatic checking
+- Automatic exit code handling for CI/CD pipeline integration
 
-**版本检查规则：**
+**Version Checking Rules:**
 ```javascript
 const regex = /\^|~|<|>|\||( - )/;
 
 function checkDependencies(deps) {
     let notExact = [];
     if (!deps) return notExact;
-    
+
     for (let pack in deps) {
         let version = deps[pack];
         if (regex.test(version)) {
@@ -216,27 +216,27 @@ yarn add ${pkg.name} --dev
 `;
 ```
 
-**使用示例：**
+**Usage Example:**
 ```bash
-# 为当前包生成 README
+# Generate README for current package
 node ../utils/generate-readme.js
 
-# 为所有包生成 README
+# Generate README for all packages
 lerna exec -- node ../utils/generate-readme.js
 ```
 
-### publish.js - 包发布脚本
+### publish.js - Package Publishing Script
 
-自动化的包发布流程，支持批量发布和依赖关系管理。
+Automated package publishing workflow supporting batch publishing and dependency management.
 
-**功能特性：**
-- 基于 Lerna 的包管理和发布流程
-- 支持包排除和包含机制
-- 智能的依赖关系分析和发布顺序
-- 并行发布和错误处理
-- 完整的 npm 发布集成
+**Features:**
+- Lerna-based package management and publishing workflow
+- Support for package exclusion and inclusion mechanisms
+- Intelligent dependency analysis and publishing order
+- Parallel publishing and error handling
+- Complete npm publishing integration
 
-**发布配置：**
+**Publishing Configuration:**
 ```javascript
 async function task(pkg) {
     await npmPublish({
@@ -247,7 +247,7 @@ async function task(pkg) {
 }
 ```
 
-**使用示例：**
+**Usage Example:**
 ```bash
 # 发布所有包
 NPM_TOKEN=your_token node utils/publish.js

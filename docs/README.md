@@ -1,46 +1,46 @@
-# 文档目录
+# Documentation Directory
 
-`docs/` 目录包含了 testring 测试框架的完整文档，提供了 API 参考、配置说明和插件开发指南。
+The `docs/` directory contains complete documentation for the testring testing framework, providing API reference, configuration instructions, and plugin development guides.
 
-## 文档内容
+## Documentation Contents
 
-### 核心文档
-- **`api.md`** - API 参考文档，详细说明了框架提供的主要 API 接口
-- **`config.md`** - 配置 API 参考，完整的配置选项说明和使用示例
-- **`plugin-handbook.md`** - 插件开发手册，插件系统的使用和开发指南
+### Core Documentation
+- **`api.md`** - API reference documentation, detailing the main API interfaces provided by the framework
+- **`config.md`** - Configuration API reference, complete configuration options description and usage examples
+- **`plugin-handbook.md`** - Plugin development handbook, usage and development guide for the plugin system
 
-## 文档说明
+## Documentation Description
 
-### API 参考 (api.md)
-提供了 testring 框架的主要命令和接口说明：
-- `run` - 运行测试命令
-- `record` - 录制测试会话命令
+### API Reference (api.md)
+Provides descriptions of the main commands and interfaces of the testring framework:
+- `run` - Run tests command
+- `record` - Record test session command
 
-### 配置参考 (config.md)
-详细说明了框架的配置系统：
-- 配置文件优先级：CLI 参数 > 环境配置 > 配置文件
-- 所有可用的配置选项和参数说明
-- 配置示例和最佳实践
+### Configuration Reference (config.md)
+Detailed description of the framework's configuration system:
+- Configuration file priority: CLI parameters > Environment configuration > Configuration file
+- All available configuration options and parameter descriptions
+- Configuration examples and best practices
 
-### 插件手册 (plugin-handbook.md)
-插件系统的完整指南：
-- 插件的使用方法
-- 插件开发规范
-- 插件 API 说明
-- 插件开发示例
+### Plugin Handbook (plugin-handbook.md)
+Complete guide to the plugin system:
+- Plugin usage methods
+- Plugin development standards
+- Plugin API descriptions
+- Plugin development examples
 
-## 使用指南
+## Usage Guide
 
-### 快速开始
-1. 阅读 `api.md` 了解基本命令
-2. 查看 `config.md` 配置测试环境
-3. 根据需要参考 `plugin-handbook.md` 开发或使用插件
+### Quick Start
+1. Read `api.md` to understand basic commands
+2. Check `config.md` to configure test environment
+3. Refer to `plugin-handbook.md` as needed to develop or use plugins
 
-### 开发者指南
-- 如果要开发插件，重点参考 `plugin-handbook.md`
-- 如果要集成框架，重点参考 `api.md` 和 `config.md`
-- 如果要贡献代码，建议阅读所有文档
+### Developer Guide
+- If developing plugins, focus on `plugin-handbook.md`
+- If integrating the framework, focus on `api.md` and `config.md`
+- If contributing code, recommend reading all documentation
 
-## 文档维护
+## Documentation Maintenance
 
-这些文档与代码同步更新，确保文档的准确性和时效性。如果发现文档问题或需要补充，请提交 Issue 或 Pull Request。 
+These documents are updated synchronously with the code to ensure accuracy and timeliness. If you find documentation issues or need additions, please submit an Issue or Pull Request.

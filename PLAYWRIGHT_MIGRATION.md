@@ -1,45 +1,45 @@
-# Playwright 插件迁移指南
+# Playwright Plugin Migration Guide
 
-本文档提供了从 Selenium 迁移到 Playwright 的指南，以及相关的兼容性信息。
+This document provides a guide for migrating from Selenium to Playwright, along with related compatibility information.
 
-## 概述
+## Overview
 
-testring 框架现在支持 Playwright 作为浏览器自动化驱动，作为 Selenium 的替代方案。Playwright 插件提供了与 Selenium 高度兼容的 API，使迁移过程尽可能平滑。
+The testring framework now supports Playwright as a browser automation driver, serving as an alternative to Selenium. The Playwright plugin provides a highly compatible API with Selenium, making the migration process as smooth as possible.
 
-## 主要改进
+## Key Improvements
 
-### 🔧 资源管理
-- **改进的进程清理**: 修复了 Chromium 进程可能不正确结束的问题
-- **超时保护**: 所有清理操作都有超时保护，防止无限等待
-- **强制清理**: 如果正常清理失败，会尝试强制终止相关进程
-- **启动时清理**: 自动检测并清理历史遗留的孤儿进程
+### 🔧 Resource Management
+- **Improved process cleanup**: Fixed issues where Chromium processes might not terminate correctly
+- **Timeout protection**: All cleanup operations have timeout protection to prevent infinite waiting
+- **Force cleanup**: If normal cleanup fails, attempts to forcefully terminate related processes
+- **Startup cleanup**: Automatically detects and cleans up orphaned processes from previous runs
 
-### 🆔 Tab ID 管理
-- **一致的 Tab ID**: 使用 WeakMap 确保页面实例与 Tab ID 的一对一映射
-- **导航兼容**: 页面导航后 Tab ID 保持不变，与 Selenium 行为一致
+### 🆔 Tab ID Management
+- **Consistent Tab ID**: Uses WeakMap to ensure one-to-one mapping between page instances and Tab IDs
+- **Navigation compatibility**: Tab ID remains unchanged after page navigation, consistent with Selenium behavior
 
-### ⚡ 异步执行
-- **executeAsync 兼容性**: 完全支持 Selenium 风格的异步 JavaScript 执行
-- **浏览器脚本支持**: 支持 `getOptionsPropertyScript` 等框架内置脚本
-- **回调转换**: 自动将回调风格的函数转换为 Promise 风格
+### ⚡ Asynchronous Execution
+- **executeAsync compatibility**: Full support for Selenium-style asynchronous JavaScript execution
+- **Browser script support**: Supports framework built-in scripts like `getOptionsPropertyScript`
+- **Callback conversion**: Automatically converts callback-style functions to Promise-style
 
-### 🚨 对话框处理
-- **Alert 兼容性**: 与 Selenium 一致的 alert/confirm/prompt 处理行为
-- **序列化安全**: 修复了异步函数序列化导致的进程间通信问题
+### 🚨 Dialog Handling
+- **Alert compatibility**: Consistent alert/confirm/prompt handling behavior with Selenium
+- **Serialization safety**: Fixed inter-process communication issues caused by async function serialization
 
-## 使用方法
+## Usage
 
-### 配置 Playwright 插件
+### Configure Playwright Plugin
 
-在你的 testring 配置文件中，使用 `playwright-driver` 插件：
+In your testring configuration file, use the `playwright-driver` plugin:
 
 ```javascript
 module.exports = {
     plugins: ['playwright-driver', 'babel'],
-    
-    // Playwright 特定配置
+
+    // Playwright specific configuration
     'playwright-driver': {
-        browserName: 'chromium', // 或 'firefox', 'webkit'
+        browserName: 'chromium', // or 'firefox', 'webkit'
         launchOptions: {
             headless: true,
             args: []
@@ -52,154 +52,154 @@ module.exports = {
 };
 ```
 
-### 环境变量
+### Environment Variables
 
-支持以下环境变量：
+Supports the following environment variables:
 
-- `PLAYWRIGHT_DEBUG=1`: 启用调试模式（非 headless，慢动作）
+- `PLAYWRIGHT_DEBUG=1`: Enable debug mode (non-headless, slow motion)
 
-### 清理僵尸进程
+### Cleanup Zombie Processes
 
-如果遇到 Chromium 进程没有正确结束的情况，可以使用：
+If you encounter situations where Chromium processes don't terminate correctly, you can use:
 
 ```bash
 npm run cleanup:playwright
 ```
 
-## 兼容性
+## Compatibility
 
-### ✅ 完全兼容的功能
+### ✅ Fully Compatible Features
 
-- 所有基本的浏览器操作 (click, type, navigate 等)
-- 元素查找和操作
-- 窗口/标签页管理
-- Alert/Dialog 处理
-- 文件上传
-- 截图功能
-- JavaScript 执行
-- Cookie 管理
-- 表单操作
+- All basic browser operations (click, type, navigate, etc.)
+- Element finding and manipulation
+- Window/tab management
+- Alert/Dialog handling
+- File uploads
+- Screenshot functionality
+- JavaScript execution
+- Cookie management
+- Form operations
 
-### ⚠️ 部分兼容的功能
+### ⚠️ Partially Compatible Features
 
-- **Frame 操作**: 基本功能可用，但某些高级 frame 操作可能有差异
-- **移动设备模拟**: 支持基本的设备模拟，但可能与 Selenium 的实现有差异
+- **Frame operations**: Basic functionality available, but some advanced frame operations may differ
+- **Mobile device emulation**: Supports basic device emulation, but may differ from Selenium implementation
 
-### ❌ 不兼容的功能
+### ❌ Incompatible Features
 
-目前没有已知的完全不兼容的功能。如果遇到问题，请参考故障排除部分。
+Currently no known completely incompatible features. If you encounter issues, please refer to the troubleshooting section.
 
-## 性能对比
+## Performance Comparison
 
-| 特性 | Selenium | Playwright |
-|------|----------|------------|
-| 启动速度 | 较慢 | 快 |
-| 稳定性 | 一般 | 高 |
-| 调试能力 | 基本 | 强大 |
-| 浏览器支持 | 广泛 | Chrome/Firefox/Safari |
-| 资源消耗 | 高 | 中等 |
+| Feature | Selenium | Playwright |
+|---------|----------|------------|
+| Startup Speed | Slower | Fast |
+| Stability | Average | High |
+| Debugging Capability | Basic | Powerful |
+| Browser Support | Wide | Chrome/Firefox/Safari |
+| Resource Consumption | High | Medium |
 
-## 故障排除
+## Troubleshooting
 
-### 进程清理问题
+### Process Cleanup Issues
 
-如果发现 Chromium 进程没有正确结束：
+If you find that Chromium processes don't terminate correctly:
 
-1. 运行清理命令：
+1. Run cleanup command:
    ```bash
    npm run cleanup:playwright
    ```
 
-2. 手动检查残留进程：
+2. Manually check for remaining processes:
    ```bash
    pgrep -fla "playwright.*chrom"
    ```
 
-3. 如果仍有残留，手动清理：
+3. If there are still remnants, manually clean up:
    ```bash
    pkill -f "playwright.*chrom"
    ```
 
-### 序列化错误
+### Serialization Errors
 
-如果遇到 "await is only valid in async functions" 错误：
+If you encounter "await is only valid in async functions" errors:
 
-1. 确保使用的是最新版本的插件
-2. 检查是否在回调函数中误用了 async/await
-3. 重启测试进程
+1. Ensure you're using the latest version of the plugin
+2. Check if async/await is being misused in callback functions
+3. Restart the test process
 
-### Tab ID 不一致
+### Tab ID Inconsistency
 
-如果测试中遇到 Tab ID 不匹配的问题：
+If you encounter Tab ID mismatch issues in tests:
 
-1. 确保没有手动操作浏览器窗口
-2. 检查测试代码中的窗口切换逻辑
-3. 使用 `app.getCurrentTabId()` 获取当前 Tab ID
+1. Ensure no manual browser window operations
+2. Check window switching logic in test code
+3. Use `app.getCurrentTabId()` to get current Tab ID
 
-## 最佳实践
+## Best Practices
 
-### 1. 资源清理
+### 1. Resource Cleanup
 ```javascript
-// 测试结束后确保清理
+// Ensure cleanup after tests
 afterEach(async () => {
     await app.end();
 });
 ```
 
-### 2. 错误处理
+### 2. Error Handling
 ```javascript
 try {
     await app.click(selector);
 } catch (error) {
-    // 记录错误信息
+    // Log error information
     console.error('Click failed:', error.message);
     throw error;
 }
 ```
 
-### 3. 等待策略
+### 3. Waiting Strategy
 ```javascript
-// 使用适当的等待
+// Use appropriate waiting
 await app.waitForVisible(selector, 5000);
 await app.click(selector);
 ```
 
-### 4. 调试模式
+### 4. Debug Mode
 ```javascript
-// 开发时启用调试模式
+// Enable debug mode during development
 if (process.env.NODE_ENV === 'development') {
     process.env.PLAYWRIGHT_DEBUG = '1';
 }
 ```
 
-## 迁移检查清单
+## Migration Checklist
 
-- [ ] 更新配置文件使用 `playwright-driver`
-- [ ] 测试基本的浏览器操作
-- [ ] 验证 Alert/Dialog 处理
-- [ ] 检查窗口/标签页管理
-- [ ] 测试文件上传功能
-- [ ] 验证异步 JavaScript 执行
-- [ ] 运行完整的测试套件
-- [ ] 检查进程清理是否正常
+- [ ] Update configuration file to use `playwright-driver`
+- [ ] Test basic browser operations
+- [ ] Verify Alert/Dialog handling
+- [ ] Check window/tab management
+- [ ] Test file upload functionality
+- [ ] Verify asynchronous JavaScript execution
+- [ ] Run complete test suite
+- [ ] Check if process cleanup works properly
 
-## 支持
+## Support
 
-如果在迁移过程中遇到问题，请：
+If you encounter issues during migration, please:
 
-1. 查阅本文档的故障排除部分
-2. 检查 GitHub Issues
-3. 运行 `npm run cleanup:playwright` 清理可能的残留进程
-4. 提供详细的错误信息和复现步骤
+1. Consult the troubleshooting section of this document
+2. Check GitHub Issues
+3. Run `npm run cleanup:playwright` to clean up possible remaining processes
+4. Provide detailed error information and reproduction steps
 
-## 版本历史
+## Version History
 
-- **v0.8.1**: 增强资源管理
-  - 启动时自动清理孤儿进程
-  - 改进的进程生命周期管理
-  - 更强的清理机制
-- **v0.8.0**: 初始 Playwright 插件发布
-  - 基本浏览器操作支持
-  - Tab ID 管理系统
-  - 进程清理改进
-  - executeAsync 兼容性
+- **v0.8.1**: Enhanced resource management
+  - Automatic cleanup of orphaned processes at startup
+  - Improved process lifecycle management
+  - Stronger cleanup mechanisms
+- **v0.8.0**: Initial Playwright plugin release
+  - Basic browser operation support
+  - Tab ID management system
+  - Process cleanup improvements
+  - executeAsync compatibility

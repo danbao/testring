@@ -1,78 +1,78 @@
 # @testring/cli
 
-命令行界面模块，提供了 testring 框架的命令行工具和用户交互功能。
+Command line interface module that provides command line tools and user interaction functionality for the testring framework.
 
-## 功能概述
+## Overview
 
-该模块是 testring 框架的命令行入口，负责：
-- 解析命令行参数
-- 处理用户输入
-- 管理测试运行流程
-- 提供命令行帮助信息
+This module serves as the command line entry point for the testring framework, responsible for:
+- Parsing command line arguments
+- Handling user input
+- Managing test execution flow
+- Providing command line help information
 
-## 主要功能
+## Main Features
 
-### 命令支持
-- **`run`** - 运行测试命令（默认命令）
-- **`--help`** - 显示帮助信息
-- **`--version`** - 显示版本信息
+### Command Support
+- **`run`** - Run tests command (default command)
+- **`--help`** - Display help information
+- **`--version`** - Display version information
 
-### 配置选项
-支持以下命令行参数：
+### Configuration Options
+Supports the following command line parameters:
 
-- `--config` - 自定义配置文件路径
-- `--tests` - 测试文件搜索模式（glob 模式）
-- `--plugins` - 插件列表
-- `--bail` - 测试失败后立即停止
-- `--workerLimit` - 并行测试工作进程数量
-- `--retryCount` - 重试次数
-- `--retryDelay` - 重试延迟时间
-- `--logLevel` - 日志级别
-- `--envConfig` - 环境配置文件路径
-- `--devtool` - 启用开发工具（已弃用）
+- `--config` - Custom configuration file path
+- `--tests` - Test file search pattern (glob pattern)
+- `--plugins` - Plugin list
+- `--bail` - Stop immediately after test failure
+- `--workerLimit` - Number of parallel test worker processes
+- `--retryCount` - Number of retries
+- `--retryDelay` - Retry delay time
+- `--logLevel` - Log level
+- `--envConfig` - Environment configuration file path
+- `--devtool` - Enable development tools (deprecated)
 
-## 使用方法
+## Usage
 
-### 基本命令
+### Basic Commands
 ```bash
-# 运行测试（默认）
+# Run tests (default)
 testring
 testring run
 
-# 指定测试文件
+# Specify test files
 testring run --tests "./tests/**/*.spec.js"
 
-# 使用自定义配置
+# Use custom configuration
 testring run --config ./my-config.json
 
-# 设置并行工作进程数
+# Set parallel worker process count
 testring run --workerLimit 4
 
-# 设置重试次数
+# Set retry count
 testring run --retryCount 3
 
-# 设置日志级别
+# Set log level
 testring run --logLevel debug
 ```
 
-### 插件配置
+### Plugin Configuration
 ```bash
-# 使用单个插件
+# Use single plugin
 testring run --plugins @testring/plugin-selenium-driver
 
-# 使用多个插件
+# Use multiple plugins
 testring run --plugins @testring/plugin-selenium-driver --plugins @testring/plugin-babel
 ```
 
-### 环境配置
+### Environment Configuration
 ```bash
-# 使用环境配置覆盖主配置
+# Use environment configuration to override main configuration
 testring run --config ./config.json --envConfig ./env.json
 ```
 
-## 配置文件
+## Configuration Files
 
-### 基本配置文件 (.testringrc)
+### Basic Configuration File (.testringrc)
 ```json
 {
   "tests": "./tests/**/*.spec.js",
@@ -88,7 +88,7 @@ testring run --config ./config.json --envConfig ./env.json
 }
 ```
 
-### JavaScript 配置文件
+### JavaScript Configuration File
 ```javascript
 module.exports = {
   tests: "./tests/**/*.spec.js",
@@ -96,12 +96,12 @@ module.exports = {
     "@testring/plugin-selenium-driver"
   ],
   workerLimit: 2,
-  // 可以是函数
+  // Can be a function
   retryCount: process.env.CI ? 1 : 3
 };
 ```
 
-### 异步配置文件
+### Asynchronous Configuration File
 ```javascript
 module.exports = async () => {
   const config = await loadConfiguration();
@@ -113,41 +113,41 @@ module.exports = async () => {
 };
 ```
 
-## 错误处理
+## Error Handling
 
-CLI 模块提供了完善的错误处理机制：
-- 捕获并格式化运行时错误
-- 提供详细的错误信息
-- 支持优雅的进程退出
-- 处理用户中断信号（Ctrl+C）
+The CLI module provides comprehensive error handling mechanisms:
+- Captures and formats runtime errors
+- Provides detailed error information
+- Supports graceful process exit
+- Handles user interrupt signals (Ctrl+C)
 
-## 进程管理
+## Process Management
 
-支持以下进程信号：
-- `SIGINT` - 用户中断（Ctrl+C）
-- `SIGUSR1` - 用户信号1
-- `SIGUSR2` - 用户信号2
-- `SIGHUP` - 终端挂起
-- `SIGQUIT` - 退出信号
-- `SIGABRT` - 异常终止
-- `SIGTERM` - 终止信号
+Supports the following process signals:
+- `SIGINT` - User interrupt (Ctrl+C)
+- `SIGUSR1` - User signal 1
+- `SIGUSR2` - User signal 2
+- `SIGHUP` - Terminal hangup
+- `SIGQUIT` - Quit signal
+- `SIGABRT` - Abnormal termination
+- `SIGTERM` - Termination signal
 
-## 安装
+## Installation
 
 ```bash
 npm install @testring/cli
 ```
 
-## 依赖
+## Dependencies
 
-- `yargs` - 命令行参数解析
-- `@testring/logger` - 日志记录
-- `@testring/cli-config` - 配置管理
-- `@testring/transport` - 进程通信
-- `@testring/types` - 类型定义
+- `yargs` - Command line argument parsing
+- `@testring/logger` - Logging
+- `@testring/cli-config` - Configuration management
+- `@testring/transport` - Process communication
+- `@testring/types` - Type definitions
 
-## 相关模块
+## Related Modules
 
-- `@testring/cli-config` - 配置文件处理
-- `@testring/api` - 测试 API
-- `@testring/test-run-controller` - 测试运行控制
+- `@testring/cli-config` - Configuration file handling
+- `@testring/api` - Test API
+- `@testring/test-run-controller` - Test run control

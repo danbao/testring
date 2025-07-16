@@ -1,70 +1,70 @@
 # @testring/fs-reader
 
-文件系统读取器模块，提供了测试文件的查找、读取和解析功能。
+File system reader module that provides test file finding, reading, and parsing functionality.
 
-## 功能概述
+## Overview
 
-该模块负责处理测试文件的文件系统操作，包括：
-- 根据 glob 模式查找测试文件
-- 读取和解析测试文件内容
-- 支持插件化的文件处理
-- 提供文件缓存和优化
+This module handles file system operations for test files, including:
+- Finding test files based on glob patterns
+- Reading and parsing test file content
+- Supporting plugin-based file processing
+- Providing file caching and optimization
 
-## 主要组件
+## Main Components
 
 ### FSReader
-文件系统读取器主类：
+Main file system reader class:
 
 ```typescript
 export class FSReader extends PluggableModule implements IFSReader {
-  // 根据模式查找文件
+  // Find files based on pattern
   find(pattern: string): Promise<IFile[]>
-  
-  // 读取单个文件
+
+  // Read single file
   readFile(fileName: string): Promise<IFile | null>
 }
 ```
 
-### 文件接口
+### File Interface
 ```typescript
 interface IFile {
-  path: string;           // 文件路径
-  content: string;        // 文件内容
-  dependencies?: string[]; // 依赖文件
+  path: string;           // File path
+  content: string;        // File content
+  dependencies?: string[]; // Dependency files
 }
 ```
 
-## 主要功能
+## Main Features
 
-### 文件查找
-使用 glob 模式查找测试文件：
+### File Finding
+Find test files using glob patterns:
 
 ```typescript
 import { FSReader } from '@testring/fs-reader';
 
 const fsReader = new FSReader();
 
-// 查找所有测试文件
+// Find all test files
 const files = await fsReader.find('./tests/**/*.spec.js');
-console.log('找到的测试文件:', files.map(f => f.path));
+console.log('Found test files:', files.map(f => f.path));
 
-// 支持复杂的 glob 模式
+// Support complex glob patterns
 const unitTests = await fsReader.find('./src/**/*.{test,spec}.{js,ts}');
 ```
 
-### 文件读取
-读取单个文件的内容：
+### File Reading
+Read content of individual files:
 
 ```typescript
 import { FSReader } from '@testring/fs-reader';
 
 const fsReader = new FSReader();
 
-// 读取特定文件
+// Read specific file
 const file = await fsReader.readFile('./tests/login.spec.js');
 if (file) {
-  console.log('文件路径:', file.path);
-  console.log('文件内容:', file.content);
+  console.log('File path:', file.path);
+  console.log('File content:', file.content);
 }
 ```
 

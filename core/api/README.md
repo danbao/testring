@@ -1,184 +1,184 @@
 # @testring/api
 
-测试 API 控制器模块，提供了 testring 框架的核心 API 接口和测试执行控制功能。
+Test API controller module that provides the core API interface and test execution control functionality for the testring framework.
 
-## 功能概述
+## Overview
 
-该模块是 testring 框架的核心 API 层，负责：
-- 提供测试运行的主要入口点和生命周期管理
-- 管理测试状态、参数和环境变量
-- 处理测试事件的发布和订阅
-- 提供测试上下文和工具（HTTP客户端、Web应用等）
-- 集成异步断点和日志记录功能
+This module serves as the core API layer of the testring framework, responsible for:
+- Providing the main entry points and lifecycle management for test execution
+- Managing test state, parameters, and environment variables
+- Handling test event publishing and subscription
+- Providing test context and tools (HTTP client, web applications, etc.)
+- Integrating asynchronous breakpoints and logging functionality
 
-## 主要特性
+## Key Features
 
-### 测试生命周期管理
-- **完整的测试生命周期控制**：从测试开始到结束的全过程管理
-- **回调机制**：支持beforeRun和afterRun回调注册
-- **异步断点支持**：与@testring/async-breakpoints集成
+### Test Lifecycle Management
+- **Complete test lifecycle control**: Full process management from test start to finish
+- **Callback mechanism**: Support for beforeRun and afterRun callback registration
+- **Asynchronous breakpoint support**: Integration with @testring/async-breakpoints
 
-### 测试状态管理
-- **测试ID管理**：唯一标识每个测试
-- **参数管理**：支持测试参数和环境参数的设置和获取
-- **事件总线**：统一的事件发布和订阅机制
+### Test State Management
+- **Test ID management**: Unique identification for each test
+- **Parameter management**: Support for setting and getting test parameters and environment parameters
+- **Event bus**: Unified event publishing and subscription mechanism
 
-### 测试上下文
-- **集成工具**：HTTP客户端、Web应用、日志记录等
-- **自定义应用**：支持自定义Web应用实例
-- **参数访问**：便捷的参数和环境变量访问
+### Test Context
+- **Integrated tools**: HTTP client, web applications, logging, etc.
+- **Custom applications**: Support for custom web application instances
+- **Parameter access**: Convenient access to parameters and environment variables
 
-## 安装
+## Installation
 
 ```bash
 npm install @testring/api
 ```
 
-## 主要组件
+## Main Components
 
 ### 1. TestAPIController
 
-测试API控制器，管理测试的执行状态和参数：
+Test API controller that manages test execution state and parameters:
 
 ```typescript
 import { testAPIController } from '@testring/api';
 
-// 设置测试ID
+// Set test ID
 testAPIController.setTestID('user-login-test');
 
-// 设置测试参数
+// Set test parameters
 testAPIController.setTestParameters({
   username: 'testuser',
   password: 'testpass',
   timeout: 5000
 });
 
-// 设置环境参数
+// Set environment parameters
 testAPIController.setEnvironmentParameters({
   baseUrl: 'https://api.example.com',
   apiKey: 'secret-key'
 });
 
-// 获取当前测试ID
+// Get current test ID
 const testId = testAPIController.getTestID();
 
-// 获取测试参数
+// Get test parameters
 const params = testAPIController.getTestParameters();
 
-// 获取环境参数
+// Get environment parameters
 const env = testAPIController.getEnvironmentParameters();
 ```
 
 ### 2. BusEmitter
 
-事件总线，处理测试事件的发布和订阅：
+Event bus that handles test event publishing and subscription:
 
 ```typescript
 import { testAPIController } from '@testring/api';
 
 const bus = testAPIController.getBus();
 
-// 监听测试事件
+// Listen to test events
 bus.on('started', () => {
-  console.log('测试开始执行');
+  console.log('Test execution started');
 });
 
 bus.on('finished', () => {
-  console.log('测试执行完成');
+  console.log('Test execution completed');
 });
 
 bus.on('failed', (error: Error) => {
-  console.error('测试执行失败:', error.message);
+  console.error('Test execution failed:', error.message);
 });
 
-// 手动触发事件
+// Manually trigger events
 await bus.startedTest();
 await bus.finishedTest();
-await bus.failedTest(new Error('测试失败'));
+await bus.failedTest(new Error('Test failed'));
 ```
 
-### 3. run 函数
+### 3. run Function
 
-测试运行的主要入口点：
+Main entry point for test execution:
 
 ```typescript
 import { run, beforeRun, afterRun } from '@testring/api';
 
-// 注册生命周期回调
+// Register lifecycle callbacks
 beforeRun(() => {
-  console.log('准备执行测试');
+  console.log('Preparing to execute test');
 });
 
 afterRun(() => {
-  console.log('测试执行完毕');
+  console.log('Test execution completed');
 });
 
-// 定义测试函数
+// Define test function
 const loginTest = async (api) => {
-  await api.log('开始登录测试');
-  
-  // 使用HTTP客户端
+  await api.log('Starting login test');
+
+  // Use HTTP client
   const response = await api.http.post('/login', {
     username: 'testuser',
     password: 'testpass'
   });
-  
-  await api.log('登录请求完成', response.status);
-  
-  // 使用Web应用
+
+  await api.log('Login request completed', response.status);
+
+  // Use web application
   await api.application.url('https://example.com/dashboard');
   const title = await api.application.getTitle();
-  
-  await api.log('页面标题:', title);
+
+  await api.log('Page title:', title);
 };
 
-// 执行测试
+// Execute test
 await run(loginTest);
 ```
 
 ### 4. TestContext
 
-测试上下文类，提供测试环境和工具：
+Test context class that provides test environment and tools:
 
 ```typescript
-// 在测试函数中使用
+// Use in test function
 const myTest = async (api) => {
-  // HTTP客户端
+  // HTTP client
   const response = await api.http.get('/api/users');
-  
-  // Web应用操作
+
+  // Web application operations
   await api.application.url('https://example.com');
   const element = await api.application.findElement('#login-button');
   await element.click();
-  
-  // 日志记录
-  await api.log('用户操作完成');
-  await api.logWarning('这是一个警告');
-  await api.logError('这是一个错误');
-  
-  // 业务日志
-  await api.logBusiness('用户登录流程');
-  // ... 执行业务逻辑
+
+  // Logging
+  await api.log('User operation completed');
+  await api.logWarning('This is a warning');
+  await api.logError('This is an error');
+
+  // Business logging
+  await api.logBusiness('User login flow');
+  // ... execute business logic
   await api.stopLogBusiness();
-  
-  // 获取参数
+
+  // Get parameters
   const params = api.getParameters();
   const env = api.getEnvironment();
-  
-  // 自定义应用
+
+  // Custom application
   const customApp = api.initCustomApplication(MyCustomWebApp);
   await customApp.doSomething();
 };
 ```
 
-## 完整使用示例
+## Complete Usage Examples
 
-### 基本测试示例
+### Basic Test Example
 
 ```typescript
 import { run, testAPIController, beforeRun, afterRun } from '@testring/api';
 
-// 设置测试配置
+// Set test configuration
 testAPIController.setTestID('e2e-user-workflow');
 testAPIController.setTestParameters({
   username: 'testuser@example.com',
@@ -191,103 +191,103 @@ testAPIController.setEnvironmentParameters({
   apiKey: 'staging-api-key'
 });
 
-// 注册生命周期回调
+// Register lifecycle callbacks
 beforeRun(async () => {
-  console.log('测试准备阶段');
-  // 初始化测试数据
+  console.log('Test preparation phase');
+  // Initialize test data
   await setupTestData();
 });
 
 afterRun(async () => {
-  console.log('测试清理阶段');
-  // 清理测试数据
+  console.log('Test cleanup phase');
+  // Clean up test data
   await cleanupTestData();
 });
 
-// 定义测试函数
+// Define test function
 const userRegistrationTest = async (api) => {
-  await api.logBusiness('用户注册流程测试');
-  
+  await api.logBusiness('User registration flow test');
+
   try {
-    // 步骤1：访问注册页面
+    // Step 1: Visit registration page
     await api.application.url(`${api.getEnvironment().baseUrl}/register`);
-    await api.log('已访问注册页面');
-    
-    // 步骤2：填写注册表单
+    await api.log('Visited registration page');
+
+    // Step 2: Fill registration form
     const params = api.getParameters();
     await api.application.setValue('#email', params.username);
     await api.application.setValue('#password', params.password);
     await api.application.click('#register-btn');
-    
-    // 步骤3：验证注册成功
+
+    // Step 3: Verify registration success
     const successMessage = await api.application.getText('.success-message');
-    await api.log('注册成功消息:', successMessage);
-    
-    // 步骤4：API验证
+    await api.log('Registration success message:', successMessage);
+
+    // Step 4: API verification
     const response = await api.http.get('/api/user/profile', {
       headers: {
         'Authorization': `Bearer ${api.getEnvironment().apiKey}`
       }
     });
-    
-    await api.log('用户资料获取成功', response.data);
-    
+
+    await api.log('User profile retrieved successfully', response.data);
+
   } catch (error) {
-    await api.logError('测试执行失败:', error);
+    await api.logError('Test execution failed:', error);
     throw error;
   } finally {
     await api.stopLogBusiness();
   }
 };
 
-// 执行测试
+// Execute test
 await run(userRegistrationTest);
 ```
 
-### 多测试函数示例
+### Multiple Test Functions Example
 
 ```typescript
 import { run } from '@testring/api';
 
 const loginTest = async (api) => {
-  await api.logBusiness('用户登录测试');
-  
+  await api.logBusiness('User login test');
+
   await api.application.url('/login');
   await api.application.setValue('#username', 'testuser');
   await api.application.setValue('#password', 'testpass');
   await api.application.click('#login-btn');
-  
+
   const dashboard = await api.application.findElement('.dashboard');
-  await api.log('登录成功，进入仪表板');
-  
+  await api.log('Login successful, entered dashboard');
+
   await api.stopLogBusiness();
 };
 
 const profileTest = async (api) => {
-  await api.logBusiness('用户资料测试');
-  
+  await api.logBusiness('User profile test');
+
   await api.application.click('#profile-link');
   const profileData = await api.application.getText('.profile-info');
-  await api.log('用户资料:', profileData);
-  
+  await api.log('User profile:', profileData);
+
   await api.stopLogBusiness();
 };
 
 const logoutTest = async (api) => {
-  await api.logBusiness('用户登出测试');
-  
+  await api.logBusiness('User logout test');
+
   await api.application.click('#logout-btn');
   const loginForm = await api.application.findElement('#login-form');
-  await api.log('登出成功，返回登录页');
-  
+  await api.log('Logout successful, returned to login page');
+
   await api.stopLogBusiness();
 };
 
-// 按顺序执行多个测试
+// Execute multiple tests in sequence
 await run(loginTest, profileTest, logoutTest);
 ```
 
-### 自定义应用示例
+### Custom Application Example
 
 ```typescript
 import { WebApplication } from '@testring/web-application';
@@ -298,11 +298,11 @@ class CustomWebApp extends WebApplication {
     await this.setValue('#username', username);
     await this.setValue('#password', password);
     await this.click('#login-btn');
-    
-    // 等待登录完成
+
+    // Wait for login completion
     await this.waitForElement('.dashboard', 5000);
   }
-  
+
   async getUnreadNotifications() {
     const notifications = await this.findElements('.notification.unread');
     return notifications.length;
@@ -311,27 +311,27 @@ class CustomWebApp extends WebApplication {
 
 const customAppTest = async (api) => {
   const customApp = api.initCustomApplication(CustomWebApp);
-  
+
   await customApp.loginWithCredentials('testuser', 'testpass');
   const unreadCount = await customApp.getUnreadNotifications();
-  
-  await api.log(`未读通知数量: ${unreadCount}`);
-  
-  // 访问自定义应用列表
+
+  await api.log(`Unread notification count: ${unreadCount}`);
+
+  // Access custom application list
   const customApps = api.getCustomApplicationsList();
-  await api.log(`自定义应用数量: ${customApps.length}`);
+  await api.log(`Custom application count: ${customApps.length}`);
 };
 ```
 
-## 错误处理
+## Error Handling
 
 ```typescript
 import { run, testAPIController } from '@testring/api';
 
-// 监听测试失败事件
+// Listen to test failure events
 const bus = testAPIController.getBus();
 bus.on('failed', (error: Error) => {
-  console.error('测试失败详情:', {
+  console.error('Test failure details:', {
     testId: testAPIController.getTestID(),
     error: error.message,
     stack: error.stack
@@ -340,15 +340,15 @@ bus.on('failed', (error: Error) => {
 
 const errorHandlingTest = async (api) => {
   try {
-    await api.logBusiness('错误处理测试');
-    
-    // 可能失败的操作
+    await api.logBusiness('Error handling test');
+
+    // Operation that might fail
     await api.application.url('/invalid-url');
-    
+
   } catch (error) {
-    await api.logError('捕获到错误:', error);
-    
-    // 可以选择重新抛出或处理错误
+    await api.logError('Caught error:', error);
+
+    // Can choose to re-throw or handle the error
     throw error;
   } finally {
     await api.stopLogBusiness();
@@ -358,12 +358,12 @@ const errorHandlingTest = async (api) => {
 await run(errorHandlingTest);
 ```
 
-## 性能优化
+## Performance Optimization
 
-### HTTP请求优化
+### HTTP Request Optimization
 ```typescript
 const optimizedHttpTest = async (api) => {
-  // 配置HTTP客户端
+  // Configure HTTP client
   const httpOptions = {
     timeout: 5000,
     retries: 3,
@@ -371,76 +371,76 @@ const optimizedHttpTest = async (api) => {
       'User-Agent': 'testring-test-client'
     }
   };
-  
-  // 并发请求
+
+  // Concurrent requests
   const [user, posts, comments] = await Promise.all([
     api.http.get('/api/user', httpOptions),
     api.http.get('/api/posts', httpOptions),
     api.http.get('/api/comments', httpOptions)
   ]);
-  
-  await api.log('并发请求完成');
+
+  await api.log('Concurrent requests completed');
 };
 ```
 
-### 资源清理
+### Resource Cleanup
 ```typescript
 afterRun(async () => {
-  // 确保所有资源被正确清理
+  // Ensure all resources are properly cleaned up
   await api.end();
 });
 ```
 
-## 配置选项
+## Configuration Options
 
-### TestAPIController配置
+### TestAPIController Configuration
 ```typescript
 interface TestAPIControllerOptions {
-  testID: string;                    // 测试ID
-  testParameters: object;            // 测试参数
-  environmentParameters: object;     // 环境参数
+  testID: string;                    // Test ID
+  testParameters: object;            // Test parameters
+  environmentParameters: object;     // Environment parameters
 }
 ```
 
-### TestContext配置
+### TestContext Configuration
 ```typescript
 interface TestContextConfig {
-  httpThrottle?: number;             // HTTP请求限流
-  runData?: ITestQueuedTestRunData;  // 运行数据
+  httpThrottle?: number;             // HTTP request throttling
+  runData?: ITestQueuedTestRunData;  // Run data
 }
 ```
 
-## 事件类型
+## Event Types
 
 ```typescript
 enum TestEvents {
-  started = 'started',               // 测试开始
-  finished = 'finished',             // 测试完成
-  failed = 'failed'                  // 测试失败
+  started = 'started',               // Test started
+  finished = 'finished',             // Test completed
+  failed = 'failed'                  // Test failed
 }
 ```
 
-## 依赖
+## Dependencies
 
-- `@testring/web-application` - Web应用测试功能
-- `@testring/async-breakpoints` - 异步断点支持
-- `@testring/logger` - 日志记录系统
-- `@testring/http-api` - HTTP客户端
-- `@testring/transport` - 传输层
-- `@testring/utils` - 工具函数
-- `@testring/types` - 类型定义
+- `@testring/web-application` - Web application testing functionality
+- `@testring/async-breakpoints` - Asynchronous breakpoint support
+- `@testring/logger` - Logging system
+- `@testring/http-api` - HTTP client
+- `@testring/transport` - Transport layer
+- `@testring/utils` - Utility functions
+- `@testring/types` - Type definitions
 
-## 相关模块
+## Related Modules
 
-- `@testring/test-run-controller` - 测试运行控制器
-- `@testring/test-worker` - 测试工作进程
-- `@testring/cli` - 命令行界面
-- `@testring/async-assert` - 异步断言库
+- `@testring/test-run-controller` - Test run controller
+- `@testring/test-worker` - Test worker process
+- `@testring/cli` - Command line interface
+- `@testring/async-assert` - Asynchronous assertion library
 
-## 最佳实践
+## Best Practices
 
-1. **合理设置测试ID**：使用有意义的测试ID，便于日志追踪
-2. **参数管理**：将可变参数和环境变量分离管理
-3. **生命周期回调**：合理使用beforeRun和afterRun进行初始化和清理
-4. **错误处理**：监听测试事件，实现完整的错误处理机制
-5. **资源清理**：确保测试结束时正确清理所有资源
+1. **Set meaningful test IDs**: Use descriptive test IDs for easy log tracking
+2. **Parameter management**: Separate variable parameters and environment variables
+3. **Lifecycle callbacks**: Use beforeRun and afterRun appropriately for initialization and cleanup
+4. **Error handling**: Listen to test events and implement comprehensive error handling mechanisms
+5. **Resource cleanup**: Ensure all resources are properly cleaned up when tests end

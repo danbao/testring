@@ -213,148 +213,148 @@ module.exports = {
 };
 ```
 
-## 使用方法
+## Usage
 
-### 基本用法
+### Basic Usage
 ```javascript
-// 测试文件
-describe('登录测试', () => {
-  it('应该能够成功登录', async () => {
-    // 导航到登录页面
+// Test file
+describe('Login Test', () => {
+  it('should be able to login successfully', async () => {
+    // Navigate to login page
     await browser.url('https://example.com/login');
-    
-    // 输入用户名和密码
+
+    // Enter username and password
     await browser.setValue('#username', 'testuser');
     await browser.setValue('#password', 'testpass');
-    
-    // 点击登录按钮
+
+    // Click login button
     await browser.click('#login-button');
-    
-    // 验证登录成功
+
+    // Verify login success
     const welcomeText = await browser.getText('#welcome');
-    expect(welcomeText).toContain('欢迎');
+    expect(welcomeText).toContain('Welcome');
   });
 });
 ```
 
-### 元素定位
+### Element Location
 ```javascript
-// 多种定位方式
+// Multiple location methods
 await browser.click('#button-id');                    // ID
 await browser.click('.button-class');                 // Class
-await browser.click('button[type="submit"]');         // CSS 选择器
+await browser.click('button[type="submit"]');         // CSS selector
 await browser.click('//button[@type="submit"]');      // XPath
-await browser.click('=Submit');                       // 文本内容
-await browser.click('*=Submit');                      // 部分文本
+await browser.click('=Submit');                       // Text content
+await browser.click('*=Submit');                      // Partial text
 ```
 
-### 页面操作
+### Page Operations
 ```javascript
-// 页面导航
+// Page navigation
 await browser.url('https://example.com');
 await browser.back();
 await browser.forward();
 await browser.refresh();
 
-// 窗口操作
+// Window operations
 await browser.newWindow('https://example.com');
 await browser.switchWindow('window-name');
 await browser.closeWindow();
 
-// 框架操作
+// Frame operations
 await browser.switchToFrame('#frame-id');
 await browser.switchToParentFrame();
 ```
 
-### 等待机制
+### Waiting Mechanisms
 ```javascript
-// 等待元素出现
+// Wait for element to appear
 await browser.waitForVisible('#element', 5000);
 
-// 等待元素消失
+// Wait for element to disappear
 await browser.waitForHidden('#loading', 10000);
 
-// 等待文本内容
+// Wait for text content
 await browser.waitForText('#status', 'Complete', 5000);
 
-// 等待值变化
+// Wait for value change
 await browser.waitForValue('#input', 'expected-value', 3000);
 
-// 自定义等待条件
+// Custom wait condition
 await browser.waitUntil(() => {
   return browser.isVisible('#submit-button');
-}, 5000, '提交按钮未出现');
+}, 5000, 'Submit button did not appear');
 ```
 
-### 表单操作
+### Form Operations
 ```javascript
-// 输入框操作
+// Input field operations
 await browser.setValue('#input', 'test value');
 await browser.addValue('#input', ' additional');
 await browser.clearValue('#input');
 
-// 选择框操作
+// Select box operations
 await browser.selectByVisibleText('#select', 'Option 1');
 await browser.selectByValue('#select', 'option1');
 await browser.selectByIndex('#select', 0);
 
-// 复选框和单选框
+// Checkboxes and radio buttons
 await browser.click('#checkbox');
 await browser.click('#radio');
 
-// 文件上传
+// File upload
 await browser.chooseFile('#file-input', './test-file.txt');
 ```
 
-### 断言和验证
+### Assertions and Verification
 ```javascript
-// 元素存在性
+// Element existence
 const isVisible = await browser.isVisible('#element');
 expect(isVisible).toBe(true);
 
-// 文本内容
+// Text content
 const text = await browser.getText('#element');
 expect(text).toBe('Expected Text');
 
-// 属性值
+// Attribute values
 const value = await browser.getValue('#input');
 expect(value).toBe('expected-value');
 
-// 元素属性
+// Element attributes
 const className = await browser.getAttribute('#element', 'class');
 expect(className).toContain('active');
 ```
 
-## 高级功能
+## Advanced Features
 
-### 多浏览器测试
+### Multi-Browser Testing
 ```javascript
-// 配置多个浏览器
+// Configure multiple browsers
 const browsers = ['chrome', 'firefox', 'safari'];
 
 browsers.forEach(browserName => {
-  describe(`${browserName} 测试`, () => {
+  describe(`${browserName} Tests`, () => {
     beforeEach(async () => {
       await browser.switchBrowser(browserName);
     });
-    
-    it('应该在所有浏览器中正常工作', async () => {
+
+    it('should work properly in all browsers', async () => {
       await browser.url('https://example.com');
-      // 测试逻辑
+      // Test logic
     });
   });
 });
 ```
 
-### 截图功能
+### Screenshot Features
 ```javascript
-// 全屏截图
+// Full page screenshot
 await browser.saveScreenshot('./screenshots/full-page.png');
 
-// 元素截图
+// Element screenshot
 await browser.saveElementScreenshot('#element', './screenshots/element.png');
 
-// 失败时自动截图
+// Automatic screenshot on failure
 afterEach(async function() {
   if (this.currentTest.state === 'failed') {
     await browser.saveScreenshot(`./screenshots/failed-${this.currentTest.title}.png`);
@@ -362,51 +362,51 @@ afterEach(async function() {
 });
 ```
 
-### 性能监控
+### Performance Monitoring
 ```javascript
-// 页面加载时间
+// Page load time
 const startTime = Date.now();
 await browser.url('https://example.com');
 const loadTime = Date.now() - startTime;
-console.log(`页面加载时间: ${loadTime}ms`);
+console.log(`Page load time: ${loadTime}ms`);
 
-// 网络请求监控
+// Network request monitoring
 await browser.setupNetworkCapture();
 await browser.url('https://example.com');
 const networkLogs = await browser.getNetworkLogs();
 ```
 
-## 调试功能
+## Debugging Features
 
-### 调试模式
+### Debug Mode
 ```javascript
-// 启用调试模式
+// Enable debug mode
 await browser.debug();
 
-// 暂停执行
+// Pause execution
 await browser.pause(3000);
 
-// 控制台日志
+// Console logs
 const logs = await browser.getLogs('browser');
-console.log('浏览器日志:', logs);
+console.log('Browser logs:', logs);
 ```
 
-### 元素检查
+### Element Inspection
 ```javascript
-// 获取元素信息
+// Get element information
 const element = await browser.$('#element');
 const location = await element.getLocation();
 const size = await element.getSize();
 const tagName = await element.getTagName();
 
-console.log('元素位置:', location);
-console.log('元素大小:', size);
-console.log('元素标签:', tagName);
+console.log('Element location:', location);
+console.log('Element size:', size);
+console.log('Element tag:', tagName);
 ```
 
-## Selenium Grid 支持
+## Selenium Grid Support
 
-### 配置 Selenium Grid
+### Configure Selenium Grid
 ```json
 {
   "plugins": [
@@ -422,7 +422,7 @@ console.log('元素标签:', tagName);
 }
 ```
 
-### Docker 支持
+### Docker Support
 ```yaml
 # docker-compose.yml
 version: '3'
@@ -431,7 +431,7 @@ services:
     image: selenium/hub:latest
     ports:
       - "4444:4444"
-  
+
   chrome:
     image: selenium/node-chrome:latest
     depends_on:
@@ -440,26 +440,26 @@ services:
       - HUB_HOST=selenium-hub
 ```
 
-## 故障排除
+## Troubleshooting
 
-### 常见问题
-1. **浏览器驱动不匹配**
-   - 确保 ChromeDriver 版本与 Chrome 版本匹配
-   - 使用 `chromedriver --version` 检查版本
+### Common Issues
+1. **Browser driver mismatch**
+   - Ensure ChromeDriver version matches Chrome version
+   - Use `chromedriver --version` to check version
 
-2. **元素定位失败**
-   - 使用 `browser.debug()` 调试
-   - 检查元素是否在框架中
-   - 等待元素加载完成
+2. **Element location failure**
+   - Use `browser.debug()` for debugging
+   - Check if element is in a frame
+   - Wait for element to load completely
 
-3. **超时问题**
-   - 增加等待时间
-   - 使用显式等待而非隐式等待
-   - 检查网络连接
+3. **Timeout issues**
+   - Increase wait time
+   - Use explicit waits instead of implicit waits
+   - Check network connection
 
-### 性能优化
+### Performance Optimization
 ```javascript
-// 优化配置
+// Optimized configuration
 {
   "chromeOptions": {
     "args": [

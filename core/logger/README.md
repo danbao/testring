@@ -1,19 +1,19 @@
 # @testring/logger
 
-分布式日志系统模块，提供了多进程环境下的日志记录和管理功能。
+Distributed logging system module that provides logging and management functionality in multi-process environments.
 
-## 功能概述
+## Overview
 
-该模块提供了完整的日志记录解决方案，支持：
-- 多进程环境下的日志聚合
-- 可配置的日志级别过滤
-- 插件化的日志处理
-- 格式化的日志输出
+This module provides a complete logging solution, supporting:
+- Log aggregation in multi-process environments
+- Configurable log level filtering
+- Plugin-based log processing
+- Formatted log output
 
-## 主要组件
+## Main Components
 
 ### LoggerServer
-日志服务器，负责处理和输出日志：
+Log server responsible for processing and outputting logs:
 
 ```typescript
 export class LoggerServer extends PluggableModule {
@@ -26,7 +26,7 @@ export class LoggerServer extends PluggableModule {
 ```
 
 ### LoggerClient
-日志客户端，提供日志记录接口：
+Log client that provides logging interface:
 
 ```typescript
 export interface ILoggerClient {
@@ -38,73 +38,73 @@ export interface ILoggerClient {
 }
 ```
 
-## 日志级别
+## Log Levels
 
-支持以下日志级别（按优先级排序）：
+Supports the following log levels (ordered by priority):
 
-1. **`verbose`** - 最详细的调试信息
-2. **`debug`** - 调试信息
-3. **`info`** - 一般信息（默认级别）
-4. **`warning`** - 警告信息
-5. **`error`** - 错误信息
-6. **`silent`** - 静默模式，不输出任何日志
+1. **`verbose`** - Most detailed debugging information
+2. **`debug`** - Debug information
+3. **`info`** - General information (default level)
+4. **`warning`** - Warning information
+5. **`error`** - Error information
+6. **`silent`** - Silent mode, no log output
 
-## 使用方法
+## Usage
 
-### 基本使用
+### Basic Usage
 ```typescript
 import { loggerClient } from '@testring/logger';
 
-// 记录不同级别的日志
-loggerClient.verbose('详细的调试信息');
-loggerClient.debug('调试信息');
-loggerClient.info('一般信息');
-loggerClient.warn('警告信息');
-loggerClient.error('错误信息');
+// Log different levels
+loggerClient.verbose('Detailed debugging information');
+loggerClient.debug('Debug information');
+loggerClient.info('General information');
+loggerClient.warn('Warning information');
+loggerClient.error('Error information');
 ```
 
-### 配置日志级别
+### Configure Log Level
 ```typescript
 import { LoggerServer } from '@testring/logger';
 
 const config = {
-  logLevel: 'debug',  // 只显示 debug 及以上级别的日志
-  silent: false       // 是否静默模式
+  logLevel: 'debug',  // Only show debug and above level logs
+  silent: false       // Whether in silent mode
 };
 
 const loggerServer = new LoggerServer(config, transport, process.stdout);
 ```
 
-### 日志格式化
+### Log Formatting
 ```typescript
-// 日志会自动格式化输出
-loggerClient.info('测试开始', { testId: 'test-001' });
-// 输出: [INFO] 测试开始 { testId: 'test-001' }
+// Logs are automatically formatted for output
+loggerClient.info('Test started', { testId: 'test-001' });
+// Output: [INFO] Test started { testId: 'test-001' }
 ```
 
-## 配置选项
+## Configuration Options
 
-### 日志级别配置
+### Log Level Configuration
 ```typescript
 interface IConfigLogger {
   logLevel: 'verbose' | 'debug' | 'info' | 'warning' | 'error' | 'silent';
-  silent: boolean;  // 快速静默模式
+  silent: boolean;  // Quick silent mode
 }
 ```
 
-### 命令行配置
+### Command Line Configuration
 ```bash
-# 设置日志级别
+# Set log level
 testring run --logLevel debug
 
-# 静默模式
+# Silent mode
 testring run --silent
 
-# 或者
+# Or
 testring run --logLevel silent
 ```
 
-### 配置文件
+### Configuration File
 ```json
 {
   "logLevel": "debug",
@@ -112,22 +112,22 @@ testring run --logLevel silent
 }
 ```
 
-## 插件支持
+## Plugin Support
 
-日志系统支持插件扩展，可以自定义日志处理逻辑：
+The logging system supports plugin extensions for custom log processing logic:
 
-### 插件钩子
-- `beforeLog` - 日志输出前处理
-- `onLog` - 日志输出时处理
-- `onError` - 错误处理
+### Plugin Hooks
+- `beforeLog` - Pre-processing before log output
+- `onLog` - Processing during log output
+- `onError` - Error handling
 
-### 自定义日志插件
+### Custom Log Plugin
 ```typescript
 export default (pluginAPI) => {
   const logger = pluginAPI.getLogger();
-  
+
   logger.beforeLog((logEntity, meta) => {
-    // 日志预处理
+    // Log preprocessing
     return {
       ...logEntity,
       timestamp: new Date().toISOString()
@@ -135,97 +135,97 @@ export default (pluginAPI) => {
   });
   
   logger.onLog((logEntity, meta) => {
-    // 自定义日志处理
+    // Custom log processing
     if (logEntity.logLevel === 'error') {
-      // 发送错误报告
+      // Send error report
       sendErrorReport(logEntity.content);
     }
   });
 };
 ```
 
-## 多进程支持
+## Multi-Process Support
 
-### 进程间日志聚合
-日志系统在多进程环境中会自动聚合所有进程的日志：
+### Inter-Process Log Aggregation
+The logging system automatically aggregates logs from all processes in a multi-process environment:
 
 ```typescript
-// 子进程中的日志
-loggerClient.info('子进程日志');
+// Log from child process
+loggerClient.info('Child process log');
 
-// 会自动传输到主进程并统一输出
-// [INFO] [Worker-1] 子进程日志
+// Automatically transmitted to main process and output uniformly
+// [INFO] [Worker-1] Child process log
 ```
 
-### 进程标识
-每个进程的日志都会带有进程标识，便于调试：
-- 主进程：无标识
-- 子进程：`[Worker-{ID}]`
+### Process Identification
+Each process's logs include process identification for easier debugging:
+- Main process: No identifier
+- Child process: `[Worker-{ID}]`
 
-## 日志格式
+## Log Format
 
-### 标准格式
+### Standard Format
 ```
 [LEVEL] [ProcessID] Message
 ```
 
-### 示例输出
+### Example Output
 ```
-[INFO] 测试开始
-[DEBUG] [Worker-1] 加载测试文件: test.spec.js
-[WARN] [Worker-2] 测试重试: 第2次
-[ERROR] [Worker-1] 测试失败: 断言错误
+[INFO] Test started
+[DEBUG] [Worker-1] Loading test file: test.spec.js
+[WARN] [Worker-2] Test retry: 2nd attempt
+[ERROR] [Worker-1] Test failed: Assertion error
 ```
 
-## 性能优化
+## Performance Optimization
 
-### 异步日志处理
-- 使用队列系统处理日志
-- 避免阻塞主流程
-- 支持批量处理
+### Asynchronous Log Processing
+- Uses queue system for log processing
+- Avoids blocking main flow
+- Supports batch processing
 
-### 内存管理
-- 自动清理日志队列
-- 防止内存泄漏
-- 可配置的缓冲区大小
+### Memory Management
+- Automatic log queue cleanup
+- Prevents memory leaks
+- Configurable buffer size
 
-## 调试功能
+## Debugging Features
 
-### 日志追踪
+### Log Tracing
 ```typescript
-// 启用详细日志追踪
+// Enable detailed log tracing
 const config = {
   logLevel: 'verbose'
 };
 
-// 会输出详细的执行信息
-loggerClient.verbose('详细的调试信息', { 
-  stack: new Error().stack 
+// Will output detailed execution information
+loggerClient.verbose('Detailed debugging information', {
+  stack: new Error().stack
 });
 ```
 
-### 错误上下文
-错误日志会包含完整的上下文信息：
-- 错误堆栈
-- 进程信息
-- 时间戳
-- 相关参数
+### Error Context
+Error logs include complete context information:
+- Error stack trace
+- Process information
+- Timestamp
+- Related parameters
 
-## 安装
+## Installation
 
 ```bash
 npm install @testring/logger
 ```
 
-## 依赖
+## Dependencies
 
-- `@testring/pluggable-module` - 插件支持
-- `@testring/utils` - 工具函数
-- `@testring/transport` - 进程间通信
-- `@testring/types` - 类型定义
+- `@testring/pluggable-module` - Plugin support
+- `@testring/utils` - Utility functions
+- `@testring/transport` - Inter-process communication
+- `@testring/types` - Type definitions
 
-## 相关模块
+## Related Modules
 
-- `@testring/cli` - 命令行工具
-- `@testring/plugin-api` - 插件接口
-- `@testring/transport` - 传输层
+- `@testring/cli` - Command line tools
+- `@testring/plugin-api` - Plugin interface
+- `@testring/transport` - Transport layer

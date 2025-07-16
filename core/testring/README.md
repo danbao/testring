@@ -1,61 +1,61 @@
 # testring
 
-testring 框架的主入口包，提供了命令行工具和可编程的测试 API，是整个测试框架的统一入口点。
+Main entry package for the testring framework, providing command-line tools and programmable test API, serving as the unified entry point for the entire testing framework.
 
 [![npm version](https://badge.fury.io/js/testring.svg)](https://www.npmjs.com/package/testring)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 功能概述
+## Overview
 
-testring 主包作为整个测试框架的入口点，负责：
-- 提供 `testring` 命令行工具用于执行测试
-- 暴露统一的 `run` API 供脚本中直接调用
-- 集成所有核心模块与插件系统
-- 管理测试执行的生命周期
-- 处理配置文件和命令行参数
+The testring main package serves as the entry point for the entire testing framework, responsible for:
+- Providing the `testring` command-line tool for test execution
+- Exposing a unified `run` API for direct script invocation
+- Integrating all core modules with the plugin system
+- Managing test execution lifecycle
+- Handling configuration files and command-line parameters
 
-## 主要特性
+## Key Features
 
-### 命令行界面
-- 简单易用的命令行工具
-- 支持多种配置方式
-- 丰富的命令行参数
-- 智能的错误提示
+### Command Line Interface
+- Simple and easy-to-use command-line tool
+- Support for multiple configuration methods
+- Rich command-line parameters
+- Intelligent error prompts
 
-### 可编程 API
-- 灵活的编程接口
-- 支持异步操作
-- 完整的生命周期管理
-- 插件系统集成
+### Programmable API
+- Flexible programming interface
+- Support for asynchronous operations
+- Complete lifecycle management
+- Plugin system integration
 
-### 多进程支持
-- 并行测试执行
-- 进程间通信
-- 负载均衡
-- 错误隔离
+### Multi-Process Support
+- Parallel test execution
+- Inter-process communication
+- Load balancing
+- Error isolation
 
-## 安装
+## Installation
 
-### 使用 npm
+### Using npm
 ```bash
 npm install --save-dev testring
 ```
 
-### 使用 yarn
+### Using yarn
 ```bash
 yarn add testring --dev
 ```
 
-### 使用 pnpm
+### Using pnpm
 ```bash
 pnpm add testring --dev
 ```
 
-## 快速开始
+## Quick Start
 
-### 1. 创建配置文件
+### 1. Create Configuration File
 
-创建 `.testringrc` 文件：
+Create `.testringrc` file:
 
 ```json
 {
@@ -69,13 +69,13 @@ pnpm add testring --dev
 }
 ```
 
-### 2. 编写测试文件
+### 2. Write Test File
 
-创建 `tests/example.spec.js`：
+Create `tests/example.spec.js`:
 
 ```javascript
-describe('示例测试', () => {
-  it('应该通过基本测试', async () => {
+describe('Example Test', () => {
+  it('should pass basic test', async () => {
     await browser.url('https://example.com');
     const title = await browser.getTitle();
     expect(title).toBe('Example Domain');
@@ -83,7 +83,7 @@ describe('示例测试', () => {
 });
 ```
 
-### 3. 运行测试
+### 3. Run Tests
 
 ```bash
 npx testring

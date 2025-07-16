@@ -1,36 +1,36 @@
-# Timeout 配置优化指南
+# Timeout Configuration Optimization Guide
 
-本项目已经优化了所有的timeout配置，统一管理不同类型操作的超时时间，并支持环境相关的动态调整。
+This project has optimized all timeout configurations, providing unified management of timeout durations for different types of operations, with support for environment-related dynamic adjustments.
 
-## 📋 概述
+## 📋 Overview
 
-### 主要改进
+### Key Improvements
 
-1. **统一的timeout配置文件** - 所有timeout设置集中管理
-2. **环境相关的timeout调整** - 本地、CI、调试环境自动调整
-3. **分类管理** - 按操作类型分类，更好的可维护性
-4. **配置验证** - 自动验证配置的合理性
-5. **性能优化** - 解决了 `moveToObject` 等待30秒的问题
+1. **Unified timeout configuration file** - All timeout settings centrally managed
+2. **Environment-related timeout adjustments** - Automatic adjustments for local, CI, and debug environments
+3. **Categorized management** - Organized by operation type for better maintainability
+4. **Configuration validation** - Automatic validation of configuration reasonableness
+5. **Performance optimization** - Resolved the issue of `moveToObject` waiting 30 seconds
 
-## 🚀 使用方法
+## 🚀 Usage
 
-### 1. 基本用法
+### 1. Basic Usage
 
 ```javascript
-// 导入timeout配置
+// Import timeout configuration
 const TIMEOUTS = require('./timeout-config.js');
 
-// 使用预定义的timeout
+// Use predefined timeouts
 await page.click(selector, { timeout: TIMEOUTS.CLICK });
 await page.hover(selector, { timeout: TIMEOUTS.HOVER });
 await page.waitForSelector(selector, { timeout: TIMEOUTS.WAIT_FOR_ELEMENT });
 ```
 
-### 2. 自定义timeout
+### 2. Custom Timeout
 
 ```javascript
-// 使用自定义计算的timeout
-const customTimeout = TIMEOUTS.custom('fast', 'hover', 2000); // 基于2秒计算
+// Use custom calculated timeout
+const customTimeout = TIMEOUTS.custom('fast', 'hover', 2000); // Based on 2 seconds calculation
 await page.hover(selector, { timeout: customTimeout });
 ```
 
