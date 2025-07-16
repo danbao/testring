@@ -1,46 +1,76 @@
-# Documentation Directory
+# Testring Documentation
 
-The `docs/` directory contains complete documentation for the testring testing framework, providing API reference, configuration instructions, and plugin development guides.
+Welcome to the comprehensive documentation for testring, a modern Node.js-based automated UI testing framework designed for web applications.
 
-## Documentation Contents
+## Quick Navigation
 
-### Core Documentation
-- **`api.md`** - API reference documentation, detailing the main API interfaces provided by the framework
-- **`config.md`** - Configuration API reference, complete configuration options description and usage examples
-- **`plugin-handbook.md`** - Plugin development handbook, usage and development guide for the plugin system
+### 🚀 Getting Started
+- [Installation & Setup](getting-started/README.md)
+- [Quick Start Guide](getting-started/quick-start.md)
+- [Migration Guides](getting-started/migration-guides/README.md)
 
-## Documentation Description
+### 📚 Core Documentation
+- [API Reference](api/README.md) - Framework API documentation
+- [Configuration](configuration/README.md) - Complete configuration options
+- [Guides](guides/README.md) - Comprehensive usage guides
 
-### API Reference (api.md)
-Provides descriptions of the main commands and interfaces of the testring framework:
-- `run` - Run tests command
-- `record` - Record test session command
+### 🔧 Architecture
+- [Core Modules](core-modules/README.md) - Framework foundation modules
+- [Packages](packages/README.md) - Extension packages and plugins
+- [Playwright Driver](playwright-driver/README.md) - Modern browser automation
 
-### Configuration Reference (config.md)
-Detailed description of the framework's configuration system:
-- Configuration file priority: CLI parameters > Environment configuration > Configuration file
-- All available configuration options and parameter descriptions
-- Configuration examples and best practices
+### 🛠️ Development
+- [Development Guide](development/README.md) - Contributing to testring
+- [Plugin Development](guides/plugin-development.md) - Creating custom plugins
+- [Utilities](development/utils.md) - Build and maintenance tools
 
-### Plugin Handbook (plugin-handbook.md)
-Complete guide to the plugin system:
-- Plugin usage methods
-- Plugin development standards
-- Plugin API descriptions
-- Plugin development examples
+### 📊 Reports & Analysis
+- [Reports](reports/README.md) - Project reports and analysis
+- [Test Coverage](reports/test-coverage-analysis.md) - Coverage analysis
+- [Compatibility](reports/test-compatibility-report.md) - Browser compatibility
 
-## Usage Guide
+## Framework Overview
 
-### Quick Start
-1. Read `api.md` to understand basic commands
-2. Check `config.md` to configure test environment
-3. Refer to `plugin-handbook.md` as needed to develop or use plugins
+Testring is a powerful testing framework that provides:
 
-### Developer Guide
-- If developing plugins, focus on `plugin-handbook.md`
-- If integrating the framework, focus on `api.md` and `config.md`
-- If contributing code, recommend reading all documentation
+- **Multi-Process Parallel Execution** - Run tests simultaneously with process isolation
+- **Multi-Browser Support** - Chrome, Firefox, Safari, Edge support
+- **Modern Driver Support** - Both Selenium and Playwright drivers
+- **Rich Plugin System** - Extensible architecture with comprehensive plugin support
+- **Advanced Debugging** - Built-in debugging tools and breakpoints
+- **CI/CD Integration** - Seamless integration with continuous integration systems
 
-## Documentation Maintenance
+## Quick Start
 
-These documents are updated synchronously with the code to ensure accuracy and timeliness. If you find documentation issues or need additions, please submit an Issue or Pull Request.
+```bash
+# Install testring
+npm install --save-dev testring
+
+# Run tests
+testring run
+
+# Run with specific configuration
+testring run --config ./test.config.js
+```
+
+## Documentation Structure
+
+This documentation is organized into logical sections:
+
+1. **Getting Started** - Everything you need to begin using testring
+2. **API & Configuration** - Detailed reference documentation
+3. **Guides** - Step-by-step instructions for common tasks
+4. **Architecture** - Deep dive into framework components
+5. **Development** - Information for contributors and plugin developers
+6. **Reports** - Analysis and metrics about the project
+
+## Need Help?
+
+- 📖 Browse the [guides](guides/README.md) for step-by-step instructions
+- 🔍 Check the [troubleshooting guide](guides/troubleshooting.md) for common issues
+- 🐛 Report bugs or request features on [GitHub](https://github.com/ringcentral/testring)
+- 💬 Join the community discussions
+
+## Contributing
+
+We welcome contributions! Please see our [development guide](development/README.md) for information on how to contribute to testring.

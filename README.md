@@ -125,9 +125,10 @@ testring run --logLevel debug
 
 For detailed documentation, please refer to:
 
-- [API Reference](docs/api.md) - Framework API documentation
-- [Configuration Reference](docs/config.md) - Complete configuration options
-- [Plugin Handbook](docs/plugin-handbook.md) - Plugin development guide
+- [API Reference](docs/api/README.md) - Framework API documentation
+- [Configuration Reference](docs/configuration/README.md) - Complete configuration options
+- [Plugin Development Guide](docs/guides/plugin-development.md) - Plugin development guide
+- [Complete Documentation](docs/README.md) - Full documentation index
 
 ## Key Features
 
