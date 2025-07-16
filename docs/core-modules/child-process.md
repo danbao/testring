@@ -1,21 +1,21 @@
 # @testring/child-process
 
-子进程管理模块，提供了跨平台的子进程创建和管理功能，支持 JavaScript 和 TypeScript 文件的直接执行。
+Child process management module that provides cross-platform child process creation and management capabilities, supporting direct execution of JavaScript and TypeScript files.
 
-## 功能概述
+## Overview
 
-该模块提供了增强的子进程管理功能，包括：
-- 支持 JavaScript 和 TypeScript 文件的直接执行
-- 跨平台兼容性（Windows、Linux、macOS）
-- 调试模式支持
-- 进程间通信（IPC）
-- 自动端口分配
-- 进程状态检测
+This module provides enhanced child process management features, including:
+- Support for direct execution of JavaScript and TypeScript files
+- Cross-platform compatibility (Windows, Linux, macOS)
+- Debug mode support
+- Inter-process communication (IPC)
+- Automatic port allocation
+- Process state detection
 
-## 主要功能
+## Main Features
 
 ### fork
-增强的子进程创建函数，支持多种文件类型：
+Enhanced child process creation function supporting multiple file types:
 
 ```typescript
 export async function fork(
@@ -26,7 +26,7 @@ export async function fork(
 ```
 
 ### spawn
-基本的子进程启动功能：
+Basic child process launch functionality:
 
 ```typescript
 export function spawn(
@@ -36,7 +36,7 @@ export function spawn(
 ```
 
 ### spawnWithPipes
-带管道的子进程启动：
+Child process launch with pipes:
 
 ```typescript
 export function spawnWithPipes(
@@ -46,70 +46,70 @@ export function spawnWithPipes(
 ```
 
 ### isChildProcess
-检查当前进程是否是子进程：
+Check if the current process is a child process:
 
 ```typescript
 export function isChildProcess(argv?: string[]): boolean
 ```
 
-## 使用方法
+## Usage
 
-### 基本使用
+### Basic Usage
 
-#### 执行 JavaScript 文件
+#### Execute JavaScript Files
 ```typescript
 import { fork } from '@testring/child-process';
 
-// 执行 JavaScript 文件
+// Execute JavaScript file
 const childProcess = await fork('./worker.js');
 
 childProcess.on('message', (data) => {
-  console.log('收到消息:', data);
+  console.log('Received message:', data);
 });
 
 childProcess.send({ type: 'start', data: 'hello' });
 ```
 
-#### 执行 TypeScript 文件
+#### Execute TypeScript Files
 ```typescript
 import { fork } from '@testring/child-process';
 
-// 直接执行 TypeScript 文件（自动处理 ts-node）
+// Directly execute TypeScript file (automatically handles ts-node)
 const childProcess = await fork('./worker.ts');
 
 childProcess.on('message', (data) => {
-  console.log('收到消息:', data);
+  console.log('Received message:', data);
 });
 ```
 
-#### 传递参数
+#### Pass Arguments
 ```typescript
 import { fork } from '@testring/child-process';
 
-// 传递命令行参数
+// Pass command line arguments
 const childProcess = await fork('./worker.js', ['--mode', 'production']);
 
-// 子进程中访问参数
-// process.argv 包含传递的参数
+// Access arguments in child process
+// process.argv contains the passed arguments
 ```
 
-### 调试模式
+### Debug Mode
 
-#### 启用调试
+#### Enable Debugging
 ```typescript
 import { fork } from '@testring/child-process';
 
-// 启用调试模式
+// Enable debug mode
 const childProcess = await fork('./worker.js', [], {
   debug: true
 });
 
-// 访问调试端口
-console.log('调试端口:', childProcess.debugPort);
-// 可以使用 Chrome DevTools 或 VS Code 连接到此端口
+// Access debug port
+console.log('Debug port:', childProcess.debugPort);
+// You can use Chrome DevTools or VS Code to connect to this port
 ```
 
-#### 自定义调试端口范围
+#### Custom Debug Port Range
 ```typescript
 import { fork } from '@testring/child-process';
 
@@ -119,41 +119,41 @@ const childProcess = await fork('./worker.js', [], {
 });
 ```
 
-### 进程间通信
+### Inter-Process Communication
 
-#### 父进程代码
+#### Parent Process Code
 ```typescript
 import { fork } from '@testring/child-process';
 
 const childProcess = await fork('./worker.js');
 
-// 发送消息到子进程
+// Send message to child process
 childProcess.send({
   type: 'task',
   data: { id: 1, action: 'process' }
 });
 
-// 监听子进程消息
+// Listen for child process messages
 childProcess.on('message', (message) => {
   if (message.type === 'result') {
-    console.log('任务结果:', message.data);
+    console.log('Task result:', message.data);
   }
 });
 
-// 监听子进程退出
+// Listen for child process exit
 childProcess.on('exit', (code, signal) => {
-  console.log(`子进程退出: code=${code}, signal=${signal}`);
+  console.log(`Child process exited: code=${code}, signal=${signal}`);
 });
 ```
 
-#### 子进程代码 (worker.js)
+#### Child Process Code (worker.js)
 ```javascript
-// 监听父进程消息
+// Listen for parent process messages
 process.on('message', (message) => {
   if (message.type === 'task') {
     const result = processTask(message.data);
     
-    // 发送结果回父进程
+    // Send result back to parent process
     process.send({
       type: 'result',
       data: result
@@ -162,7 +162,7 @@ process.on('message', (message) => {
 });
 
 function processTask(data) {
-  // 处理任务逻辑
+  // Process task logic
   return { id: data.id, status: 'completed' };
 }
 ```

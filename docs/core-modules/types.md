@@ -1,113 +1,113 @@
 # @testring/types
 
-TypeScript 类型定义模块，为 testring 框架提供完整的类型支持和接口定义。
+TypeScript type definition module that provides complete type support and interface definitions for the testring framework.
 
-## 功能概述
+## Overview
 
-该模块是 testring 框架的类型定义中心，包含了：
-- 所有核心模块的 TypeScript 接口定义
-- 通用类型和枚举定义
-- 配置对象的类型规范
-- 插件开发的类型支持
-- 测试相关的数据结构定义
+This module is the type definition center for the testring framework, containing:
+- TypeScript interface definitions for all core modules
+- Common types and enum definitions
+- Configuration object type specifications
+- Type support for plugin development
+- Test-related data structure definitions
 
-## 主要特性
+## Key Features
 
-### 完整的类型支持
-- 涵盖框架所有模块的类型定义
-- 严格的 TypeScript 类型检查
-- 完善的泛型支持
-- 详细的接口文档
+### Complete Type Support
+- Type definitions covering all framework modules
+- Strict TypeScript type checking
+- Comprehensive generic support
+- Detailed interface documentation
 
-### 模块化设计
-- 按功能模块组织类型定义
-- 清晰的命名空间划分
-- 易于扩展和维护
-- 支持选择性导入
+### Modular Design
+- Type definitions organized by functional modules
+- Clear namespace separation
+- Easy to extend and maintain
+- Supports selective imports
 
-### 开发友好
-- 提供 IDE 智能提示
-- 编译时类型检查
-- 详细的类型注释
-- 示例和用法说明
+### Developer-Friendly
+- IDE intelligent hints
+- Compile-time type checking
+- Detailed type annotations
+- Examples and usage instructions
 
-## 安装
+## Installation
 
 ```bash
 npm install --save-dev @testring/types
 ```
 
-或使用 yarn:
+Or using yarn:
 
 ```bash
 yarn add @testring/types --dev
 ```
 
-## 主要类型类别
+## Main Type Categories
 
-### 配置类型
-定义框架配置相关的接口：
+### Configuration Types
+Defines framework configuration related interfaces:
 
 ```typescript
-// 主配置接口
+// Main configuration interface
 interface IConfig {
-  tests: string;                    // 测试文件 glob 模式
-  plugins: Array<string | IPlugin>; // 插件列表
-  workerLimit: number | 'local';    // 工作进程限制
-  retryCount: number;               // 重试次数
-  retryDelay: number;               // 重试延迟
-  logLevel: LogLevel;               // 日志级别
-  bail: boolean;                    // 失败时是否立即停止
-  testTimeout: number;              // 测试超时时间
-  debug: boolean;                   // 调试模式
+  tests: string;                    // Test file glob pattern
+  plugins: Array<string | IPlugin>; // Plugin list
+  workerLimit: number | 'local';    // Worker process limit
+  retryCount: number;               // Retry count
+  retryDelay: number;               // Retry delay
+  logLevel: LogLevel;               // Log level
+  bail: boolean;                    // Stop immediately on failure
+  testTimeout: number;              // Test timeout
+  debug: boolean;                   // Debug mode
 }
 
-// 日志配置
+// Logger configuration
 interface IConfigLogger {
   logLevel: LogLevel;
   silent: boolean;
 }
 
-// 插件配置
+// Plugin configuration
 interface IPlugin {
   name: string;
   config?: any;
 }
 ```
 
-### 测试相关类型
-定义测试执行和管理的接口：
+### Test-Related Types
+Defines interfaces for test execution and management:
 
 ```typescript
-// 测试文件接口
+// Test file interface
 interface IFile {
-  path: string;           // 文件路径
-  content: string;        // 文件内容
-  dependencies?: string[]; // 依赖列表
+  path: string;           // File path
+  content: string;        // File content
+  dependencies?: string[]; // Dependency list
 }
 
-// 队列中的测试项
+// Queued test item
 interface IQueuedTest {
-  path: string;           // 测试文件路径
-  content?: string;       // 测试内容
-  retryCount?: number;    // 当前重试次数
-  maxRetryCount?: number; // 最大重试次数
+  path: string;           // Test file path
+  content?: string;       // Test content
+  retryCount?: number;    // Current retry count
+  maxRetryCount?: number; // Maximum retry count
 }
 
-// 测试执行结果
+// Test execution result
 interface ITestExecutionResult {
-  success: boolean;       // 是否成功
-  error?: Error;         // 错误信息
-  duration?: number;     // 执行时长
-  retryCount?: number;   // 重试次数
+  success: boolean;       // Whether successful
+  error?: Error;         // Error information
+  duration?: number;     // Execution duration
+  retryCount?: number;   // Retry count
 }
 ```
 
-### 进程通信类型
-定义进程间通信的接口：
+### Inter-Process Communication Types
+Defines interfaces for inter-process communication:
 
 ```typescript
-// 传输层接口
+// Transport layer interface
 interface ITransport {
   send<T>(processID: string, messageType: string, payload: T): Promise<void>;
   broadcast<T>(messageType: string, payload: T): void;
@@ -117,28 +117,28 @@ interface ITransport {
   getProcessesList(): string[];
 }
 
-// 消息处理器
+// Message handler
 type TransportMessageHandler<T> = (message: T, processID?: string) => void;
 
-// 直接传输消息格式
+// Direct transport message format
 interface ITransportDirectMessage {
   type: string;
   payload: any;
 }
 ```
 
-### 工作进程类型
-定义测试工作进程的接口：
+### Worker Process Types
+Defines interfaces for test worker processes:
 
 ```typescript
-// 测试工作进程实例
+// Test worker process instance
 interface ITestWorkerInstance {
   getWorkerID(): string;
   execute(test: IQueuedTest): Promise<void>;
   kill(): Promise<void>;
 }
 
-// 子进程 Fork 选项
+// Child process fork options
 interface IChildProcessForkOptions {
   debug: boolean;
   debugPort?: number;
@@ -147,7 +147,7 @@ interface IChildProcessForkOptions {
   silent?: boolean;
 }
 
-// Fork 结果
+// Fork result
 interface IChildProcessFork {
   send(message: any): void;
   on(event: string, callback: Function): void;
@@ -156,38 +156,38 @@ interface IChildProcessFork {
 }
 ```
 
-### 文件存储类型
-定义文件存储系统的接口：
+### File Storage Types
+Defines interfaces for the file storage system:
 
 ```typescript
-// 文件存储客户端
+// File storage client
 interface IFSStoreClient {
   createTextFile(options: IFSStoreTextFileOptions): Promise<IFSStoreTextFile>;
   createBinaryFile(options: IFSStoreBinaryFileOptions): Promise<IFSStoreBinaryFile>;
   createScreenshotFile(options: IFSStoreScreenshotFileOptions): Promise<IFSStoreScreenshotFile>;
 }
 
-// 文件存储选项
+// File storage options
 interface IFSStoreFileOptions {
-  ext?: string;           // 文件扩展名
-  name?: string;          // 文件名
-  content?: any;          // 文件内容
+  ext?: string;           // File extension
+  name?: string;          // File name
+  content?: any;          // File content
 }
 
-// 文件存储文件接口
+// File storage file interface
 interface IFSStoreFile {
-  fullPath: string;       // 完整路径
+  fullPath: string;       // Full path
   write(content: any): Promise<void>;
   read(): Promise<any>;
   release(): Promise<void>;
 }
 ```
 
-### 浏览器代理类型
-定义浏览器自动化的接口：
+### Browser Proxy Types
+Defines interfaces for browser automation:
 
 ```typescript
-// 浏览器代理接口
+// Browser proxy interface
 interface IBrowserProxy {
   start(): Promise<void>;
   stop(): Promise<void>;
@@ -195,14 +195,14 @@ interface IBrowserProxy {
   takeScreenshot(): Promise<Buffer>;
 }
 
-// 浏览器命令
+// Browser command
 interface IBrowserCommand {
   type: string;
   args: any[];
   timeout?: number;
 }
 
-// 浏览器选项
+// Browser options
 interface IBrowserProxyOptions {
   headless: boolean;
   width: number;
@@ -212,11 +212,11 @@ interface IBrowserProxyOptions {
 }
 ```
 
-### HTTP 相关类型
-定义 HTTP 服务和客户端接口：
+### HTTP-Related Types
+Defines HTTP service and client interfaces:
 
 ```typescript
-// HTTP 客户端接口
+// HTTP client interface
 interface IHttpClient {
   get(url: string, options?: any): Promise<any>;
   post(url: string, data?: any, options?: any): Promise<any>;
@@ -225,7 +225,7 @@ interface IHttpClient {
   request(options: any): Promise<any>;
 }
 
-// HTTP 服务器接口
+// HTTP server interface
 interface IHttpServer {
   start(port?: number): Promise<void>;
   stop(): Promise<void>;
@@ -233,7 +233,7 @@ interface IHttpServer {
   getPort(): number;
 }
 
-// HTTP 请求选项
+// HTTP request options
 interface IHttpRequestOptions {
   url: string;
   method: string;
@@ -243,11 +243,11 @@ interface IHttpRequestOptions {
 }
 ```
 
-### 插件系统类型
-定义插件开发的接口：
+### Plugin System Types
+Defines interfaces for plugin development:
 
 ```typescript
-// 插件模块集合
+// Plugin module collection
 interface IPluginModules {
   logger: ILogger;
   fsReader?: IFSReader;
@@ -259,10 +259,10 @@ interface IPluginModules {
   fsStoreServer: IFSStoreServer;
 }
 
-// 插件函数类型
+// Plugin function type
 type PluginFunction = (api: IPluginAPI) => void | Promise<void>;
 
-// 插件 API 接口
+// Plugin API interface
 interface IPluginAPI {
   getLogger(): ILoggerAPI;
   getFSReader(): IFSReaderAPI | null;
@@ -275,11 +275,11 @@ interface IPluginAPI {
 }
 ```
 
-### 日志系统类型
-定义日志记录的接口：
+### Logging System Types
+Defines interfaces for logging:
 
 ```typescript
-// 日志级别枚举
+// Log level enumeration
 enum LogLevel {
   verbose = 'verbose',
   debug = 'debug',
@@ -289,7 +289,7 @@ enum LogLevel {
   silent = 'silent'
 }
 
-// 日志客户端接口
+// Logger client interface
 interface ILoggerClient {
   verbose(...args: any[]): void;
   debug(...args: any[]): void;
@@ -298,7 +298,7 @@ interface ILoggerClient {
   error(...args: any[]): void;
 }
 
-// 日志实体
+// Log entity
 interface ILogEntity {
   logLevel: LogLevel;
   content: any[];
@@ -307,9 +307,9 @@ interface ILogEntity {
 }
 ```
 
-## 使用示例
+## Usage Examples
 
-### 在项目中使用类型
+### Using Types in Projects
 ```typescript
 import {
   IConfig,
@@ -318,7 +318,7 @@ import {
   LogLevel
 } from '@testring/types';
 
-// 配置对象
+// Configuration object
 const config: IConfig = {
   tests: './tests/**/*.spec.js',
   plugins: ['@testring/plugin-selenium-driver'],
@@ -331,7 +331,7 @@ const config: IConfig = {
   debug: false
 };
 
-// 测试队列项
+// Test queue item
 const queuedTest: IQueuedTest = {
   path: './tests/login.spec.js',
   retryCount: 0,
@@ -339,54 +339,54 @@ const queuedTest: IQueuedTest = {
 };
 ```
 
-### 实现接口
+### Implementing Interfaces
 ```typescript
 import { ITestWorkerInstance, IQueuedTest } from '@testring/types';
 
 class MyTestWorker implements ITestWorkerInstance {
   private workerID: string;
-  
+
   constructor(id: string) {
     this.workerID = id;
   }
-  
+
   getWorkerID(): string {
     return this.workerID;
   }
-  
+
   async execute(test: IQueuedTest): Promise<void> {
-    console.log(`执行测试: ${test.path}`);
-    // 测试执行逻辑
+    console.log(`Executing test: ${test.path}`);
+    // Test execution logic
   }
-  
+
   async kill(): Promise<void> {
-    console.log(`停止工作进程: ${this.workerID}`);
-    // 清理逻辑
+    console.log(`Stopping worker process: ${this.workerID}`);
+    // Cleanup logic
   }
 }
 ```
 
-### 插件开发类型支持
+### Plugin Development Type Support
 ```typescript
 import { PluginFunction, IPluginAPI } from '@testring/types';
 
 const myPlugin: PluginFunction = (api: IPluginAPI) => {
   const logger = api.getLogger();
   const testWorker = api.getTestWorker();
-  
+
   testWorker.beforeRun(async () => {
-    await logger.info('插件初始化完成');
+    await logger.info('Plugin initialization completed');
   });
 };
 
 export default myPlugin;
 ```
 
-### 泛型使用
+### Generic Usage
 ```typescript
 import { Queue, IQueue } from '@testring/types';
 
-// 创建类型安全的队列
+// Create type-safe queue
 const testQueue: IQueue<IQueuedTest> = new Queue<IQueuedTest>();
 
 testQueue.push({
@@ -394,12 +394,12 @@ testQueue.push({
   retryCount: 0
 });
 
-const nextTest = testQueue.shift(); // 类型为 IQueuedTest | void
+const nextTest = testQueue.shift(); // Type is IQueuedTest | void
 ```
 
-## 枚举定义
+## Enumeration Definitions
 
-### 日志级别
+### Log Levels
 ```typescript
 enum LogLevel {
   verbose = 'verbose',
@@ -411,7 +411,7 @@ enum LogLevel {
 }
 ```
 
-### 断点类型
+### Breakpoint Types
 ```typescript
 enum BreakpointsTypes {
   beforeInstruction = 'beforeInstruction',
@@ -419,7 +419,7 @@ enum BreakpointsTypes {
 }
 ```
 
-### 浏览器事件
+### Browser Events
 ```typescript
 enum BrowserProxyEvents {
   beforeStart = 'beforeStart',
@@ -429,7 +429,7 @@ enum BrowserProxyEvents {
 }
 ```
 
-### HTTP 方法
+### HTTP Methods
 ```typescript
 enum HttpMethods {
   GET = 'GET',
@@ -442,11 +442,11 @@ enum HttpMethods {
 }
 ```
 
-## 实用类型
+## Utility Types
 
-### 队列和栈
+### Queue and Stack
 ```typescript
-// 队列接口
+// Queue interface
 interface IQueue<T> {
   push(...elements: T[]): void;
   shift(): T | void;
@@ -457,7 +457,7 @@ interface IQueue<T> {
   length: number;
 }
 
-// 栈接口
+// Stack interface
 interface IStack<T> {
   push(...elements: T[]): void;
   pop(): T | void;
@@ -466,23 +466,23 @@ interface IStack<T> {
 }
 ```
 
-### 依赖字典
+### Dependency Dictionary
 ```typescript
-// 依赖字典类型
+// Dependency dictionary type
 type DependencyDict = IDependencyDictionary<IDependencyDictionary<IDependencyDictionaryNode>>;
 
-// 依赖字典接口
+// Dependency dictionary interface
 interface IDependencyDictionary<T> {
   [key: string]: T;
 }
 
-// 依赖节点
+// Dependency node
 interface IDependencyDictionaryNode {
   path: string;
   content: string;
 }
 
-// 依赖树节点
+// Dependency tree node
 interface IDependencyTreeNode {
   path: string;
   content: string;
@@ -490,26 +490,26 @@ interface IDependencyTreeNode {
 }
 ```
 
-### 钩子和回调
+### Hooks and Callbacks
 ```typescript
-// 钩子回调类型
+// Hook callback type
 type HookCallback<T> = (payload: T) => Promise<void> | void;
 
-// 断点回调类型
+// Breakpoint callback type
 type HasBreakpointCallback = (hasBreakpoint: boolean) => Promise<void> | void;
 
-// 文件读取器类型
+// File reader type
 type DependencyFileReader = (path: string) => Promise<string>;
 
-// 消息处理器类型
+// Message handler type
 type TransportMessageHandler<T> = (message: T, processID?: string) => void;
 ```
 
-## 扩展类型
+## Extended Types
 
-### 自定义配置扩展
+### Custom Configuration Extension
 ```typescript
-// 扩展基础配置
+// Extend base configuration
 interface ICustomConfig extends IConfig {
   customOption: string;
   advancedSettings: {
@@ -519,33 +519,33 @@ interface ICustomConfig extends IConfig {
 }
 ```
 
-### 自定义插件模块
+### Custom Plugin Modules
 ```typescript
-// 扩展插件模块集合
+// Extend plugin module collection
 interface IExtendedPluginModules extends IPluginModules {
   customModule: ICustomModule;
 }
 ```
 
-## 最佳实践
+## Best Practices
 
-### 类型安全
+### Type Safety
 ```typescript
-// 使用严格的类型检查
+// Use strict type checking
 function createTestWorker(config: IConfig): ITestWorkerInstance {
-  // 实现确保类型安全
+  // Implementation ensures type safety
   return new TestWorker(config);
 }
 
-// 使用类型守卫
+// Use type guards
 function isQueuedTest(obj: any): obj is IQueuedTest {
   return obj && typeof obj.path === 'string';
 }
 ```
 
-### 泛型使用
+### Generic Usage
 ```typescript
-// 创建类型安全的通用函数
+// Create type-safe generic functions
 function processQueue<T>(queue: IQueue<T>, processor: (item: T) => void): void {
   let item = queue.shift();
   while (item) {
@@ -555,29 +555,29 @@ function processQueue<T>(queue: IQueue<T>, processor: (item: T) => void): void {
 }
 ```
 
-### 接口扩展
+### Interface Extension
 ```typescript
-// 正确扩展接口
+// Properly extend interfaces
 interface IEnhancedLogger extends ILoggerClient {
   logWithTimestamp(level: LogLevel, ...args: any[]): void;
   getLogHistory(): ILogEntity[];
 }
 ```
 
-## 模块依赖
+## Module Dependencies
 
-该模块为纯类型定义模块，不包含运行时代码，可以安全地在任何 TypeScript 项目中使用而不增加运行时开销。
+This module is a pure type definition module that contains no runtime code. It can be safely used in any TypeScript project without adding runtime overhead.
 
-## 版本兼容性
+## Version Compatibility
 
-类型定义遵循语义化版本控制：
-- **主版本**：破坏性类型变更
-- **次版本**：新增类型定义
-- **修订版本**：类型修复和优化
+Type definitions follow semantic versioning:
+- **Major version**: Breaking type changes
+- **Minor version**: New type definitions
+- **Patch version**: Type fixes and optimizations
 
-## IDE 支持
+## IDE Support
 
-该模块为以下 IDE 提供完整的类型支持：
+This module provides complete type support for the following IDEs:
 - Visual Studio Code
 - WebStorm / IntelliJ IDEA
 - Sublime Text (with TypeScript plugin)

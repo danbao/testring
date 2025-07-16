@@ -1,65 +1,65 @@
-# 🚀 自动浏览器安装指南
+# 🚀 Automatic Browser Installation Guide
 
-## 概述
+## Overview
 
-从 v0.8.0 版本开始，`@testring/plugin-playwright-driver` 支持在 `npm install` 时自动安装所有必需的浏览器，无需手动执行额外的命令。
+Starting from v0.8.0, `@testring/plugin-playwright-driver` supports automatic installation of all required browsers during `npm install`, eliminating the need for manual execution of additional commands.
 
-## 🎯 快速开始
+## 🎯 Quick Start
 
-### 默认安装（推荐）
+### Default Installation (Recommended)
 
 ```bash
 npm install @testring/plugin-playwright-driver
 ```
 
-这会自动安装以下浏览器：
+This will automatically install the following browsers:
 - ✅ Chromium (Chrome)
 - ✅ Firefox
 - ✅ WebKit (Safari)
 - ✅ Microsoft Edge
 
-### 跳过浏览器安装
+### Skip Browser Installation
 
-如果你不想自动安装浏览器：
+If you don't want to automatically install browsers:
 
 ```bash
 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install @testring/plugin-playwright-driver
 ```
 
-### 安装特定浏览器
+### Install Specific Browsers
 
-只安装你需要的浏览器：
+Install only the browsers you need:
 
 ```bash
 PLAYWRIGHT_BROWSERS=chromium,msedge npm install @testring/plugin-playwright-driver
 ```
 
-## 🔧 环境变量控制
+## 🔧 Environment Variable Control
 
-| 环境变量 | 作用 | 默认值 | 示例 |
+| Environment Variable | Purpose | Default | Example |
 |---------|------|-------|------|
-| `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` | 跳过浏览器安装 | `false` | `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` |
-| `PLAYWRIGHT_BROWSERS` | 指定要安装的浏览器 | `chromium,firefox,webkit,msedge` | `PLAYWRIGHT_BROWSERS=chromium,firefox` |
-| `PLAYWRIGHT_INSTALL_IN_CI` | CI 环境强制安装 | `false` | `PLAYWRIGHT_INSTALL_IN_CI=1` |
+| `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` | Skip browser installation | `false` | `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` |
+| `PLAYWRIGHT_BROWSERS` | Specify browsers to install | `chromium,firefox,webkit,msedge` | `PLAYWRIGHT_BROWSERS=chromium,firefox` |
+| `PLAYWRIGHT_INSTALL_IN_CI` | Force installation in CI | `false` | `PLAYWRIGHT_INSTALL_IN_CI=1` |
 
-## 🔨 手动管理浏览器
+## 🔨 Manual Browser Management
 
-如果你需要手动管理浏览器：
+If you need to manually manage browsers:
 
 ```bash
-# 安装所有浏览器
+# Install all browsers
 npm run install-browsers
 
-# 卸载所有浏览器
+# Uninstall all browsers
 npm run uninstall-browsers
 
-# 使用 Playwright 命令安装特定浏览器
+# Use Playwright command to install specific browsers
 npx playwright install msedge
 npx playwright install firefox
 npx playwright install webkit
 ```
 
-## 🌐 CI/CD 环境
+## 🌐 CI/CD Environment
 
 ### GitHub Actions
 
@@ -67,9 +67,9 @@ npx playwright install webkit
 - name: Install dependencies
   run: npm install
   env:
-    PLAYWRIGHT_INSTALL_IN_CI: 1  # 强制在 CI 中安装浏览器
+    PLAYWRIGHT_INSTALL_IN_CI: 1  # Force browser installation in CI
 
-# 或者跳过自动安装，手动控制
+# Or skip auto-install and control manually
 - name: Install dependencies  
   run: npm install
   env:
@@ -82,89 +82,89 @@ npx playwright install webkit
 ### Docker
 
 ```dockerfile
-# 跳过自动安装
+# Skip automatic installation
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 RUN npm install
 
-# 手动安装系统依赖和浏览器
+# Manually install system dependencies and browsers
 RUN npx playwright install-deps
 RUN npx playwright install chromium firefox
 ```
 
-## 📋 常见场景
+## 📋 Common Scenarios
 
-### 开发环境
+### Development Environment
 
 ```bash
-# 完整安装，包含所有浏览器
+# Full installation with all browsers
 npm install @testring/plugin-playwright-driver
 ```
 
-### 测试环境
+### Test Environment
 
 ```bash
-# 只安装 Chromium 和 Firefox
+# Install only Chromium and Firefox
 PLAYWRIGHT_BROWSERS=chromium,firefox npm install @testring/plugin-playwright-driver
 ```
 
-### 生产构建
+### Production Build
 
 ```bash
-# 跳过浏览器安装
+# Skip browser installation
 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install @testring/plugin-playwright-driver
 ```
 
-## 🐛 故障排除
+## 🐛 Troubleshooting
 
-### 1. 浏览器安装失败
+### 1. Browser Installation Failed
 
 ```bash
-# 手动重新安装浏览器
+# Manually reinstall browsers
 npm run install-browsers
 
-# 或者强制重新安装
+# Or force reinstall
 npx playwright install --force
 ```
 
-### 2. Microsoft Edge 安装问题
+### 2. Microsoft Edge Installation Issue
 
 ```bash
-# 强制重新安装 Edge
+# Force reinstall Edge
 npx playwright install --force msedge
 ```
 
-### 3. 权限问题
+### 3. Permission Issue
 
 ```bash
-# 确保脚本有执行权限
+# Ensure script has execution permission
 chmod +x node_modules/@testring/plugin-playwright-driver/scripts/install-browsers.js
 ```
 
-### 4. CI 环境中的问题
+### 4. Issues in CI Environment
 
 ```bash
-# 在 CI 中强制安装浏览器
+# Force browser installation in CI
 PLAYWRIGHT_INSTALL_IN_CI=1 npm install
 
-# 或者安装系统依赖
+# Or install system dependencies
 npx playwright install-deps
 ```
 
-## 📊 验证安装
+## 📊 Verify Installation
 
-安装完成后，可以验证浏览器是否正确安装：
+After the installation, verify if the browsers are properly installed:
 
 ```bash
-# 检查已安装的浏览器
+# Check installed browsers
 npx playwright install --list
 
-# 运行测试验证
+# Run test verification
 npm test
 ```
 
-## 🎨 自定义配置
+## 🎨 Custom Configuration
 
-你可以在项目的 `.npmrc` 文件中设置默认行为：
+You can set default behaviors in the project's `.npmrc` file:
 
 ```ini
 # .npmrc
@@ -172,37 +172,37 @@ playwright-skip-browser-download=1
 playwright-browsers=chromium,firefox
 ```
 
-## 🚀 升级指南
+## 🚀 Upgrade Guide
 
-从旧版本升级时：
+When upgrading from an older version:
 
 ```bash
-# 卸载旧版本的浏览器
+# Uninstall old browsers
 npm run uninstall-browsers
 
-# 重新安装
+# Reinstall
 npm install
 
-# 验证安装
+# Verify installation
 npm run install-browsers
 ```
 
-## 💡 最佳实践
+## 💡 Best Practices
 
-1. **开发环境**：使用默认安装，获得完整的浏览器支持
-2. **CI/CD**：根据测试需求选择特定浏览器
-3. **Docker**：跳过自动安装，手动控制浏览器安装
-4. **团队协作**：使用 `.npmrc` 文件统一团队配置
+1. **Development Environment**: Use default installation for full browser support
+2. **CI/CD**: Choose specific browsers based on testing needs
+3. **Docker**: Skip auto-installation and manually control browser installation
+4. **Team Collaboration**: Use `.npmrc` to unify team settings
 
-## 🔗 相关链接
+## 🔗 Related Links
 
-- [Playwright 官方文档](https://playwright.dev)
-- [浏览器支持列表](https://playwright.dev/docs/browsers)
-- [CI 环境配置指南](https://playwright.dev/docs/ci)
+- [Playwright Official Documentation](https://playwright.dev)
+- [Browser Support List](https://playwright.dev/docs/browsers)
+- [CI Environment Configuration Guide](https://playwright.dev/docs/ci)
 
-## 📞 支持
+## 📞 Support
 
-如果遇到问题，请查看：
-1. 本文档的故障排除部分
-2. 项目的 GitHub Issues
-3. Playwright 官方文档 
+If you encounter issues, please consult:
+1. The troubleshooting section of this document
+2. The project's GitHub Issues
+3. Playwright Official Documentation

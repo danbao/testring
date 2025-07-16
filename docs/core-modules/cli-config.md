@@ -1,85 +1,85 @@
 # @testring/cli-config
 
-命令行配置管理模块，作为 testring 框架的配置中心，负责解析命令行参数、读取配置文件并生成最终的运行配置。该模块提供了灵活的配置管理机制，支持多种配置源的优先级合并，确保测试环境的精确配置。
+Command-line configuration management module that serves as the configuration center for the testring framework. It handles parsing command-line arguments, reading configuration files, and generating the final runtime configuration. This module provides a flexible configuration management mechanism with priority-based merging from multiple configuration sources, ensuring precise test environment configuration.
 
 [![npm version](https://badge.fury.io/js/@testring/cli-config.svg)](https://www.npmjs.com/package/@testring/cli-config)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 功能概述
+## Overview
 
-命令行配置管理模块是 testring 框架的配置基础，提供了：
-- 智能的命令行参数解析和处理
-- 多格式配置文件支持（JSON、JavaScript）
-- 分层配置合并机制和优先级管理
-- 环境变量和调试状态的自动检测
-- 插件配置的特殊处理逻辑
-- 配置文件的继承和扩展机制
+The command-line configuration management module is the configuration foundation of the testring framework, providing:
+- Intelligent command-line argument parsing and processing
+- Multi-format configuration file support (JSON, JavaScript)
+- Layered configuration merging mechanism and priority management
+- Automatic detection of environment variables and debug state
+- Special handling logic for plugin configurations
+- Configuration file inheritance and extension mechanism
 
-## 主要特性
+## Key Features
 
-### 命令行解析
-- 基于 yargs 的强大参数解析能力
-- 自动 kebab-case 到 camelCase 转换
-- 支持复杂的嵌套参数结构
-- 参数类型验证和规范化
+### Command-Line Parsing
+- Powerful argument parsing capabilities based on yargs
+- Automatic kebab-case to camelCase conversion
+- Support for complex nested parameter structures
+- Parameter type validation and normalization
 
-### 配置文件支持
-- JSON 格式的静态配置文件
-- JavaScript 格式的动态配置文件
-- 异步配置函数支持
-- 配置文件继承（@extend 语法）
+### Configuration File Support
+- JSON format static configuration files
+- JavaScript format dynamic configuration files
+- Asynchronous configuration function support
+- Configuration file inheritance (@extend syntax)
 
-### 配置合并
-- 多层级配置优先级管理
-- 深度合并算法
-- 插件配置的特殊处理
-- 环境感知的配置选择
+### Configuration Merging
+- Multi-level configuration priority management
+- Deep merge algorithms
+- Special handling for plugin configurations
+- Environment-aware configuration selection
 
-### 调试和环境检测
-- 自动检测 Node.js 调试模式
-- 环境变量传递和处理
-- 配置加载过程的详细日志
+### Debug and Environment Detection
+- Automatic detection of Node.js debug mode
+- Environment variable passing and processing
+- Detailed logging of configuration loading process
 
-## 安装
+## Installation
 
 ```bash
 npm install @testring/cli-config
 ```
 
-## 核心架构
+## Core Architecture
 
-### getConfig 函数
-主要的配置获取函数，提供完整的配置解析和合并：
+### getConfig Function
+The main configuration retrieval function that provides complete configuration parsing and merging:
 
 ```typescript
 async function getConfig(argv: Array<string> = []): Promise<IConfig>
 ```
 
-### 配置处理流程
-1. **命令行参数解析** - 使用 yargs 解析输入参数
-2. **调试状态检测** - 自动检测 Node.js 调试模式
-3. **临时配置生成** - 合并默认配置和命令行参数
-4. **环境配置加载** - 读取环境特定的配置文件
-5. **主配置加载** - 读取主要配置文件
-6. **最终配置合并** - 按优先级合并所有配置源
+### Configuration Processing Flow
+1. **Command-line argument parsing** - Parse input parameters using yargs
+2. **Debug state detection** - Automatically detect Node.js debug mode
+3. **Temporary configuration generation** - Merge default configuration and command-line arguments
+4. **Environment configuration loading** - Read environment-specific configuration files
+5. **Main configuration loading** - Read main configuration files
+6. **Final configuration merging** - Merge all configuration sources by priority
 
-## 基本用法
+## Basic Usage
 
-### 简单配置获取
+### Simple Configuration Retrieval
 
 ```typescript
 import { getConfig } from '@testring/cli-config';
 
-// 获取默认配置
+// Get default configuration
 const config = await getConfig();
-console.log('默认配置:', config);
+console.log('Default configuration:', config);
 
-// 从命令行参数获取配置
+// Get configuration from command-line arguments
 const config = await getConfig(process.argv.slice(2));
-console.log('命令行配置:', config);
+console.log('Command-line configuration:', config);
 ```
 
-### 在 CLI 应用中使用
+### Usage in CLI Applications
 
 ```typescript
 import { getConfig } from '@testring/cli-config';
@@ -87,16 +87,16 @@ import { getConfig } from '@testring/cli-config';
 async function main() {
   try {
     const config = await getConfig(process.argv.slice(2));
-    
-    console.log('测试文件模式:', config.tests);
-    console.log('工作进程数:', config.workerLimit);
-    console.log('重试次数:', config.retryCount);
-    console.log('插件列表:', config.plugins);
-    
-    // 使用配置启动测试
+
+    console.log('Test file pattern:', config.tests);
+    console.log('Worker limit:', config.workerLimit);
+    console.log('Retry count:', config.retryCount);
+    console.log('Plugin list:', config.plugins);
+
+    // Start tests using configuration
     await startTests(config);
   } catch (error) {
-    console.error('配置加载失败:', error.message);
+    console.error('Configuration loading failed:', error.message);
     process.exit(1);
   }
 }
@@ -104,7 +104,7 @@ async function main() {
 main();
 ```
 
-### 在测试框架中集成
+### Integration in Test Framework
 
 ```typescript
 import { getConfig } from '@testring/cli-config';
@@ -112,16 +112,16 @@ import { TestRunner } from '@testring/test-runner';
 
 class TestFramework {
   private config: IConfig;
-  
+
   async initialize(argv: string[]) {
     this.config = await getConfig(argv);
-    
-    // 根据配置初始化组件
+
+    // Initialize components based on configuration
     this.setupLogger(this.config.logLevel);
     this.setupWorkers(this.config.workerLimit);
     this.setupPlugins(this.config.plugins);
   }
-  
+
   async run() {
     const runner = new TestRunner(this.config);
     return await runner.execute();
@@ -129,9 +129,9 @@ class TestFramework {
 }
 ```
 
-## 配置文件格式
+## Configuration File Formats
 
-### JSON 配置文件
+### JSON Configuration File
 
 ```json
 // .testringrc.json
@@ -152,10 +152,10 @@ class TestFramework {
 }
 ```
 
-### JavaScript 配置文件
+### JavaScript Configuration File
 
 ```javascript
-// .testringrc.js - 静态配置对象
+// .testringrc.js - Static configuration object
 module.exports = {
   tests: './tests/**/*.spec.js',
   plugins: ['@testring/plugin-selenium-driver'],
@@ -168,15 +168,15 @@ module.exports = {
 };
 ```
 
-### 动态配置函数
+### Dynamic Configuration Function
 
 ```javascript
-// .testringrc.js - 异步配置函数
+// .testringrc.js - Asynchronous configuration function
 module.exports = async (baseConfig, env) => {
-  // 根据环境变量动态配置
+  // Dynamic configuration based on environment variables
   const isCI = env.CI === 'true';
   const isDev = env.NODE_ENV === 'development';
-  
+
   return {
     tests: './tests/**/*.spec.js',
     plugins: [
@@ -196,7 +196,7 @@ module.exports = async (baseConfig, env) => {
 };
 ```
 
-### 配置文件继承
+### Configuration File Inheritance
 
 ```javascript
 // base.config.js
@@ -957,20 +957,20 @@ const config = await getConfig(['--debug', '--log-level', 'debug']);
 console.log('配置详情:', JSON.stringify(config, null, 2));
 ```
 
-## 依赖
+## Dependencies
 
-- `yargs` - 命令行参数解析
-- `deepmerge` - 深度配置合并
-- `@testring/logger` - 日志记录
-- `@testring/types` - 类型定义
-- `@testring/utils` - 工具函数
+- `yargs` - Command-line argument parsing
+- `deepmerge` - Deep configuration merging
+- `@testring/logger` - Logging functionality
+- `@testring/types` - Type definitions
+- `@testring/utils` - Utility functions
 
-## 相关模块
+## Related Modules
 
-- `@testring/cli` - 命令行界面
-- `@testring/logger` - 日志记录
-- `@testring/types` - 类型定义
+- `@testring/cli` - Command-line interface
+- `@testring/logger` - Logging functionality
+- `@testring/types` - Type definitions
 
-## 许可证
+## License
 
 MIT License

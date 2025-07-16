@@ -1,56 +1,56 @@
 # @testring/fs-store
 
-文件存储管理模块，作为 testring 框架的文件系统抽象层，提供在多进程环境下统一的文件读写与缓存能力。该模块通过客户端-服务器架构实现文件操作的并发控制、权限管理和资源协调，确保多进程环境下的文件操作安全性和一致性。
+File storage management module that serves as the file system abstraction layer for the testring framework. It provides unified file read/write and caching capabilities in multi-process environments. This module implements concurrent control, permission management, and resource coordination through a client-server architecture, ensuring file operation safety and consistency in multi-process environments.
 
 [![npm version](https://badge.fury.io/js/@testring/fs-store.svg)](https://www.npmjs.com/package/@testring/fs-store)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 功能概述
+## Overview
 
-文件存储管理模块是 testring 框架的文件系统基础设施，提供了：
-- 多进程环境下的文件操作协调和同步
-- 文件锁机制和并发访问控制
-- 统一的文件命名和路径管理
-- 多种文件类型的工厂模式支持
-- 插件化的文件操作扩展机制
-- 完整的文件生命周期管理
+The file storage management module is the file system infrastructure of the testring framework, providing:
+- File operation coordination and synchronization in multi-process environments
+- File locking mechanism and concurrent access control
+- Unified file naming and path management
+- Factory pattern support for multiple file types
+- Plugin-based file operation extension mechanism
+- Complete file lifecycle management
 
-## 主要特性
+## Key Features
 
-### 并发控制
-- 文件锁机制防止并发写入冲突
-- 权限队列管理和访问控制
-- 线程池限制同时执行的文件操作数量
-- 事务支持确保操作的原子性
+### Concurrency Control
+- File locking mechanism to prevent concurrent write conflicts
+- Permission queue management and access control
+- Thread pool limiting the number of simultaneous file operations
+- Transaction support ensuring operation atomicity
 
-### 多进程支持
-- 基于 transport 的进程间通信
-- 服务器-客户端架构支持多工作进程
-- 统一的文件存储目录管理
-- 工作进程间的文件共享机制
+### Multi-Process Support
+- Inter-process communication based on transport
+- Server-client architecture supporting multiple worker processes
+- Unified file storage directory management
+- File sharing mechanism between worker processes
 
-### 文件类型支持
-- 文本文件（UTF-8 编码）
-- 二进制文件（Binary 编码）
-- 截图文件（PNG 格式）
-- 自定义文件类型扩展
+### File Type Support
+- Text files (UTF-8 encoding)
+- Binary files (Binary encoding)
+- Screenshot files (PNG format)
+- Custom file type extensions
 
-### 插件化扩展
-- 文件命名策略的自定义钩子
-- 文件操作队列的插件控制
-- 文件释放事件的监听机制
-- 存储路径的动态配置
+### Plugin-Based Extensions
+- Custom hooks for file naming strategies
+- Plugin control for file operation queues
+- Listening mechanism for file release events
+- Dynamic configuration of storage paths
 
-## 安装
+## Installation
 
 ```bash
 npm install @testring/fs-store
 ```
 
-## 核心架构
+## Core Architecture
 
-### 系统架构
-fs-store 模块采用客户端-服务器架构：
+### System Architecture
+The fs-store module uses a client-server architecture:
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -71,82 +71,82 @@ fs-store 模块采用客户端-服务器架构：
                     └─────────────────┘
 ```
 
-### 核心组件
+### Core Components
 
 #### FSStoreServer
-服务器端组件，负责文件操作的协调和管理：
+Server-side component responsible for coordinating and managing file operations:
 
 ```typescript
 class FSStoreServer extends PluggableModule {
   constructor(threadCount: number = 10, msgNamePrefix: string)
-  
-  // 初始化服务器
+
+  // Initialize server
   init(): boolean
-  
-  // 获取服务器状态
+
+  // Get server state
   getState(): number
-  
-  // 清理传输层连接
+
+  // Clean up transport connections
   cleanUpTransport(): void
-  
-  // 获取文件名列表
+
+  // Get file name list
   getNameList(): string[]
 }
 ```
 
 #### FSStoreClient
-客户端组件，提供文件操作的接口：
+Client-side component providing file operation interfaces:
 
 ```typescript
 class FSStoreClient {
   constructor(msgNamePrefix: string)
-  
-  // 获取文件锁
+
+  // Get file lock
   getLock(meta: requestMeta, cb: Function): string
-  
-  // 获取文件访问权限
+
+  // Get file access permission
   getAccess(meta: requestMeta, cb: Function): string
-  
-  // 获取文件删除权限
+
+  // Get file deletion permission
   getUnlink(meta: requestMeta, cb: Function): string
-  
-  // 释放文件资源
+
+  // Release file resources
   release(requestId: string, cb?: Function): boolean
-  
-  // 释放所有工作进程的操作
+
+  // Release all worker process operations
   releaseAllWorkerActions(): void
 }
 ```
 
 #### FSStoreFile
-文件操作的主要接口：
+Main interface for file operations:
 
 ```typescript
 class FSStoreFile implements IFSStoreFile {
   constructor(options: FSStoreOptions)
-  
-  // 文件锁操作
+
+  // File locking operations
   async lock(): Promise<void>
   async unlock(): Promise<boolean>
   async unlockAll(): Promise<boolean>
-  
-  // 文件访问操作
+
+  // File access operations
   async getAccess(): Promise<void>
   async releaseAccess(): Promise<boolean>
-  
-  // 文件 I/O 操作
+
+  // File I/O operations
   async read(): Promise<Buffer>
   async write(data: Buffer): Promise<string>
   async append(data: Buffer): Promise<string>
   async stat(): Promise<fs.Stats>
   async unlink(): Promise<boolean>
-  
-  // 事务支持
+
+  // Transaction support
   async transaction(cb: () => Promise<void>): Promise<void>
   async startTransaction(): Promise<void>
   async endTransaction(): Promise<void>
-  
-  // 状态查询
+
+  // Status queries
   isLocked(): boolean
   isValid(): boolean
   getFullPath(): string | null
@@ -154,49 +154,49 @@ class FSStoreFile implements IFSStoreFile {
 }
 ```
 
-## 基本用法
+## Basic Usage
 
-### 服务器端设置
+### Server-Side Setup
 
 ```typescript
 import { FSStoreServer } from '@testring/fs-store';
 
-// 创建文件存储服务器
+// Create file storage server
 const server = new FSStoreServer(
-  10,  // 并发线程数
-  'test-fs-store'  // 消息名前缀
+  10,  // Concurrent thread count
+  'test-fs-store'  // Message name prefix
 );
 
-// 检查服务器状态
-console.log('服务器状态:', server.getState());
+// Check server status
+console.log('Server status:', server.getState());
 
-// 获取当前管理的文件列表
-console.log('文件列表:', server.getNameList());
+// Get current managed file list
+console.log('File list:', server.getNameList());
 ```
 
-### 客户端文件操作
+### Client-Side File Operations
 
 ```typescript
 import { FSStoreClient } from '@testring/fs-store';
 
-// 创建客户端
+// Create client
 const client = new FSStoreClient('test-fs-store');
 
-// 获取文件锁
+// Get file lock
 const lockId = client.getLock(
   { ext: 'txt' },
   (fullPath, requestId) => {
-    console.log('文件锁获取成功:', fullPath);
-    
-    // 执行文件操作
+    console.log('File lock acquired successfully:', fullPath);
+
+    // Perform file operations
     // ...
-    
-    // 释放锁
+
+    // Release lock
     client.release(requestId);
   }
 );
 
-// 获取文件访问权限
+// Get file access permission
 const accessId = client.getAccess(
   { ext: 'log' },
   (fullPath, requestId) => {
@@ -211,7 +211,7 @@ const accessId = client.getAccess(
 );
 ```
 
-### 使用 FSStoreFile 进行文件操作
+### Using FSStoreFile for File Operations
 
 ```typescript
 import { FSStoreFile } from '@testring/fs-store';
@@ -241,9 +241,9 @@ console.log('文件大小:', stats.size);
 await file.unlink();
 ```
 
-## 文件工厂模式
+## File Factory Pattern
 
-### 文本文件工厂
+### Text File Factory
 
 ```typescript
 import { FSTextFileFactory } from '@testring/fs-store';
@@ -262,7 +262,7 @@ const content = await textFile.read();
 console.log('文本内容:', content.toString());
 ```
 
-### 二进制文件工厂
+### Binary File Factory
 
 ```typescript
 import { FSBinaryFileFactory } from '@testring/fs-store';
@@ -282,7 +282,7 @@ const data = await binaryFile.read();
 console.log('二进制数据:', data);
 ```
 
-### 截图文件工厂
+### Screenshot File Factory
 
 ```typescript
 import { FSScreenshotFileFactory } from '@testring/fs-store';
@@ -300,9 +300,9 @@ await screenshotFile.write(screenshotData);
 console.log('截图文件路径:', screenshotFile.getFullPath());
 ```
 
-## 高级用法
+## Advanced Usage
 
-### 文件事务处理
+### File Transaction Processing
 
 ```typescript
 import { FSStoreFile } from '@testring/fs-store';
@@ -324,7 +324,7 @@ await file.transaction(async () => {
 console.log('事务完成，文件路径:', file.getFullPath());
 ```
 
-### 手动事务控制
+### Manual Transaction Control
 
 ```typescript
 const file = new FSStoreFile({
@@ -355,7 +355,7 @@ try {
 }
 ```
 
-### 文件锁管理
+### File Lock Management
 
 ```typescript
 const file = new FSStoreFile({
@@ -382,7 +382,7 @@ await file.unlock();
 await file.unlockAll();
 ```
 
-### 等待文件解锁
+### Waiting for File Unlock
 
 ```typescript
 const file = new FSStoreFile({
@@ -397,9 +397,9 @@ await file.waitForUnlock();
 await file.write(Buffer.from('文件现在可写'));
 ```
 
-## 静态方法使用
+## Static Method Usage
 
-### 快速文件操作
+### Quick File Operations
 
 ```typescript
 import { FSStoreFile } from '@testring/fs-store';
@@ -434,9 +434,9 @@ await FSStoreFile.unlink({
 });
 ```
 
-## 服务器端插件钩子
+## Server-Side Plugin Hooks
 
-### 文件名生成钩子
+### File Name Generation Hooks
 
 ```typescript
 import { FSStoreServer, fsStoreServerHooks } from '@testring/fs-store';
@@ -458,7 +458,7 @@ server.getHook(fsStoreServerHooks.ON_FILENAME)?.writeHook(
 );
 ```
 
-### 队列管理钩子
+### Queue Management Hooks
 
 ```typescript
 server.getHook(fsStoreServerHooks.ON_QUEUE)?.writeHook(
@@ -476,7 +476,7 @@ server.getHook(fsStoreServerHooks.ON_QUEUE)?.writeHook(
 );
 ```
 
-### 文件释放钩子
+### File Release Hooks
 
 ```typescript
 server.getHook(fsStoreServerHooks.ON_RELEASE)?.readHook(

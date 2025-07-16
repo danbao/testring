@@ -1,41 +1,41 @@
 # @testring/async-breakpoints
 
-异步断点系统模块，提供了测试执行过程中的暂停点控制和调试功能。
+Asynchronous breakpoint system module that provides pause point control and debugging functionality during test execution.
 
-## 功能概述
+## Overview
 
-该模块提供了一个基于事件的异步断点系统，用于：
-- 在测试执行过程中设置暂停点
-- 控制测试流程的执行时序
-- 支持调试和测试协调
-- 提供指令前后的断点控制
+This module provides an event-based asynchronous breakpoint system for:
+- Setting pause points during test execution
+- Controlling test flow execution timing
+- Supporting debugging and test coordination
+- Providing breakpoint control before and after instructions
 
-## 主要组件
+## Main Components
 
 ### AsyncBreakpoints
-主要的断点管理类，继承自 EventEmitter：
+The main breakpoint management class that extends EventEmitter:
 
 ```typescript
 export class AsyncBreakpoints extends EventEmitter {
-  // 指令前断点
+  // Before instruction breakpoints
   addBeforeInstructionBreakpoint(): void
   waitBeforeInstructionBreakpoint(callback?: HasBreakpointCallback): Promise<void>
   resolveBeforeInstructionBreakpoint(): void
   isBeforeInstructionBreakpointActive(): boolean
   
-  // 指令后断点
+  // After instruction breakpoints
   addAfterInstructionBreakpoint(): void
   waitAfterInstructionBreakpoint(callback?: HasBreakpointCallback): Promise<void>
   resolveAfterInstructionBreakpoint(): void
   isAfterInstructionBreakpointActive(): boolean
   
-  // 断点控制
-  breakStack(): void  // 中断所有断点
+  // Breakpoint control
+  breakStack(): void  // Break all breakpoints
 }
 ```
 
 ### BreakStackError
-断点中断错误类，用于处理断点被强制中断的情况：
+Breakpoint break error class for handling forced breakpoint interruptions:
 
 ```typescript
 export class BreakStackError extends Error {
@@ -43,27 +43,27 @@ export class BreakStackError extends Error {
 }
 ```
 
-## 断点类型
+## Breakpoint Types
 
 ### BreakpointsTypes
 ```typescript
 export enum BreakpointsTypes {
-  beforeInstruction = 'beforeInstruction',  // 指令前断点
-  afterInstruction = 'afterInstruction'     // 指令后断点
+  beforeInstruction = 'beforeInstruction',  // Before instruction breakpoint
+  afterInstruction = 'afterInstruction'     // After instruction breakpoint
 }
 ```
 
 ### BreakpointEvents
 ```typescript
 export enum BreakpointEvents {
-  resolverEvent = 'resolveEvent',    // 断点解析事件
-  breakStackEvent = 'breakStack'     // 断点中断事件
+  resolverEvent = 'resolveEvent',    // Breakpoint resolution event
+  breakStackEvent = 'breakStack'     // Breakpoint break event
 }
 ```
 
-## 使用方法
+## Usage
 
-### 基本使用
+### Basic Usage
 ```typescript
 import { AsyncBreakpoints } from '@testring/async-breakpoints';
 
