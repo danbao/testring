@@ -4,7 +4,7 @@ run(async (api) => {
     const app = api.application;
     
     // Test basic navigation
-    await app.url('https://example.com');
+    await app.url('https://captive.apple.com');
     
     // Test title retrieval
     const title = await app.getTitle();

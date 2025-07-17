@@ -69,7 +69,7 @@ export class PluginCompatibilityTester {
 
         try {
             // Test URL navigation
-            const testUrl = 'https://example.com';
+            const testUrl = 'https://captive.apple.com';
             const result = await this.plugin.url(applicant, testUrl);
             expect(typeof result).to.equal('string');
 
@@ -280,7 +280,7 @@ export class PluginCompatibilityTester {
 
         try {
             // Create multiple sessions
-            await this.plugin.url(applicant1, 'https://example.com');
+            await this.plugin.url(applicant1, 'https://captive.apple.com');
             await this.plugin.url(applicant2, 'https://google.com');
 
             // Sessions should be independent

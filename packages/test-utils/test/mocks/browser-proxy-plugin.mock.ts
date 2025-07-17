@@ -11,7 +11,7 @@ export function createBrowserProxyPluginMock(sandbox: sinon.SinonSandbox): sinon
         end: sandbox.stub().resolves(),
         refresh: sandbox.stub().resolves(),
         click: sandbox.stub().resolves(),
-        url: sandbox.stub().resolves('https://example.com'),
+        url: sandbox.stub().resolves('https://captive.apple.com'),
         newWindow: sandbox.stub().resolves(),
         waitForExist: sandbox.stub().resolves(),
         waitForVisible: sandbox.stub().resolves(),
@@ -78,7 +78,7 @@ export function createMinimalBrowserProxyPluginMock(sandbox: sinon.SinonSandbox)
     return {
         kill: sandbox.stub().resolves(),
         end: sandbox.stub().resolves(),
-        url: sandbox.stub().resolves('https://example.com'),
+        url: sandbox.stub().resolves('https://captive.apple.com'),
         getTitle: sandbox.stub().resolves('Test Page')
     };
 }

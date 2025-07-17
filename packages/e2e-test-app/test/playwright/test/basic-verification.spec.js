@@ -4,14 +4,14 @@ run(async (api) => {
     const app = api.application;
     
     // Test basic navigation
-    await app.url('https://example.com');
+    await app.url('https://captive.apple.com');
     
     // Test title retrieval
     const title = await app.getTitle();
     await app.assert.include(title, 'Example');
     
     // Test simple navigation methods
-    await app.url('https://api.wordpress.org/secret-key/1.1/salt/');
+    await app.url('https://captive.apple.com');
     await app.refresh();
     
     // Test basic element methods

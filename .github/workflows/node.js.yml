@@ -60,11 +60,39 @@ jobs:
           echo "❌ E2E test coverage file not found"
         fi
 
+    # Prepare coverage report for Coveralls
+    - name: Prepare Coverage Report
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
+      run: |
+        # Create merged coverage directory
+        mkdir -p ./merged-coverage
+
+        # Check which coverage files exist and use the appropriate one
+        if [ -f "./.coverage/lcov.info" ] && [ -f "./c8-cov/lcov.info" ]; then
+          echo "Both coverage reports found. Using unit test coverage as primary..."
+          # For now, prioritize unit test coverage as it covers more of the codebase
+          cp ./.coverage/lcov.info ./merged-coverage/lcov.info
+          echo "✅ Unit test coverage report prepared for upload"
+        elif [ -f "./.coverage/lcov.info" ]; then
+          echo "Using unit test coverage report..."
+          cp ./.coverage/lcov.info ./merged-coverage/lcov.info
+          echo "✅ Unit test coverage report prepared for upload"
+        elif [ -f "./c8-cov/lcov.info" ]; then
+          echo "Using E2E test coverage report..."
+          cp ./c8-cov/lcov.info ./merged-coverage/lcov.info
+          echo "✅ E2E test coverage report prepared for upload"
+        else
+          echo "❌ No coverage reports found!"
+          ls -la ./.coverage/ || echo "No .coverage directory"
+          ls -la ./c8-cov/ || echo "No c8-cov directory"
+          exit 1
+        fi
+
     - name: Upload Coverage to Coveralls
       if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
       uses: coverallsapp/github-action@master
       with:
-        path-to-lcov: './c8-cov/lcov.info'
+        path-to-lcov: './merged-coverage/lcov.info'
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: SonarCloud Scan

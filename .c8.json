@@ -3,8 +3,8 @@
   "reports-dir": "./c8-cov",
   "all": true,
   "include": [
-    "packages/plugin-playwrightriver/*/plugin/index.*",
-    "packages/web-application/*/web-client.*",
-    "packages/web-application/*/web-application.*"
+    "packages/plugin-playwright-driver/src/**/*",
+    "packages/web-application/src/**/*",
+    "core/*/src/**/*"
   ]
 }

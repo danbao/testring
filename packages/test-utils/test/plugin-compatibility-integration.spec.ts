@@ -105,13 +105,13 @@ describe('PluginCompatibilityTester Integration Tests', () => {
 
         it('should test navigation with realistic URL handling', async () => {
             mockPlugin.url.onFirstCall().resolves('test-session-id');
-            mockPlugin.url.onSecondCall().resolves('https://example.com');
+            mockPlugin.url.onSecondCall().resolves('https://captive.apple.com');
             mockPlugin.getTitle.resolves('Example Domain');
             mockPlugin.getSource.resolves('<!DOCTYPE html><html><head><title>Example Domain</title></head><body>Test</body></html>');
 
             await tester.testBasicNavigation();
 
-            expect(mockPlugin.url).to.have.been.calledWith('integration-test-plugin-nav-test', 'https://example.com');
+            expect(mockPlugin.url).to.have.been.calledWith('integration-test-plugin-nav-test', 'https://captive.apple.com');
             expect(mockPlugin.url).to.have.been.calledWith('integration-test-plugin-nav-test', '');
             expect(mockPlugin.getTitle).to.have.been.calledWith('integration-test-plugin-nav-test');
             expect(mockPlugin.refresh).to.have.been.calledWith('integration-test-plugin-nav-test');
@@ -181,7 +181,7 @@ describe('PluginCompatibilityTester Integration Tests', () => {
 
             await tester.testSessionManagement();
 
-            expect(mockPlugin.url).to.have.been.calledWith('integration-test-plugin-session1', 'https://example.com');
+            expect(mockPlugin.url).to.have.been.calledWith('integration-test-plugin-session1', 'https://captive.apple.com');
             expect(mockPlugin.url).to.have.been.calledWith('integration-test-plugin-session2', 'https://google.com');
             expect(mockPlugin.getTitle).to.have.been.calledWith('integration-test-plugin-session1');
             expect(mockPlugin.getTitle).to.have.been.calledWith('integration-test-plugin-session2');
