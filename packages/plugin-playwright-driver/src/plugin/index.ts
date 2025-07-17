@@ -1102,14 +1102,22 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
 
     public async url(applicant: string, val: string): Promise<string> {
         await this.createClient(applicant);
-        const { page } = this.getBrowserClient(applicant);
 
-        if (!val) {
+        try {
+            const { page } = await this.validatePageAccess(applicant, 'Navigate to URL');
+
+            if (!val) {
+                return page.url();
+            }
+
+            await page.goto(val);
             return page.url();
+        } catch (error: any) {
+            if (error.message.includes('Page for') || error.message.includes('Browser context for')) {
+                throw error; // Re-throw validation errors as-is
+            }
+            throw new Error(`Navigation failed for ${applicant}: ${error.message}`);
         }
-
-        await page.goto(val);
-        return page.url();
     }
 
     public async click(applicant: string, selector: string, options?: any): Promise<void> {
@@ -1418,8 +1426,16 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
 
     public async getTitle(applicant: string): Promise<string> {
         await this.createClient(applicant);
-        const { page } = this.getBrowserClient(applicant);
-        return await page.title();
+
+        try {
+            const { page } = await this.validatePageAccess(applicant, 'Get page title');
+            return await page.title();
+        } catch (error: any) {
+            if (error.message.includes('Page for') || error.message.includes('Browser context for')) {
+                throw error; // Re-throw validation errors as-is
+            }
+            throw new Error(`Get title failed for ${applicant}: ${error.message}`);
+        }
     }
 
     public async clearValue(applicant: string, selector: string): Promise<void> {
@@ -2145,10 +2161,18 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
 
     public async isExisting(applicant: string, selector: string): Promise<boolean> {
         await this.createClient(applicant);
-        const { page } = this.getBrowserClient(applicant);
-        const normalizedSelector = this.normalizeSelector(selector);
-        const element = await page.$(normalizedSelector);
-        return element !== null;
+
+        try {
+            const { page } = await this.validatePageAccess(applicant, 'Check element existence');
+            const normalizedSelector = this.normalizeSelector(selector);
+            const element = await page.$(normalizedSelector);
+            return element !== null;
+        } catch (error: any) {
+            if (error.message.includes('Page for') || error.message.includes('Browser context for')) {
+                throw error; // Re-throw validation errors as-is
+            }
+            throw new Error(`Element existence check failed for ${applicant}: ${error.message}`);
+        }
     }
 
     public async waitForValue(applicant: string, selector: string, timeout: number, reverse: boolean): Promise<void> {
