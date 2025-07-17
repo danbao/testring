@@ -695,20 +695,46 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         }
 
         const browser = await this.getBrowser();
-        
+
+        // Check if browser is still connected before creating context
+        try {
+            // Test if browser is still alive by checking if it's connected
+            if (typeof (browser as any).isConnected === 'function' && !(browser as any).isConnected()) {
+                throw new Error('Browser is not connected');
+            }
+        } catch (error: any) {
+            // If browser is closed, reset it and get a new one
+            this.logger.warn(`Browser connection lost for ${applicant}, creating new browser instance`);
+            this.browser = undefined;
+            await this.getBrowser(); // Get new browser instance
+            return this.createClient(applicant); // Retry with new browser
+        }
+
         // Merge custom configuration for this applicant
         const customConfig = this.customBrowserClientsConfigs.get(applicant) || {};
         const mergedConfig = { ...this.config, ...customConfig };
         const contextOptions = { ...mergedConfig.contextOptions };
-        
+
         if (mergedConfig.video) {
             contextOptions.recordVideo = {
                 dir: mergedConfig.videoDir || './test-results/videos',
             };
         }
 
-        const context = await browser.newContext(contextOptions);
-        
+        let context;
+        try {
+            context = await browser.newContext(contextOptions);
+        } catch (error: any) {
+            if (error.message.includes('Target page, context or browser has been closed') ||
+                error.message.includes('Browser has been closed')) {
+                // Browser was closed, reset and retry
+                this.logger.warn(`Browser closed during context creation for ${applicant}, retrying with new browser`);
+                this.browser = undefined;
+                return this.createClient(applicant);
+            }
+            throw error;
+        }
+
         if (this.config.trace) {
             await context.tracing.start({ screenshots: true, snapshots: true });
         }
