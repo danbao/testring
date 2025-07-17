@@ -1,56 +1,56 @@
 # @testring/test-worker
 
-测试工作进程模块，作为 testring 框架的执行引擎，负责创建和管理测试工作进程，确保测试在独立、隔离的环境中并行执行。该模块是测试执行的核心，提供了完整的进程生命周期管理、编译支持和通信机制。
+Test worker process module that serves as the execution engine for the testring framework, responsible for creating and managing test worker processes to ensure tests run in independent, isolated environments with parallel execution. This module is the core of test execution, providing complete process lifecycle management, compilation support, and communication mechanisms.
 
 [![npm version](https://badge.fury.io/js/@testring/test-worker.svg)](https://www.npmjs.com/package/@testring/test-worker)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 功能概述
+## Feature Overview
 
-测试工作进程模块是 testring 框架的执行核心，提供了：
-- 多进程并行测试执行
-- 完整的进程隔离和资源管理
-- 灵活的代码编译和插件支持
-- 高效的进程间通信机制
-- 完善的错误处理和恢复策略
-- 调试和开发支持
+The test worker process module is the execution core of the testring framework, providing:
+- Multi-process parallel test execution
+- Complete process isolation and resource management
+- Flexible code compilation and plugin support
+- Efficient inter-process communication mechanisms
+- Comprehensive error handling and recovery strategies
+- Debugging and development support
 
-## 主要特性
+## Key Features
 
-### 进程管理
-- 智能的工作进程创建和销毁
-- 支持本地模式和多进程模式
-- 进程资源监控和管理
-- 异常进程的自动恢复
+### Process Management
+- Intelligent worker process creation and destruction
+- Support for local mode and multi-process mode
+- Process resource monitoring and management
+- Automatic recovery of abnormal processes
 
-### 代码编译
-- 支持 TypeScript 和 JavaScript
-- 可插拔的编译器系统
-- 动态代码加载和执行
-- 编译缓存和优化
+### Code Compilation
+- Support for TypeScript and JavaScript
+- Pluggable compiler system
+- Dynamic code loading and execution
+- Compilation caching and optimization
 
-### 通信机制
-- 高效的进程间通信（IPC）
-- 双向消息传递
-- 序列化和反序列化支持
-- 通信错误处理和重试
+### Communication Mechanism
+- Efficient inter-process communication (IPC)
+- Bidirectional message passing
+- Serialization and deserialization support
+- Communication error handling and retry
 
-### 隔离环境
-- 每个测试在独立进程中运行
-- 避免测试间的相互干扰
-- 独立的内存空间和资源
-- 完整的环境清理
+### Isolated Environment
+- Each test runs in an independent process
+- Prevents interference between tests
+- Independent memory space and resources
+- Complete environment cleanup
 
-## 安装
+## Installation
 
 ```bash
 npm install @testring/test-worker
 ```
 
-## 核心架构
+## Core Architecture
 
-### TestWorker 类
-主要的工作进程管理器，负责创建和配置工作进程实例：
+### TestWorker Class
+The main worker process manager responsible for creating and configuring worker process instances:
 
 ```typescript
 class TestWorker extends PluggableModule {
@@ -58,13 +58,13 @@ class TestWorker extends PluggableModule {
     transport: ITransport,
     workerConfig: ITestWorkerConfig
   )
-  
+
   spawn(): ITestWorkerInstance
 }
 ```
 
-### TestWorkerInstance 接口
-工作进程实例的抽象接口：
+### TestWorkerInstance Interface
+Abstract interface for worker process instances:
 
 ```typescript
 interface ITestWorkerInstance {
@@ -78,26 +78,26 @@ interface ITestWorkerInstance {
 }
 ```
 
-### 工作进程类型
+### Worker Process Types
 
-#### 1. TestWorkerInstance (多进程模式)
-真正的子进程实现，在独立的 Node.js 进程中执行测试。
+#### 1. TestWorkerInstance (Multi-process Mode)
+Actual child process implementation that executes tests in an independent Node.js process.
 
-#### 2. TestWorkerLocal (本地模式)
-在当前进程中执行测试的实现，主要用于调试。
+#### 2. TestWorkerLocal (Local Mode)
+Implementation that executes tests in the current process, mainly used for debugging.
 
-## 基本用法
+## Basic Usage
 
-### 创建和配置工作进程
+### Creating and Configuring Worker Processes
 
 ```typescript
 import { TestWorker } from '@testring/test-worker';
 import { Transport } from '@testring/transport';
 
-// 创建传输层
+// Create transport layer
 const transport = new Transport();
 
-// 配置工作进程
+// Configure worker process
 const workerConfig = {
   debug: false,
   compilerOptions: {
@@ -106,89 +106,89 @@ const workerConfig = {
   }
 };
 
-// 创建工作进程管理器
+// Create worker process manager
 const testWorker = new TestWorker(transport, workerConfig);
 
-// 生成工作进程实例
+// Spawn worker process instance
 const workerInstance = testWorker.spawn();
 
-console.log(`工作进程ID: ${workerInstance.getWorkerID()}`);
+console.log(`Worker Process ID: ${workerInstance.getWorkerID()}`);
 ```
 
-### 执行单个测试
+### Executing a Single Test
 
 ```typescript
-// 测试文件对象
+// Test file object
 const testFile = {
   path: './tests/example.spec.js',
   content: `
-    describe('示例测试', () => {
-      it('应该通过基本测试', () => {
+    describe('Example Test', () => {
+      it('should pass basic test', () => {
         expect(1 + 1).toBe(2);
       });
     });
   `
 };
 
-// 测试参数
+// Test parameters
 const parameters = {
   timeout: 30000,
   retries: 3
 };
 
-// 环境参数
+// Environment parameters
 const envParameters = {
   baseUrl: 'https://example.com',
   apiKey: 'test-api-key'
 };
 
 try {
-  // 执行测试
+  // Execute test
   await workerInstance.execute(testFile, parameters, envParameters);
-  console.log('测试执行成功');
+  console.log('Test execution successful');
 } catch (error) {
-  console.error('测试执行失败:', error);
+  console.error('Test execution failed:', error);
 } finally {
-  // 清理工作进程
+  // Clean up worker process
   await workerInstance.kill();
 }
 ```
 
-### 并行执行多个测试
+### Parallel Execution of Multiple Tests
 
 ```typescript
 import { TestWorker } from '@testring/test-worker';
 
 async function runTestsInParallel(testFiles, workerCount = 4) {
   const testWorker = new TestWorker(transport, workerConfig);
-  
-  // 创建工作进程池
+
+  // Create worker process pool
   const workers = Array.from({ length: workerCount }, () => testWorker.spawn());
-  
+
   try {
-    // 分配测试到不同的工作进程
+    // Distribute tests to different worker processes
     const promises = testFiles.map((testFile, index) => {
       const worker = workers[index % workerCount];
       return worker.execute(testFile, parameters, envParameters);
     });
-    
-    // 等待所有测试完成
+
+    // Wait for all tests to complete
     const results = await Promise.allSettled(promises);
-    
-    // 分析结果
+
+    // Analyze results
     const successful = results.filter(r => r.status === 'fulfilled').length;
     const failed = results.filter(r => r.status === 'rejected').length;
-    
-    console.log(`测试完成: ${successful} 成功, ${failed} 失败`);
-    
+
+    console.log(`Tests completed: ${successful} successful, ${failed} failed`);
+
     return results;
   } finally {
-    // 清理所有工作进程
+    // Clean up all worker processes
     await Promise.all(workers.map(worker => worker.kill()));
   }
 }
 
-// 使用示例
+// Usage example
 const testFiles = [
   { path: './tests/test1.spec.js', content: '...' },
   { path: './tests/test2.spec.js', content: '...' },
@@ -199,81 +199,81 @@ const testFiles = [
 await runTestsInParallel(testFiles, 2);
 ```
 
-## 配置选项
+## Configuration Options
 
-### TestWorkerConfig 接口
+### TestWorkerConfig Interface
 
 ```typescript
 interface ITestWorkerConfig {
-  // 调试模式
+  // Debug mode
   debug?: boolean;
-  
-  // 编译器选项
+
+  // Compiler options
   compilerOptions?: {
     target?: string;
     module?: string;
     strict?: boolean;
     esModuleInterop?: boolean;
   };
-  
-  // 进程选项
+
+  // Process options
   processOptions?: {
-    execArgv?: string[];        // Node.js 执行参数
-    env?: object;               // 环境变量
-    timeout?: number;           // 进程超时时间
+    execArgv?: string[];        // Node.js execution arguments
+    env?: object;               // Environment variables
+    timeout?: number;           // Process timeout
   };
-  
-  // 工作目录
+
+  // Working directory
   cwd?: string;
-  
-  // 最大内存限制
+
+  // Maximum memory limit
   maxMemory?: string;
-  
-  // 插件配置
+
+  // Plugin configuration
   plugins?: string[];
 }
 ```
 
-### 配置示例
+### Configuration Examples
 
-#### 开发环境配置
+#### Development Environment Configuration
 ```typescript
 const devConfig = {
-  debug: true,                          // 启用调试输出
+  debug: true,                          // Enable debug output
   compilerOptions: {
     target: 'ES2019',
     module: 'commonjs',
-    strict: false,                      // 宽松的类型检查
+    strict: false,                      // Relaxed type checking
     esModuleInterop: true
   },
   processOptions: {
-    execArgv: ['--inspect=9229'],       // 启用调试器
-    timeout: 60000                      // 较长的超时时间
+    execArgv: ['--inspect=9229'],       // Enable debugger
+    timeout: 60000                      // Longer timeout
   }
 };
 ```
 
-#### 生产环境配置
+#### Production Environment Configuration
 ```typescript
 const prodConfig = {
   debug: false,
   compilerOptions: {
     target: 'ES2019',
     module: 'commonjs',
-    strict: true,                       // 严格的类型检查
+    strict: true,                       // Strict type checking
     esModuleInterop: true
   },
   processOptions: {
-    timeout: 30000,                     // 较短的超时时间
+    timeout: 30000,                     // Shorter timeout
     env: {
       NODE_ENV: 'production'
     }
   },
-  maxMemory: '2GB'                      // 内存限制
+  maxMemory: '2GB'                      // Memory limit
 };
 ```
 
-#### CI/CD 环境配置
+#### CI/CD Environment Configuration
 ```typescript
 const ciConfig = {
   debug: false,
@@ -292,29 +292,29 @@ const ciConfig = {
 };
 ```
 
-## 工作模式
+## Working Modes
 
-### 多进程模式（默认）
+### Multi-process Mode (Default)
 
-在多进程模式下，每个测试在独立的 Node.js 子进程中执行：
+In multi-process mode, each test executes in an independent Node.js child process:
 
 ```typescript
-// 多进程模式配置
+// Multi-process mode configuration
 const multiProcessConfig = {
-  workerLimit: 4,                       // 创建4个工作进程
-  restartWorker: true,                  // 每个测试后重启进程
+  workerLimit: 4,                       // Create 4 worker processes
+  restartWorker: true,                  // Restart process after each test
   debug: false
 };
 
 const testWorker = new TestWorker(transport, multiProcessConfig);
 
-// 创建工作进程实例（会启动子进程）
-const worker1 = testWorker.spawn();    // 子进程 1
-const worker2 = testWorker.spawn();    // 子进程 2
-const worker3 = testWorker.spawn();    // 子进程 3
-const worker4 = testWorker.spawn();    // 子进程 4
+// Create worker process instances (will start child processes)
+const worker1 = testWorker.spawn();    // Child process 1
+const worker2 = testWorker.spawn();    // Child process 2
+const worker3 = testWorker.spawn();    // Child process 3
+const worker4 = testWorker.spawn();    // Child process 4
 
-// 并行执行测试
+// Execute tests in parallel
 await Promise.all([
   worker1.execute(test1, params, env),
   worker2.execute(test2, params, env),
@@ -323,96 +323,96 @@ await Promise.all([
 ]);
 ```
 
-**优点：**
-- 完全的进程隔离
-- 真正的并行执行
-- 错误不会影响其他测试
-- 可以利用多核CPU
+**Advantages:**
+- Complete process isolation
+- True parallel execution
+- Errors don't affect other tests
+- Can utilize multi-core CPU
 
-**缺点：**
-- 进程创建开销
-- 内存使用较多
-- 调试相对困难
+**Disadvantages:**
+- Process creation overhead
+- Higher memory usage
+- Relatively difficult to debug
 
-### 本地模式
+### Local Mode
 
-在本地模式下，所有测试在当前进程中顺序执行：
+In local mode, all tests execute sequentially in the current process:
 
 ```typescript
-// 本地模式配置
+// Local mode configuration
 const localConfig = {
-  workerLimit: 'local',                 // 本地模式
-  debug: true                           // 便于调试
+  workerLimit: 'local',                 // Local mode
+  debug: true                           // Convenient for debugging
 };
 
 const testWorker = new TestWorker(transport, localConfig);
 
-// 创建本地工作进程实例
+// Create local worker process instance
 const localWorker = testWorker.spawn();
 
-// 在当前进程中执行测试
+// Execute test in current process
 await localWorker.execute(testFile, params, env);
 ```
 
-**优点：**
-- 启动速度快
-- 调试友好
-- 内存使用少
-- 错误堆栈清晰
+**Advantages:**
+- Fast startup speed
+- Debug-friendly
+- Low memory usage
+- Clear error stack traces
 
-**缺点：**
-- 没有进程隔离
-- 无法并行执行
-- 测试间可能相互影响
+**Disadvantages:**
+- No process isolation
+- Cannot execute in parallel
+- Tests may interfere with each other
 
-## 代码编译系统
+## Code Compilation System
 
-### 编译器插件
+### Compiler Plugins
 
-TestWorker 支持可插拔的编译器系统：
+TestWorker supports a pluggable compiler system:
 
 ```typescript
-// 自定义编译器插件
+// Custom compiler plugin
 const customCompilerPlugin = (pluginAPI) => {
   const testWorker = pluginAPI.getTestWorker();
-  
+
   if (testWorker) {
-    // 编译前处理
+    // Pre-compilation processing
     testWorker.getHook('beforeCompile')?.writeHook('customPreprocess', async (filePaths) => {
-      console.log('编译前预处理:', filePaths);
+      console.log('Pre-compilation preprocessing:', filePaths);
       return filePaths;
     });
-    
-    // 自定义编译逻辑
+
+    // Custom compilation logic
     testWorker.getHook('compile')?.writeHook('customCompiler', async (source, filename) => {
-      console.log(`编译文件: ${filename}`);
-      
-      // TypeScript 编译
+      console.log(`Compiling file: ${filename}`);
+
+      // TypeScript compilation
       if (filename.endsWith('.ts')) {
         return compileTypeScript(source, filename);
       }
-      
-      // Babel 编译
+
+      // Babel compilation
       if (filename.endsWith('.jsx')) {
         return compileBabel(source, filename);
       }
-      
-      // 直接返回 JavaScript
+
+      // Return JavaScript directly
       return source;
     });
   }
 };
 
-// 注册编译器插件
+// Register compiler plugin
 const testWorker = new TestWorker(transport, {
   plugins: [customCompilerPlugin]
 });
 ```
 
-### TypeScript 支持
+### TypeScript Support
 
 ```typescript
-// TypeScript 编译配置
+// TypeScript compilation configuration
 const tsConfig = {
   compilerOptions: {
     target: 'ES2019',
@@ -426,34 +426,34 @@ const tsConfig = {
   }
 };
 
-// TypeScript 编译器插件
+// TypeScript compiler plugin
 const typescriptPlugin = (pluginAPI) => {
   const testWorker = pluginAPI.getTestWorker();
-  
+
   testWorker?.getHook('compile')?.writeHook('typescript', async (source, filename) => {
     if (filename.endsWith('.ts') || filename.endsWith('.tsx')) {
       const ts = require('typescript');
-      
+
       const result = ts.transpile(source, tsConfig.compilerOptions, filename);
       return result;
     }
-    
+
     return source;
   });
 };
 ```
 
-### Babel 支持
+### Babel Support
 
 ```typescript
-// Babel 编译器插件
+// Babel compiler plugin
 const babelPlugin = (pluginAPI) => {
   const testWorker = pluginAPI.getTestWorker();
-  
+
   testWorker?.getHook('compile')?.writeHook('babel', async (source, filename) => {
     if (filename.endsWith('.jsx') || filename.endsWith('.js')) {
       const babel = require('@babel/core');
-      
+
       const result = babel.transform(source, {
         filename,
         presets: [
@@ -465,30 +465,30 @@ const babelPlugin = (pluginAPI) => {
           '@babel/plugin-proposal-decorators'
         ]
       });
-      
+
       return result.code;
     }
-    
+
     return source;
   });
 };
 ```
 
-## 进程间通信
+## Inter-Process Communication
 
-### 通信协议
+### Communication Protocol
 
-工作进程使用基于消息的通信协议：
+Worker processes use a message-based communication protocol:
 
 ```typescript
-// 消息类型定义
+// Message type definitions
 interface WorkerMessage {
   type: 'execute' | 'kill' | 'ping' | 'result' | 'error';
   payload?: any;
   id?: string;
 }
 
-// 执行测试消息
+// Execute test message
 const executeMessage: WorkerMessage = {
   type: 'execute',
   id: 'test-123',
@@ -499,7 +499,7 @@ const executeMessage: WorkerMessage = {
   }
 };
 
-// 测试结果消息
+// Test result message
 const resultMessage: WorkerMessage = {
   type: 'result',
   id: 'test-123',
@@ -510,7 +510,7 @@ const resultMessage: WorkerMessage = {
   }
 };
 
-// 错误消息
+// Error message
 const errorMessage: WorkerMessage = {
   type: 'error',
   id: 'test-123',
@@ -521,19 +521,19 @@ const errorMessage: WorkerMessage = {
 };
 ```
 
-### 通信示例
+### Communication Examples
 
 ```typescript
-// 自定义工作进程通信处理
+// Custom worker process communication handling
 class CustomTestWorkerInstance {
   private messageHandlers = new Map();
-  
+
   constructor(private transport: ITransport) {
     this.setupMessageHandlers();
   }
-  
+
   private setupMessageHandlers() {
-    // 处理测试结果
+    // Handle test results
     this.transport.on('message', (message: WorkerMessage) => {
       switch (message.type) {
         case 'result':
@@ -548,66 +548,66 @@ class CustomTestWorkerInstance {
       }
     });
   }
-  
+
   private handleTestResult(message: WorkerMessage) {
-    console.log(`测试 ${message.id} 完成:`, message.payload);
-    
-    // 触发结果处理器
+    console.log(`Test ${message.id} completed:`, message.payload);
+
+    // Trigger result handler
     const handler = this.messageHandlers.get(message.id);
     if (handler) {
       handler.resolve(message.payload);
       this.messageHandlers.delete(message.id);
     }
   }
-  
+
   private handleTestError(message: WorkerMessage) {
-    console.error(`测试 ${message.id} 失败:`, message.payload);
-    
-    // 触发错误处理器
+    console.error(`Test ${message.id} failed:`, message.payload);
+
+    // Trigger error handler
     const handler = this.messageHandlers.get(message.id);
     if (handler) {
       handler.reject(new Error(message.payload.error));
       this.messageHandlers.delete(message.id);
     }
   }
-  
+
   private handleTestProgress(message: WorkerMessage) {
-    console.log(`测试 ${message.id} 进度:`, message.payload);
+    console.log(`Test ${message.id} progress:`, message.payload);
   }
-  
+
   async execute(file: IFile, parameters: any, envParameters: any): Promise<any> {
     const testId = this.generateTestId();
-    
+
     return new Promise((resolve, reject) => {
-      // 注册消息处理器
+      // Register message handler
       this.messageHandlers.set(testId, { resolve, reject });
-      
-      // 发送执行消息
+
+      // Send execute message
       this.transport.send({
         type: 'execute',
         id: testId,
         payload: { file, parameters, envParameters }
       });
-      
-      // 设置超时
+
+      // Set timeout
       setTimeout(() => {
         if (this.messageHandlers.has(testId)) {
           this.messageHandlers.delete(testId);
-          reject(new Error('测试执行超时'));
+          reject(new Error('Test execution timeout'));
         }
       }, parameters.timeout || 30000);
     });
   }
-  
+
   private generateTestId(): string {
     return `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 }
 ```
 
-## 高级用法
+## Advanced Usage
 
-### 工作进程池管理
+### Worker Process Pool Management
 
 ```typescript
 class TestWorkerPool {
@@ -621,71 +621,71 @@ class TestWorkerPool {
     resolve: (value: any) => void;
     reject: (error: Error) => void;
   }> = [];
-  
+
   constructor(
     private testWorker: TestWorker,
     private poolSize: number = 4
   ) {
     this.initializePool();
   }
-  
+
   private async initializePool() {
-    // 创建工作进程池
+    // Create worker process pool
     for (let i = 0; i < this.poolSize; i++) {
       const worker = this.testWorker.spawn();
       this.workers.push(worker);
       this.availableWorkers.push(worker);
     }
   }
-  
+
   async execute(file: IFile, parameters: any, envParameters: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      // 添加到队列
+      // Add to queue
       this.testQueue.push({ file, parameters, envParameters, resolve, reject });
-      
-      // 尝试执行下一个测试
+
+      // Try to execute next test
       this.executeNext();
     });
   }
-  
+
   private async executeNext() {
     if (this.testQueue.length === 0 || this.availableWorkers.length === 0) {
       return;
     }
-    
+
     const worker = this.availableWorkers.pop()!;
     const testTask = this.testQueue.shift()!;
-    
+
     this.busyWorkers.add(worker);
-    
+
     try {
       const result = await worker.execute(
         testTask.file,
         testTask.parameters,
         testTask.envParameters
       );
-      
+
       testTask.resolve(result);
     } catch (error) {
       testTask.reject(error);
     } finally {
-      // 归还工作进程
+      // Return worker process
       this.busyWorkers.delete(worker);
       this.availableWorkers.push(worker);
-      
-      // 执行下一个测试
+
+      // Execute next test
       this.executeNext();
     }
   }
-  
+
   async destroy() {
-    // 清理所有工作进程
+    // Clean up all worker processes
     await Promise.all(this.workers.map(worker => worker.kill()));
     this.workers.length = 0;
     this.availableWorkers.length = 0;
     this.busyWorkers.clear();
   }
-  
+
   getStats() {
     return {
       totalWorkers: this.workers.length,
@@ -696,7 +696,7 @@ class TestWorkerPool {
   }
 }
 
-// 使用示例
+// Usage example
 const pool = new TestWorkerPool(testWorker, 4);
 
 try {
@@ -706,14 +706,14 @@ try {
     pool.execute(test3, params, env),
     pool.execute(test4, params, env)
   ]);
-  
-  console.log('所有测试完成:', results);
+
+  console.log('All tests completed:', results);
 } finally {
   await pool.destroy();
 }
 ```
 
-### 动态工作进程管理
+### Dynamic Worker Process Management
 
 ```typescript
 class DynamicTestWorkerManager {
@@ -723,7 +723,7 @@ class DynamicTestWorkerManager {
     averageDuration: number;
     lastActivity: number;
   }>();
-  
+
   constructor(
     private testWorker: TestWorker,
     private minWorkers: number = 2,
@@ -732,138 +732,138 @@ class DynamicTestWorkerManager {
     this.maintainMinWorkers();
     this.startWorkerMonitoring();
   }
-  
+
   private async maintainMinWorkers() {
     while (this.workers.size < this.minWorkers) {
       await this.createWorker();
     }
   }
-  
+
   private async createWorker(): Promise<string> {
     const worker = this.testWorker.spawn();
     const workerId = worker.getWorkerID();
-    
+
     this.workers.set(workerId, worker);
     this.workerStats.set(workerId, {
       testsExecuted: 0,
       averageDuration: 0,
       lastActivity: Date.now()
     });
-    
-    console.log(`创建工作进程: ${workerId}`);
+
+    console.log(`Created worker process: ${workerId}`);
     return workerId;
   }
-  
+
   private async removeWorker(workerId: string) {
     const worker = this.workers.get(workerId);
     if (worker) {
       await worker.kill();
       this.workers.delete(workerId);
       this.workerStats.delete(workerId);
-      console.log(`移除工作进程: ${workerId}`);
+      console.log(`Removed worker process: ${workerId}`);
     }
   }
-  
+
   private startWorkerMonitoring() {
     setInterval(() => {
       this.cleanupIdleWorkers();
       this.scaleWorkers();
-    }, 10000); // 每10秒检查一次
+    }, 10000); // Check every 10 seconds
   }
-  
+
   private cleanupIdleWorkers() {
     const now = Date.now();
-    const idleThreshold = 60000; // 1分钟
-    
+    const idleThreshold = 60000; // 1 minute
+
     for (const [workerId, stats] of this.workerStats) {
       if (now - stats.lastActivity > idleThreshold && this.workers.size > this.minWorkers) {
         this.removeWorker(workerId);
       }
     }
   }
-  
+
   private async scaleWorkers() {
-    const queueLength = this.getQueueLength(); // 假设有方法获取队列长度
+    const queueLength = this.getQueueLength(); // Assume method to get queue length
     const activeWorkers = this.getActiveWorkerCount();
-    
-    // 如果队列很长，增加工作进程
+
+    // If queue is long, add worker processes
     if (queueLength > activeWorkers * 2 && this.workers.size < this.maxWorkers) {
       await this.createWorker();
     }
-    
-    // 如果工作进程太多且队列为空，减少工作进程
+
+    // If too many workers and queue is empty, reduce worker processes
     if (queueLength === 0 && this.workers.size > this.minWorkers) {
       const idleWorkers = Array.from(this.workers.keys())
         .filter(id => this.isWorkerIdle(id))
         .slice(0, this.workers.size - this.minWorkers);
-      
+
       for (const workerId of idleWorkers) {
         await this.removeWorker(workerId);
       }
     }
   }
-  
+
   async execute(file: IFile, parameters: any, envParameters: any): Promise<any> {
-    // 选择最优的工作进程
+    // Select optimal worker process
     const workerId = this.selectOptimalWorker();
     const worker = this.workers.get(workerId);
-    
+
     if (!worker) {
-      throw new Error('没有可用的工作进程');
+      throw new Error('No available worker processes');
     }
-    
+
     const startTime = Date.now();
     const stats = this.workerStats.get(workerId)!;
-    
+
     try {
       const result = await worker.execute(file, parameters, envParameters);
-      
-      // 更新统计信息
+
+      // Update statistics
       const duration = Date.now() - startTime;
       stats.testsExecuted++;
       stats.averageDuration = (stats.averageDuration + duration) / 2;
       stats.lastActivity = Date.now();
-      
+
       return result;
     } catch (error) {
       stats.lastActivity = Date.now();
       throw error;
     }
   }
-  
+
   private selectOptimalWorker(): string {
-    // 选择平均执行时间最短的工作进程
+    // Select worker process with shortest average execution time
     let bestWorker = '';
     let bestScore = Infinity;
-    
+
     for (const [workerId, stats] of this.workerStats) {
-      const score = stats.averageDuration || 1000; // 默认1秒
+      const score = stats.averageDuration || 1000; // Default 1 second
       if (score < bestScore) {
         bestScore = score;
         bestWorker = workerId;
       }
     }
-    
+
     return bestWorker || Array.from(this.workers.keys())[0];
   }
-  
+
   private getActiveWorkerCount(): number {
-    // 获取正在工作的进程数量
+    // Get number of working processes
     return Array.from(this.workers.keys())
       .filter(id => !this.isWorkerIdle(id))
       .length;
   }
-  
+
   private isWorkerIdle(workerId: string): boolean {
     const stats = this.workerStats.get(workerId);
     return stats ? Date.now() - stats.lastActivity > 5000 : true;
   }
-  
+
   private getQueueLength(): number {
-    // 这里应该返回实际的队列长度
+    // This should return the actual queue length
     return 0;
   }
-  
+
   async destroy() {
     await Promise.all(
       Array.from(this.workers.values()).map(worker => worker.kill())
@@ -874,63 +874,63 @@ class DynamicTestWorkerManager {
 }
 ```
 
-## 错误处理和恢复
+## Error Handling and Recovery
 
-### 进程异常处理
+### Process Exception Handling
 
 ```typescript
 class RobustTestWorker extends TestWorker {
   private failedWorkers = new Set<string>();
   private maxRetries = 3;
-  
+
   spawn(): ITestWorkerInstance {
     const worker = super.spawn();
     const workerId = worker.getWorkerID();
-    
-    // 包装工作进程以添加错误处理
+
+    // Wrap worker process to add error handling
     return this.wrapWorkerWithErrorHandling(worker, workerId);
   }
-  
+
   private wrapWorkerWithErrorHandling(
     worker: ITestWorkerInstance,
     workerId: string
   ): ITestWorkerInstance {
     const originalExecute = worker.execute.bind(worker);
-    
+
     worker.execute = async (file: IFile, parameters: any, envParameters: any) => {
       let retryCount = 0;
-      
+
       while (retryCount < this.maxRetries) {
         try {
           return await originalExecute(file, parameters, envParameters);
         } catch (error) {
           retryCount++;
-          
+
           if (this.isRecoverableError(error)) {
-            console.warn(`工作进程 ${workerId} 出现可恢复错误，重试 ${retryCount}/${this.maxRetries}:`, error.message);
-            
-            // 等待一段时间后重试
+            console.warn(`Worker process ${workerId} recoverable error, retry ${retryCount}/${this.maxRetries}:`, error.message);
+
+            // Wait before retrying
             await this.delay(1000 * retryCount);
-            
-            // 如果是进程崩溃，重新创建工作进程
+
+            // If process crashed, recreate worker process
             if (this.isProcessCrashError(error)) {
               await this.recreateWorker(worker, workerId);
             }
           } else {
-            // 不可恢复的错误，直接抛出
+            // Unrecoverable error, throw directly
             throw error;
           }
         }
       }
-      
-      // 重试次数用完，标记为失败
+
+      // Retry count exhausted, mark as failed
       this.failedWorkers.add(workerId);
-      throw new Error(`工作进程 ${workerId} 执行失败，已达到最大重试次数`);
+      throw new Error(`Worker process ${workerId} execution failed, maximum retry count reached`);
     };
-    
+
     return worker;
   }
-  
+
   private isRecoverableError(error: Error): boolean {
     const recoverablePatterns = [
       'ECONNRESET',
@@ -938,69 +938,69 @@ class RobustTestWorker extends TestWorker {
       'process exited',
       'worker terminated'
     ];
-    
-    return recoverablePatterns.some(pattern => 
+
+    return recoverablePatterns.some(pattern =>
       error.message.toLowerCase().includes(pattern.toLowerCase())
     );
   }
-  
+
   private isProcessCrashError(error: Error): boolean {
-    return error.message.includes('process exited') || 
+    return error.message.includes('process exited') ||
            error.message.includes('worker terminated');
   }
-  
+
   private async recreateWorker(
     worker: ITestWorkerInstance,
     workerId: string
   ): Promise<void> {
     try {
-      // 尝试清理旧进程
+      // Try to clean up old process
       await worker.kill();
     } catch (cleanupError) {
-      console.warn(`清理工作进程 ${workerId} 失败:`, cleanupError);
+      console.warn(`Failed to clean up worker process ${workerId}:`, cleanupError);
     }
-    
-    // 创建新的工作进程实例
+
+    // Create new worker process instance
     const newWorker = super.spawn();
-    
-    // 替换方法实现（这里需要根据实际实现调整）
+
+    // Replace method implementation (needs adjustment based on actual implementation)
     Object.setPrototypeOf(worker, Object.getPrototypeOf(newWorker));
     Object.assign(worker, newWorker);
-    
-    console.log(`工作进程 ${workerId} 已重新创建`);
+
+    console.log(`Worker process ${workerId} has been recreated`);
   }
-  
+
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
-  
+
   getFailedWorkers(): string[] {
     return Array.from(this.failedWorkers);
   }
-  
+
   resetFailedWorkers(): void {
     this.failedWorkers.clear();
   }
 }
 ```
 
-### 内存泄漏检测
+### Memory Leak Detection
 
 ```typescript
 class MemoryMonitoredTestWorker extends TestWorker {
   private memoryThreshold = 500 * 1024 * 1024; // 500MB
   private monitoringInterval: NodeJS.Timeout | null = null;
-  
+
   spawn(): ITestWorkerInstance {
     const worker = super.spawn();
     const workerId = worker.getWorkerID();
-    
-    // 开始内存监控
+
+    // Start memory monitoring
     this.startMemoryMonitoring(worker, workerId);
-    
+
     return worker;
   }
-  
+
   private startMemoryMonitoring(
     worker: ITestWorkerInstance,
     workerId: string
@@ -1008,48 +1008,48 @@ class MemoryMonitoredTestWorker extends TestWorker {
     this.monitoringInterval = setInterval(async () => {
       try {
         const memoryUsage = await this.getWorkerMemoryUsage(worker);
-        
+
         if (memoryUsage > this.memoryThreshold) {
-          console.warn(`工作进程 ${workerId} 内存使用过高: ${Math.round(memoryUsage / 1024 / 1024)}MB`);
-          
-          // 尝试垃圾回收
+          console.warn(`Worker process ${workerId} high memory usage: ${Math.round(memoryUsage / 1024 / 1024)}MB`);
+
+          // Try garbage collection
           await this.triggerGarbageCollection(worker);
-          
-          // 再次检查内存使用
+
+          // Check memory usage again
           const newMemoryUsage = await this.getWorkerMemoryUsage(worker);
-          
+
           if (newMemoryUsage > this.memoryThreshold * 0.8) {
-            console.error(`工作进程 ${workerId} 可能存在内存泄漏，重启进程`);
+            console.error(`Worker process ${workerId} may have memory leak, restarting process`);
             await this.restartWorker(worker, workerId);
           }
         }
       } catch (error) {
-        console.error(`监控工作进程 ${workerId} 内存失败:`, error);
+        console.error(`Failed to monitor worker process ${workerId} memory:`, error);
       }
-    }, 10000); // 每10秒检查一次
+    }, 10000); // Check every 10 seconds
   }
-  
+
   private async getWorkerMemoryUsage(worker: ITestWorkerInstance): Promise<number> {
-    // 这里需要实现获取工作进程内存使用的逻辑
-    // 可以通过进程间通信获取
-    return 0; // 占位实现
+    // Logic to get worker process memory usage needs to be implemented here
+    // Can be obtained through inter-process communication
+    return 0; // Placeholder implementation
   }
-  
+
   private async triggerGarbageCollection(worker: ITestWorkerInstance): Promise<void> {
-    // 发送垃圾回收命令到工作进程
-    // 这需要在工作进程中实现相应的处理逻辑
+    // Send garbage collection command to worker process
+    // This requires implementing corresponding handling logic in the worker process
   }
-  
+
   private async restartWorker(worker: ITestWorkerInstance, workerId: string): Promise<void> {
     try {
       await worker.kill();
-      // 这里需要重新创建工作进程的逻辑
-      console.log(`工作进程 ${workerId} 已重启`);
+      // Logic to recreate worker process needed here
+      console.log(`Worker process ${workerId} has been restarted`);
     } catch (error) {
-      console.error(`重启工作进程 ${workerId} 失败:`, error);
+      console.error(`Failed to restart worker process ${workerId}:`, error);
     }
   }
-  
+
   stopMemoryMonitoring(): void {
     if (this.monitoringInterval) {
       clearInterval(this.monitoringInterval);
@@ -1059,28 +1059,28 @@ class MemoryMonitoredTestWorker extends TestWorker {
 }
 ```
 
-## 调试和开发支持
+## Debugging and Development Support
 
-### 调试模式
+### Debug Mode
 
 ```typescript
 class DebuggableTestWorker extends TestWorker {
   private debugMode: boolean;
   private debugPort = 9229;
-  
+
   constructor(transport: ITransport, config: ITestWorkerConfig & { debug?: boolean }) {
     super(transport, config);
     this.debugMode = config.debug || false;
   }
-  
+
   spawn(): ITestWorkerInstance {
     if (this.debugMode) {
       return this.spawnDebugWorker();
     }
-    
+
     return super.spawn();
   }
-  
+
   private spawnDebugWorker(): ITestWorkerInstance {
     const debugConfig = {
       ...this.workerConfig,
@@ -1088,17 +1088,17 @@ class DebuggableTestWorker extends TestWorker {
         ...this.workerConfig.processOptions,
         execArgv: [
           `--inspect=${this.debugPort}`,
-          '--inspect-brk'  // 在启动时暂停
+          '--inspect-brk'  // Pause on startup
         ]
       }
     };
-    
-    console.log(`启动调试模式工作进程，调试端口: ${this.debugPort}`);
-    console.log(`使用 Chrome DevTools 连接: chrome://inspect`);
-    
-    this.debugPort++; // 为下一个进程分配新端口
-    
-    // 创建带调试配置的工作进程
+
+    console.log(`Starting debug mode worker process, debug port: ${this.debugPort}`);
+    console.log(`Connect using Chrome DevTools: chrome://inspect`);
+
+    this.debugPort++; // Assign new port for next process
+
+    // Create worker process with debug configuration
     return new TestWorkerInstance(
       this.transport,
       this.compile,
@@ -1108,83 +1108,83 @@ class DebuggableTestWorker extends TestWorker {
   }
 }
 
-// 使用调试模式
+// Using debug mode
 const debugWorker = new DebuggableTestWorker(transport, {
   debug: true,
   compilerOptions: {
     target: 'ES2019',
-    sourceMap: true  // 启用源码映射
+    sourceMap: true  // Enable source maps
   }
 });
 
-// 在调试模式下执行测试
+// Execute test in debug mode
 const worker = debugWorker.spawn();
 await worker.execute(testFile, parameters, envParameters);
 ```
 
-### 性能分析
+### Performance Profiling
 
 ```typescript
 class ProfilingTestWorker extends TestWorker {
   private profilingEnabled: boolean;
   private profileData = new Map<string, any>();
-  
+
   constructor(transport: ITransport, config: ITestWorkerConfig & { profiling?: boolean }) {
     super(transport, config);
     this.profilingEnabled = config.profiling || false;
   }
-  
+
   spawn(): ITestWorkerInstance {
     const worker = super.spawn();
-    
+
     if (this.profilingEnabled) {
       return this.wrapWorkerWithProfiling(worker);
     }
-    
+
     return worker;
   }
-  
+
   private wrapWorkerWithProfiling(worker: ITestWorkerInstance): ITestWorkerInstance {
     const originalExecute = worker.execute.bind(worker);
     const workerId = worker.getWorkerID();
-    
+
     worker.execute = async (file: IFile, parameters: any, envParameters: any) => {
       const startTime = process.hrtime.bigint();
       const startMemory = process.memoryUsage();
-      
+
       try {
         const result = await originalExecute(file, parameters, envParameters);
-        
+
         const endTime = process.hrtime.bigint();
         const endMemory = process.memoryUsage();
-        
-        // 记录性能数据
+
+        // Record performance data
         this.recordPerformanceData(workerId, file.path, {
-          duration: Number(endTime - startTime) / 1000000, // 转换为毫秒
+          duration: Number(endTime - startTime) / 1000000, // Convert to milliseconds
           memoryDelta: {
             heapUsed: endMemory.heapUsed - startMemory.heapUsed,
             external: endMemory.external - startMemory.external
           },
           success: true
         });
-        
+
         return result;
       } catch (error) {
         const endTime = process.hrtime.bigint();
-        
+
         this.recordPerformanceData(workerId, file.path, {
           duration: Number(endTime - startTime) / 1000000,
           success: false,
           error: error.message
         });
-        
+
         throw error;
       }
     };
-    
+
     return worker;
   }
-  
+
   private recordPerformanceData(workerId: string, testPath: string, data: any): void {
     const key = `${workerId}:${testPath}`;
     this.profileData.set(key, {
@@ -1192,7 +1192,7 @@ class ProfilingTestWorker extends TestWorker {
       timestamp: Date.now()
     });
   }
-  
+
   getPerformanceReport(): any {
     const report = {
       summary: {
@@ -1204,124 +1204,124 @@ class ProfilingTestWorker extends TestWorker {
       },
       details: []
     };
-    
+
     let totalDuration = 0;
     let totalMemory = 0;
-    
+
     for (const [key, data] of this.profileData) {
       const [workerId, testPath] = key.split(':');
-      
+
       if (data.success) {
         report.summary.successfulTests++;
       } else {
         report.summary.failedTests++;
       }
-      
+
       totalDuration += data.duration;
       if (data.memoryDelta) {
         totalMemory += data.memoryDelta.heapUsed;
       }
-      
+
       report.details.push({
         workerId,
         testPath,
         ...data
       });
     }
-    
+
     report.summary.averageDuration = totalDuration / this.profileData.size;
     report.summary.totalMemoryUsed = totalMemory;
-    
-    // 按执行时间排序
+
+    // Sort by execution time
     report.details.sort((a, b) => b.duration - a.duration);
-    
+
     return report;
   }
-  
+
   exportPerformanceData(filename: string): void {
     const report = this.getPerformanceReport();
     const fs = require('fs');
-    
+
     fs.writeFileSync(filename, JSON.stringify(report, null, 2));
-    console.log(`性能报告已导出到: ${filename}`);
+    console.log(`Performance report exported to: ${filename}`);
   }
 }
 
-// 使用性能分析
+// Using performance profiling
 const profilingWorker = new ProfilingTestWorker(transport, {
   profiling: true
 });
 
-// 执行测试
+// Execute test
 const worker = profilingWorker.spawn();
 await worker.execute(testFile, parameters, envParameters);
 
-// 生成性能报告
+// Generate performance report
 const report = profilingWorker.getPerformanceReport();
-console.log('性能统计:', report.summary);
+console.log('Performance statistics:', report.summary);
 
-// 导出详细报告
+// Export detailed report
 profilingWorker.exportPerformanceData('./performance-report.json');
 ```
 
-## 最佳实践
+## Best Practices
 
-### 1. 工作进程配置
-- 根据 CPU 核心数合理设置工作进程数量
-- 在开发环境使用本地模式便于调试
-- 生产环境启用进程重启确保隔离性
-- 设置合适的内存限制避免系统资源耗尽
+### 1. Worker Process Configuration
+- Set worker process count appropriately based on CPU core count
+- Use local mode in development environment for easier debugging
+- Enable process restart in production environment to ensure isolation
+- Set appropriate memory limits to avoid system resource exhaustion
 
-### 2. 代码编译
-- 为不同文件类型配置相应的编译器
-- 启用源码映射便于调试
-- 使用编译缓存提高性能
-- 配置合适的 TypeScript 选项
+### 2. Code Compilation
+- Configure appropriate compilers for different file types
+- Enable source maps for easier debugging
+- Use compilation caching to improve performance
+- Configure appropriate TypeScript options
 
-### 3. 错误处理
-- 实现完善的错误分类和恢复机制
-- 监控工作进程的健康状态
-- 提供详细的错误上下文信息
-- 建立进程重启和故障转移策略
+### 3. Error Handling
+- Implement comprehensive error classification and recovery mechanisms
+- Monitor worker process health status
+- Provide detailed error context information
+- Establish process restart and failover strategies
 
-### 4. 性能优化
-- 使用工作进程池减少创建开销
-- 实现智能的负载均衡算法
-- 监控内存使用避免泄漏
-- 定期清理和重启长时间运行的进程
+### 4. Performance Optimization
+- Use worker process pools to reduce creation overhead
+- Implement intelligent load balancing algorithms
+- Monitor memory usage to avoid leaks
+- Regularly clean up and restart long-running processes
 
-### 5. 调试和监控
-- 在开发环境启用详细的调试功能
-- 收集和分析进程执行数据
-- 实现性能监控和分析工具
-- 建立完整的日志记录系统
+### 5. Debugging and Monitoring
+- Enable detailed debugging features in development environment
+- Collect and analyze process execution data
+- Implement performance monitoring and analysis tools
+- Establish comprehensive logging systems
 
-## 故障排除
+## Troubleshooting
 
-### 常见问题
+### Common Issues
 
-#### 工作进程启动失败
+#### Worker Process Startup Failed
 ```bash
 Error: spawn ENOENT
 ```
-解决方案：检查 Node.js 路径和权限，确认系统环境配置正确。
+Solution: Check Node.js path and permissions, confirm system environment configuration is correct.
 
-#### 进程间通信失败
+#### Inter-Process Communication Failed
 ```bash
 Error: IPC channel closed
 ```
-解决方案：检查进程是否正常运行，增加通信重试机制。
+Solution: Check if process is running normally, add communication retry mechanism.
 
-#### 内存使用过高
+#### High Memory Usage
 ```bash
 Error: out of memory
 ```
-解决方案：减少并发进程数量，启用内存监控和垃圾回收。
+Solution: Reduce concurrent process count, enable memory monitoring and garbage collection.
 
-### 调试技巧
+### Debugging Tips
 
 ```typescript
-// 启用详细调试
+// Enable detailed debugging
 const debugConfig = {
   debug: true,
   workerLimit: 'local',
@@ -1333,30 +1333,30 @@ const debugConfig = {
   }
 };
 
-// 监控工作进程状态
+// Monitor worker process status
 worker.on('error', (error) => {
-  console.error('工作进程错误:', error);
+  console.error('Worker process error:', error);
 });
 
 worker.on('exit', (code, signal) => {
-  console.log(`工作进程退出: code=${code}, signal=${signal}`);
+  console.log(`Worker process exited: code=${code}, signal=${signal}`);
 });
 ```
 
-## 依赖
+## Dependencies
 
-- `@testring/pluggable-module` - 插件系统基础
-- `@testring/child-process` - 子进程管理
-- `@testring/transport` - 进程间通信
-- `@testring/logger` - 日志记录
-- `@testring/types` - 类型定义
+- `@testring/pluggable-module` - Plugin system foundation
+- `@testring/child-process` - Child process management
+- `@testring/transport` - Inter-process communication
+- `@testring/logger` - Logging
+- `@testring/types` - Type definitions
 
-## 相关模块
+## Related Modules
 
-- `@testring/test-run-controller` - 测试运行控制器
-- `@testring/sandbox` - 代码沙箱
-- `@testring/cli` - 命令行界面
+- `@testring/test-run-controller` - Test run controller
+- `@testring/sandbox` - Code sandbox
+- `@testring/cli` - Command line interface
 
-## 许可证
+## License
 
 MIT License
