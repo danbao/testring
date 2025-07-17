@@ -40,6 +40,7 @@
     "build:types:check": "lerna exec --ignore=\"@testring/@(e2e-test-app|devtool-frontend|devtool-extension|ui-kit)\" -- tsc",
     "publish:version": "lerna version --exact --yes",
     "publish:ci": "node ./utils/publish.js --exclude=@testring/devtool-frontend,@testring/devtool-backend,@testring/devtool-extension",
+    "publish:dev": "node ./utils/publish.js --dev --exclude=@testring/devtool-frontend,@testring/devtool-backend,@testring/devtool-extension",
     "deps:check": "npm run deps:check:precommit",
     "deps:check:precommit": "npm run deps:validate",
     "deps:validate": "lerna exec -- node ../../utils/check-packages-versions",
