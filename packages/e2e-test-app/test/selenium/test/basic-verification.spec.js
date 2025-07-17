@@ -8,7 +8,7 @@ run(async (api) => {
     
     // Test title retrieval
     const title = await app.getTitle();
-    await app.assert.include(title, 'Example');
+    await app.assert.include(title, 'Success');
     
     // Test simple navigation methods
     await app.url('https://httpbin.org/html');

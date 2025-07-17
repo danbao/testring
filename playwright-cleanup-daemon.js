@@ -13,7 +13,7 @@ const os = require('os');
 class PlaywrightCleanupDaemon {
     constructor(options = {}) {
         this.interval = options.interval || 30000; // 30秒检查一次
-        this.maxAge = options.maxAge || 300000; // 5分钟的进程认为是孤儿进程
+        this.maxAge = options.maxAge || 1800000; // 30分钟的进程认为是孤儿进程
         this.dryRun = options.dryRun || false;
         this.verbose = options.verbose || false;
         this.registryFile = path.join(os.tmpdir(), 'testring-playwright-processes.json');

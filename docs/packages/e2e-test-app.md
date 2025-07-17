@@ -134,11 +134,11 @@ run(async (api) => {
     const app = api.application;
 
     // Navigate to a page
-    await app.url('https://example.com');
+    await app.url('https://captive.apple.com');
 
     // Verify page title
     const title = await app.getTitle();
-    await app.assert.include(title, 'Example');
+    await app.assert.include(title, 'Success');
 
     // Test navigation methods
     await app.refresh();
