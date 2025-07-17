@@ -31,7 +31,7 @@ jobs:
 
     # Install Playwright browsers for E2E tests
     - name: Install Playwright Browsers
-      run: npx playwright install chromium
+      run: npx playwright install chromium firefox
 
     # Run all tests with coverage
     - run: npm run test:ci:coverage
