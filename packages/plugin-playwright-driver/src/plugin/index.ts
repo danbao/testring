@@ -798,6 +798,33 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         return this.browserClients.has(applicant);
     }
 
+    private async validatePageAccess(applicant: string, operation: string): Promise<{ context: BrowserContext; page: Page }> {
+        const client = this.getBrowserClient(applicant);
+
+        // Check if page is still valid (only if isClosed method exists - not in mocks)
+        if (typeof (client.page as any).isClosed === 'function' && (client.page as any).isClosed()) {
+            throw new Error(`${operation} failed: Page for ${applicant} has been closed`);
+        }
+
+        // For real Playwright contexts, check if context is still valid
+        try {
+            // Try a simple operation to verify the context is still alive
+            // This will work for both real and mock contexts
+            const pages = client.context.pages();
+            // If it's a promise (real Playwright), await it
+            if (pages && typeof (pages as any).then === 'function') {
+                await (pages as any);
+            }
+        } catch (error: any) {
+            if (error.message.includes('Target closed') || error.message.includes('Browser has been closed')) {
+                throw new Error(`${operation} failed: Browser context for ${applicant} has been closed`);
+            }
+            // Don't throw other errors as they might be from mock implementations
+        }
+
+        return client;
+    }
+
     private async stopAllSessions(): Promise<void> {
         const clientsRequests: Promise<any>[] = [];
 
@@ -2007,9 +2034,32 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
 
     public async makeScreenshot(applicant: string): Promise<string> {
         await this.createClient(applicant);
-        const { page } = this.getBrowserClient(applicant);
-        const screenshot = await page.screenshot();
-        return screenshot.toString('base64');
+
+        try {
+            // Validate page access before taking screenshot
+            const { page } = await this.validatePageAccess(applicant, 'Screenshot');
+
+            // Add timeout protection for screenshot operation
+            const screenshot = await Promise.race([
+                page.screenshot(),
+                new Promise<never>((_, reject) =>
+                    setTimeout(() => reject(new Error('Screenshot timeout')), TIMEOUTS.NETWORK_REQUEST)
+                )
+            ]);
+
+            return screenshot.toString('base64');
+        } catch (error: any) {
+            // Provide more specific error information
+            if (error.message.includes('Target page, context or browser has been closed') ||
+                error.message.includes('Page for') ||
+                error.message.includes('Browser context for')) {
+                throw new Error(`Screenshot failed: Browser session for ${applicant} has been closed`);
+            } else if (error.message.includes('timeout')) {
+                throw new Error(`Screenshot failed: Operation timed out for ${applicant}`);
+            } else {
+                throw new Error(`Screenshot failed for ${applicant}: ${error.message}`);
+            }
+        }
     }
 
     public async uploadFile(applicant: string, filePath: string): Promise<string> {
@@ -2081,8 +2131,16 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
 
     public async getSource(applicant: string): Promise<string> {
         await this.createClient(applicant);
-        const { page } = this.getBrowserClient(applicant);
-        return await page.content();
+
+        try {
+            const { page } = await this.validatePageAccess(applicant, 'Get page source');
+            return await page.content();
+        } catch (error: any) {
+            if (error.message.includes('Page for') || error.message.includes('Browser context for')) {
+                throw error; // Re-throw validation errors as-is
+            }
+            throw new Error(`Get page source failed for ${applicant}: ${error.message}`);
+        }
     }
 
     public async isExisting(applicant: string, selector: string): Promise<boolean> {
