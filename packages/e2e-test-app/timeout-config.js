@@ -9,79 +9,81 @@ const isDebug = process.env.DEBUG === 'true' || process.env.PLAYWRIGHT_DEBUG ===
 
 /**
  * 基础timeout配置（毫秒）
+ * 与 Playwright 默认值保持完全一致
  */
 const BASE_TIMEOUTS = {
-  // 快速操作
+  // 所有操作使用 Playwright 默认的 actionTimeout: 30000ms
   fast: {
-    click: 2000,           // 点击操作
-    hover: 1000,           // 悬停操作
-    fill: 2000,            // 填充操作
-    key: 1000,             // 键盘操作
+    click: 30000,          // 点击操作 - Playwright 默认 actionTimeout
+    hover: 30000,          // 悬停操作 - Playwright 默认 actionTimeout
+    fill: 30000,           // 填充操作 - Playwright 默认 actionTimeout
+    key: 30000,            // 键盘操作 - Playwright 默认 actionTimeout
   },
-  
-  // 中等操作
+
+  // 等待操作使用 Playwright 默认的 actionTimeout: 30000ms
   medium: {
-    waitForElement: 10000,  // 等待元素
-    waitForVisible: 10000,  // 等待可见
-    waitForClickable: 8000, // 等待可点击
-    waitForEnabled: 5000,   // 等待可用
-    waitForStable: 5000,    // 等待稳定
-    condition: 5000,        // 等待条件
+    waitForElement: 30000,  // 等待元素 - Playwright 默认 actionTimeout
+    waitForVisible: 30000,  // 等待可见 - Playwright 默认 actionTimeout
+    waitForClickable: 30000, // 等待可点击 - Playwright 默认 actionTimeout
+    waitForEnabled: 30000,   // 等待可用 - Playwright 默认 actionTimeout
+    waitForStable: 30000,    // 等待稳定 - Playwright 默认 actionTimeout
+    condition: 30000,        // 等待条件 - Playwright 默认 actionTimeout
   },
-  
-  // 慢速操作
+
+  // 导航操作使用 Playwright 默认的 navigationTimeout: 30000ms
   slow: {
-    pageLoad: 30000,        // 页面加载
-    navigation: 30000,      // 导航
-    networkRequest: 15000,  // 网络请求
-    waitForValue: 15000,    // 等待值
-    waitForSelected: 15000, // 等待选择
+    pageLoad: 30000,        // 页面加载 - Playwright 默认 navigationTimeout
+    navigation: 30000,      // 导航 - Playwright 默认 navigationTimeout
+    networkRequest: 30000,  // 网络请求 - 与 actionTimeout 保持一致
+    waitForValue: 30000,    // 等待值 - 与 actionTimeout 保持一致
+    waitForSelected: 30000, // 等待选择 - 与 actionTimeout 保持一致
   },
   
-  // 非常慢的操作
+  // 测试执行和会话管理
   verySlow: {
-    testExecution: 30000,   // 单个测试执行
-    clientSession: 900000,  // 客户端会话 (15分钟)
-    pageLoadMax: 180000,    // 页面加载最大时间 (3分钟)
-    globalTest: 900000,     // 全局测试超时 (15分钟)
+    testExecution: 30000,   // 单个测试执行 - 与 Playwright actionTimeout 一致
+    clientSession: 900000,  // 客户端会话 (15分钟) - 保持长时间会话
+    pageLoadMax: 30000,     // 页面加载最大时间 - 与 navigationTimeout 一致
+    globalTest: 900000,     // 全局测试超时 (15分钟) - 保持长时间测试
   },
   
-  // 清理操作
+  // 清理操作 - 使用较短但合理的超时时间
   cleanup: {
-    traceStop: 2000,        // 跟踪停止
-    coverageStop: 2000,     // 覆盖率停止
-    contextClose: 3000,     // 上下文关闭
-    sessionClose: 2000,     // 会话关闭
-    browserClose: 1500,     // 浏览器关闭
+    traceStop: 5000,        // 跟踪停止 - 给足够时间保存跟踪数据
+    coverageStop: 5000,     // 覆盖率停止 - 给足够时间保存覆盖率数据
+    contextClose: 5000,     // 上下文关闭 - 给足够时间清理上下文
+    sessionClose: 5000,     // 会话关闭 - 给足够时间关闭会话
+    browserClose: 5000,     // 浏览器关闭 - 给足够时间关闭浏览器
   }
 };
 
 /**
  * 环境相关的timeout倍数
+ * 基于 Playwright 默认值进行微调
  */
 const ENVIRONMENT_MULTIPLIERS = {
   local: isLocal ? {
-    fast: 2,      // 本地环境快速操作延长2倍
-    medium: 2,    // 中等操作延长2倍
-    slow: 1.5,    // 慢速操作延长1.5倍
-    verySlow: 1,  // 非常慢的操作保持不变
-    cleanup: 2,   // 清理操作延长2倍
+    fast: 1,      // 本地环境保持 Playwright 默认值
+    medium: 1,    // 本地环境保持 Playwright 默认值
+    slow: 1,      // 本地环境保持 Playwright 默认值
+    verySlow: 1,  // 本地环境保持不变
+    cleanup: 1,   // 本地环境保持不变
   } : {},
-  
+
   ci: isCI ? {
-    fast: 0.8,    // CI环境快速操作缩短到80%
-    medium: 0.8,  // 中等操作缩短到80%
-    slow: 0.7,    // 慢速操作缩短到70%
-    verySlow: 0.5, // 非常慢的操作缩短到50%
-    cleanup: 0.8, // 清理操作缩短到80%
+    fast: 1,      // CI环境保持 Playwright 默认值
+    medium: 1,    // CI环境保持 Playwright 默认值
+    slow: 1,      // CI环境保持 Playwright 默认值
+    verySlow: 1,  // CI环境保持不变
+    cleanup: 1,   // CI环境保持不变
   } : {},
-  
+
   debug: isDebug ? {
-    fast: 10,     // 调试模式大幅延长
-    medium: 10,   // 调试模式大幅延长
-    slow: 5,      // 调试模式延长5倍
+    fast: 3,      // 调试模式适度延长到90秒
+    medium: 3,    // 调试模式适度延长到90秒
+    slow: 3,      // 调试模式适度延长到90秒
     verySlow: 2,  // 调试模式延长2倍
-    cleanup: 5,   // 清理操作延长5倍
+    cleanup: 2,   // 清理操作延长2倍
   } : {}
 };
 
@@ -144,8 +146,8 @@ const TIMEOUTS = {
   SESSION_CLOSE: calculateTimeout('cleanup', 'sessionClose'),
   BROWSER_CLOSE: calculateTimeout('cleanup', 'browserClose'),
   
-  // 兼容性别名
-  WAIT_TIMEOUT: calculateTimeout('medium', 'waitForElement'),
+  // 兼容性别名 - 与 Playwright 默认值保持一致
+  WAIT_TIMEOUT: calculateTimeout('medium', 'waitForElement'), // 30000ms
   TICK_TIMEOUT: 100,  // 保持原始的tick timeout
   
   // 工具函数

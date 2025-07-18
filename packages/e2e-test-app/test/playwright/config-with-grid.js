@@ -1,3 +1,4 @@
+// 专门用于测试 Selenium Grid 功能的配置文件
 // 导入统一的timeout配置
 const TIMEOUTS = require('../../timeout-config.js');
 
@@ -29,7 +30,7 @@ module.exports = async (config) => {
         screenshots: 'disable',
         retryCount: local ? 0 : 2, // 在 CI 环境中重试失败的测试
         testTimeout: local ? 0 : (config.testTimeout || TIMEOUTS.TEST_EXECUTION),
-        tests: 'test/playwright/test/**/*.spec.js',
+        tests: 'test/playwright/test/grid-config.spec.js', // 只运行 Grid 配置测试
         plugins: [
             [
                 'playwright-driver',
@@ -37,14 +38,21 @@ module.exports = async (config) => {
                     browserName: 'chromium',
                     launchOptions: {
                         headless: !local,
-                        slowMo: local ? 100 : 0, // Add slow motion for local debugging
+                        slowMo: local ? 100 : 0,
                         args: local ? [] : ['--no-sandbox']
                     },
                     clientTimeout: local ? 0 : (config.testTimeout || TIMEOUTS.CLIENT_SESSION),
-                    // 只在环境变量设置时启用 mock Selenium Grid
-                    ...(process.env.TESTRING_USE_MOCK_GRID === 'true' && {
-                        gridUrl: 'http://localhost:8080/wd/hub'
-                    }),
+                    // 启用 mock Selenium Grid 用于测试自定义头信息
+                    seleniumGrid: {
+                        gridUrl: 'http://localhost:8080/wd/hub',
+                        gridCapabilities: {
+                            'browserName': 'chrome',
+                            'browserVersion': 'latest'
+                        },
+                        gridHeaders: {
+                            'X-Testring-Custom-Header': 'TestringCustomValue'
+                        }
+                    },
                 },
             ],
             ['babel', babelConfig],
