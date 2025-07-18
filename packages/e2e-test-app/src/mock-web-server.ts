@@ -63,6 +63,23 @@ export class MockWebServer {
             res.status(200).json(MockWebServer.seleniumHubHeaders);
         });
 
+        // 添加一个简单的测试页面，用于验证 Grid 连接
+        app.get('/grid-test', (_req: express.Request, res: express.Response) => {
+            res.status(200).send(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Grid Test Page</title>
+                </head>
+                <body>
+                    <h1>Mock Selenium Grid Test</h1>
+                    <p>This page is served by the mock Selenium Grid server.</p>
+                    <div data-test-automation-id="grid-status">Connected to Mock Grid</div>
+                </body>
+                </html>
+            `);
+        });
+
         return app;
     }
 }

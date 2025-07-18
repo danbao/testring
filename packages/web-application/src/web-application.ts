@@ -241,21 +241,32 @@ export class WebApplication extends PluggableModule {
     public async waitForExist(
         xpath: ElementPath,
         timeout: number = this.WAIT_TIMEOUT,
-        skipMoveToObject = false,
     ) {
+        const startTime = Date.now();
+        this.logger.debug(`[waitForExist] Starting waitForExist for ${this.formatXpath(xpath)}, timeout: ${timeout}`);
+
+        this.logger.debug(`[waitForExist] Step 1: DevTool highlight`);
+        const highlightStartTime = Date.now();
         await this.devtoolHighlight(xpath);
+        const highlightEndTime = Date.now();
+        this.logger.debug(`[waitForExist] Step 1 completed: DevTool highlight took ${highlightEndTime - highlightStartTime}ms`);
 
+        this.logger.debug(`[waitForExist] Step 2: Normalizing selector`);
+        const normalizeStartTime = Date.now();
         const normalizedXPath = this.normalizeSelector(xpath);
-        const exists = await this.client.waitForExist(normalizedXPath, timeout);
+        const normalizeEndTime = Date.now();
+        this.logger.debug(`[waitForExist] Step 2 completed: Normalize took ${normalizeEndTime - normalizeStartTime}ms, normalized: ${normalizedXPath}`);
 
-        if (!skipMoveToObject) {
-            try {
-                await this.scrollIntoViewIfNeededCall(xpath);
-                await this.client.moveToObject(normalizedXPath, 1, 1);
-            } catch (ignore) {
-                /* ignore */
-            }
-        }
+        this.logger.debug(`[waitForExist] Step 3: Client waitForExist call`);
+        const clientWaitStartTime = Date.now();
+        const exists = await this.client.waitForExist(normalizedXPath, timeout);
+        const clientWaitEndTime = Date.now();
+        this.logger.debug(`[waitForExist] Step 3 completed: client.waitForExist took ${clientWaitEndTime - clientWaitStartTime}ms, exists: ${exists}`);
+
+
+
+        const totalTime = Date.now() - startTime;
+        this.logger.debug(`[waitForExist] Total execution time: ${totalTime}ms`);
 
         return exists;
     }
@@ -305,11 +316,10 @@ export class WebApplication extends PluggableModule {
     public async waitForVisible(
         xpath: ElementPath,
         timeout: number = this.WAIT_TIMEOUT,
-        skipMoveToObject = false,
     ) {
         const startTime = Date.now();
 
-        await this.waitForExist(xpath, timeout, skipMoveToObject);
+        await this.waitForExist(xpath, timeout);
 
         const spentTime = Date.now() - startTime;
         const waitTime = timeout - spentTime;
@@ -468,16 +478,16 @@ export class WebApplication extends PluggableModule {
         return false;
     }
 
-    @stepLog(function (this: WebApplication, xpath: ElementPath, timeout: number = this.WAIT_TIMEOUT) {
+    @stepLog(function (this: WebApplication, xpath: ElementPath, timeout: number = this.WAIT_TIMEOUT, _options?: any) {
         return `Clicking for ${this.formatXpath(xpath)} for ${timeout}`;
     })
-    public async click(xpath: ElementPath, timeout: number = this.WAIT_TIMEOUT) {
+    public async click(xpath: ElementPath, timeout: number = this.WAIT_TIMEOUT, options?: any) {
         const normalizedSelector = this.normalizeSelector(xpath);
 
         await this.waitForExist(normalizedSelector, timeout);
         await this.makeScreenshot();
 
-        return this.client.click(normalizedSelector, {x: 1, y: 1});
+        return this.client.click(normalizedSelector, {x: 1, y: 1, timeout, ...(options || {})});
     }
 
     @stepLog(function (this: WebApplication, xpath: ElementPath, timeout: number = this.WAIT_TIMEOUT) {
@@ -489,7 +499,7 @@ export class WebApplication extends PluggableModule {
         await this.waitForExist(normalizedSelector, timeout);
         await this.makeScreenshot();
 
-        return this.client.click(normalizedSelector, {button: 'left'});
+        return this.client.click(normalizedSelector, {button: 'left', timeout});
     }
 
     @stepLog(function (this: WebApplication, xpath: ElementPath, _options: ClickOptions, timeout: number = this.WAIT_TIMEOUT) {
@@ -502,6 +512,8 @@ export class WebApplication extends PluggableModule {
     ) {
         const normalizedSelector = this.normalizeSelector(xpath);
 
+        // For clickCoordinates, we only need to check existence, not hover capability
+        // This matches Selenium behavior where clickCoordinates fails fast for covered elements
         await this.waitForExist(normalizedSelector, timeout);
         await this.makeScreenshot();
 
@@ -548,7 +560,7 @@ export class WebApplication extends PluggableModule {
             }
         }
 
-        return this.client.click(normalizedSelector, {x: hPos, y: vPos});
+        return this.client.click(normalizedSelector, {x: hPos, y: vPos, timeout});
     }
 
     @stepLog(function (this: WebApplication, xpath: ElementPath, timeout: number = this.WAIT_TIMEOUT) {
@@ -684,7 +696,7 @@ export class WebApplication extends PluggableModule {
         xpath: ElementPath,
         timeout: number = this.WAIT_TIMEOUT,
     ) {
-        await this.waitForExist(xpath, timeout, true);
+        await this.waitForExist(xpath, timeout);
 
         const text = (await this.getTextsInternal(xpath, true)).join(' ');
 
@@ -958,15 +970,36 @@ export class WebApplication extends PluggableModule {
         return `Checking if ${this.formatXpath(xpath)} has any of the classes ${suitableClasses.join(', ')}`;
     })
     public async isCSSClassExists(xpath: ElementPath, ...suitableClasses: string[]) {
+        const startTime = Date.now();
+        this.logger.debug(`[isCSSClassExists] Starting CSS class check for ${this.formatXpath(xpath)} with classes: ${suitableClasses.join(', ')}`);
+
+        this.logger.debug(`[isCSSClassExists] Step 1: About to call getAttribute for 'class' attribute`);
+        const getAttributeStartTime = Date.now();
         const elemClasses: any = await this.getAttribute(xpath, 'class');
+        const getAttributeEndTime = Date.now();
+        this.logger.debug(`[isCSSClassExists] Step 1 completed: getAttribute took ${getAttributeEndTime - getAttributeStartTime}ms, result: "${elemClasses}"`);
+
+        this.logger.debug(`[isCSSClassExists] Step 2: Processing class string`);
+        const processStartTime = Date.now();
         const elemClassesArr = (elemClasses || '')
             .trim()
             .toLowerCase()
             .split(/\s+/g);
+        const processEndTime = Date.now();
+        this.logger.debug(`[isCSSClassExists] Step 2 completed: Processing took ${processEndTime - processStartTime}ms, classes array: [${elemClassesArr.join(', ')}]`);
 
-        return suitableClasses.some((suitableClass) =>
+        this.logger.debug(`[isCSSClassExists] Step 3: Checking if any suitable class exists`);
+        const checkStartTime = Date.now();
+        const result = suitableClasses.some((suitableClass) =>
             elemClassesArr.includes(suitableClass.toLowerCase()),
         );
+        const checkEndTime = Date.now();
+        this.logger.debug(`[isCSSClassExists] Step 3 completed: Class check took ${checkEndTime - checkStartTime}ms, result: ${result}`);
+
+        const totalTime = Date.now() - startTime;
+        this.logger.debug(`[isCSSClassExists] Total execution time: ${totalTime}ms`);
+
+        return result;
     }
 
     @stepLog(function (this: WebApplication, xpath: ElementPath, attr: string, timeout: number = this.WAIT_TIMEOUT) {
@@ -977,11 +1010,31 @@ export class WebApplication extends PluggableModule {
         attr: string,
         timeout: number = this.WAIT_TIMEOUT,
     ) {
+        const startTime = Date.now();
+        this.logger.debug(`[getAttribute] Starting getAttribute for ${this.formatXpath(xpath)}, attribute: ${attr}, timeout: ${timeout}`);
+
+        this.logger.debug(`[getAttribute] Step 1: Normalizing selector`);
+        const normalizeStartTime = Date.now();
         xpath = this.normalizeSelector(xpath);
+        const normalizeEndTime = Date.now();
+        this.logger.debug(`[getAttribute] Step 1 completed: Normalize took ${normalizeEndTime - normalizeStartTime}ms, normalized xpath: ${xpath}`);
 
+        this.logger.debug(`[getAttribute] Step 2: Waiting for element to exist`);
+        const waitStartTime = Date.now();
         await this.waitForExist(xpath, timeout);
+        const waitEndTime = Date.now();
+        this.logger.debug(`[getAttribute] Step 2 completed: waitForExist took ${waitEndTime - waitStartTime}ms`);
 
-        return this.client.getAttribute(xpath, attr);
+        this.logger.debug(`[getAttribute] Step 3: Getting attribute from client`);
+        const clientStartTime = Date.now();
+        const result = await this.client.getAttribute(xpath, attr);
+        const clientEndTime = Date.now();
+        this.logger.debug(`[getAttribute] Step 3 completed: client.getAttribute took ${clientEndTime - clientStartTime}ms, result: "${result}"`);
+
+        const totalTime = Date.now() - startTime;
+        this.logger.debug(`[getAttribute] Total execution time: ${totalTime}ms`);
+
+        return result;
     }
 
     @stepLog(function (this: WebApplication, xpath: ElementPath, timeout: number = this.WAIT_TIMEOUT) {
@@ -1073,7 +1126,7 @@ export class WebApplication extends PluggableModule {
         y = 0,
         timeout: number = this.WAIT_TIMEOUT,
     ) {
-        await this.waitForExist(xpath, timeout, true);
+        await this.waitForExist(xpath, timeout);
 
         xpath = this.normalizeSelector(xpath);
 
@@ -1109,7 +1162,7 @@ export class WebApplication extends PluggableModule {
         leftOffset?: number,
         timeout: number = this.WAIT_TIMEOUT,
     ) {
-        await this.waitForExist(xpath, timeout, true);
+        await this.waitForExist(xpath, timeout);
 
         await this.scrollIntoViewCall(xpath, topOffset, leftOffset);
     }
@@ -1143,7 +1196,7 @@ export class WebApplication extends PluggableModule {
         leftOffset?: number,
         timeout: number = this.WAIT_TIMEOUT,
     ) {
-        await this.waitForExist(xpath, timeout, true);
+        await this.waitForExist(xpath, timeout);
         await this.scrollIntoViewIfNeededCall(xpath, topOffset, leftOffset);
     }
 

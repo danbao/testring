@@ -45,7 +45,9 @@
     "deps:validate": "lerna exec -- node ../../utils/check-packages-versions",
     "deps:find-updates": "ncu -m --deep --color",
     "deps:lerna:update": "lernaupdate",
-    "deps:lerna:dedupe": "lernaupdate -d"
+    "deps:lerna:dedupe": "lernaupdate -d",
+    "analyze:performance": "node scripts/run-tests-and-analyze.js",
+    "analyze:performance:logs-only": "node scripts/analyze-long-steps.js"
   },
   "nyc": {
     "report-dir": "./.coverage",
