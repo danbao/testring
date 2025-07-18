@@ -167,103 +167,103 @@ function processTask(data) {
 }
 ```
 
-### 进程状态检测
+### Process State Detection
 
-#### 检查是否为子进程
+#### Check if Running in Child Process
 ```typescript
 import { isChildProcess } from '@testring/child-process';
 
 if (isChildProcess()) {
-  console.log('运行在子进程中');
-  // 子进程特定的逻辑
+  console.log('Running in child process');
+  // Child process specific logic
 } else {
-  console.log('运行在主进程中');
-  // 主进程特定的逻辑
+  console.log('Running in main process');
+  // Main process specific logic
 }
 ```
 
-#### 检查特定参数
+#### Check Specific Parameters
 ```typescript
 import { isChildProcess } from '@testring/child-process';
 
-// 检查自定义参数
+// Check custom parameters
 const customArgs = ['--testring-parent-pid=12345'];
 if (isChildProcess(customArgs)) {
-  console.log('这是 testring 子进程');
+  console.log('This is a testring child process');
 }
 ```
 
-### 使用 spawn 功能
+### Using spawn Functionality
 
-#### 基本 spawn
+#### Basic spawn
 ```typescript
 import { spawn } from '@testring/child-process';
 
-// 启动基本子进程
+// Start basic child process
 const childProcess = spawn('node', ['--version']);
 
 childProcess.stdout.on('data', (data) => {
-  console.log(`输出: ${data}`);
+  console.log(`Output: ${data}`);
 });
 
 childProcess.stderr.on('data', (data) => {
-  console.error(`错误: ${data}`);
+  console.error(`Error: ${data}`);
 });
 ```
 
-#### 带管道的 spawn
+#### spawn with Pipes
 ```typescript
 import { spawnWithPipes } from '@testring/child-process';
 
-// 启动带管道的子进程
+// Start child process with pipes
 const childProcess = spawnWithPipes('node', ['script.js']);
 
-// 向子进程发送数据
+// Send data to child process
 childProcess.stdin.write('hello\n');
 childProcess.stdin.end();
 
-// 读取输出
+// Read output
 childProcess.stdout.on('data', (data) => {
-  console.log(`输出: ${data}`);
+  console.log(`Output: ${data}`);
 });
 ```
 
-## 跨平台支持
+## Cross-Platform Support
 
-### Windows 特殊处理
-模块自动处理 Windows 平台的差异：
+### Windows Special Handling
+The module automatically handles Windows platform differences:
 
 ```typescript
-// 在 Windows 上会自动使用 'node' 命令
-// 在 Unix 系统上会使用 ts-node 或 node 根据文件类型
+// On Windows, 'node' command will be used automatically
+// On Unix systems, ts-node or node will be used based on file type
 const childProcess = await fork('./worker.ts');
 ```
 
-### TypeScript 支持
-自动检测和处理 TypeScript 文件：
+### TypeScript Support
+Automatically detect and handle TypeScript files:
 
 ```typescript
-// .ts 文件会自动使用 ts-node 执行
+// .ts files will automatically use ts-node for execution
 const tsProcess = await fork('./worker.ts');
 
-// .js 文件使用 node 执行
+// .js files use node for execution
 const jsProcess = await fork('./worker.js');
 
-// 无扩展名文件根据环境自动选择
+// Files without extension are automatically selected based on environment
 const process = await fork('./worker');
 ```
 
-## 配置选项
+## Configuration Options
 
 ### IChildProcessForkOptions
 ```typescript
 interface IChildProcessForkOptions {
-  debug: boolean;                    // 是否启用调试模式
-  debugPortRange: Array<number>;     // 调试端口范围
+  debug: boolean;                    // Whether to enable debug mode
+  debugPortRange: Array<number>;     // Debug port range
 }
 ```
 
-### 默认配置
+### Default Configuration
 ```typescript
 const DEFAULT_FORK_OPTIONS = {
   debug: false,
@@ -271,13 +271,13 @@ const DEFAULT_FORK_OPTIONS = {
 };
 ```
 
-## 实际应用场景
+## Real-World Application Scenarios
 
-### 测试工作进程
+### Test Worker Process
 ```typescript
 import { fork } from '@testring/child-process';
 
-// 创建测试工作进程
+// Create test worker process
 const createTestWorker = async (testFile: string) => {
   const worker = await fork('./test-runner.js', [testFile]);
   
@@ -292,17 +292,17 @@ const createTestWorker = async (testFile: string) => {
     
     worker.on('exit', (code) => {
       if (code !== 0) {
-        reject(new Error(`工作进程异常退出: ${code}`));
+        reject(new Error(`Worker process exited abnormally: ${code}`));
       }
     });
   });
 };
 
-// 使用
+// Usage
 const result = await createTestWorker('./my-test.spec.js');
 ```
 
-### 并行任务处理
+### Parallel Task Processing
 ```typescript
 import { fork } from '@testring/child-process';
 
@@ -323,14 +323,14 @@ const processTasks = async (tasks: any[]) => {
     })
   );
   
-  // 清理工作进程
+  // Clean up worker processes
   workers.forEach(worker => worker.kill());
   
   return results;
 };
 ```
 
-### 调试支持
+### Debug Support
 ```typescript
 import { fork } from '@testring/child-process';
 
@@ -340,17 +340,17 @@ const createDebugWorker = async (script: string) => {
     debugPortRange: [9229, 9230, 9231]
   });
   
-  console.log(`调试端口: ${worker.debugPort}`);
-  console.log(`可以使用以下命令连接调试器:`);
-  console.log(`chrome://inspect 或 VS Code 连接到 localhost:${worker.debugPort}`);
+  console.log(`Debug port: ${worker.debugPort}`);
+  console.log(`You can use the following commands to connect the debugger:`);
+  console.log(`chrome://inspect or VS Code connect to localhost:${worker.debugPort}`);
   
   return worker;
 };
 ```
 
-## 错误处理
+## Error Handling
 
-### 进程异常处理
+### Process Exception Handling
 ```typescript
 import { fork } from '@testring/child-process';
 
@@ -359,24 +359,24 @@ const createRobustWorker = async (script: string) => {
     const worker = await fork(script);
     
     worker.on('error', (error) => {
-      console.error('进程错误:', error);
+      console.error('Process error:', error);
     });
     
     worker.on('exit', (code, signal) => {
       if (code !== 0) {
-        console.error(`进程异常退出: code=${code}, signal=${signal}`);
+        console.error(`Process exited abnormally: code=${code}, signal=${signal}`);
       }
     });
     
     return worker;
   } catch (error) {
-    console.error('创建进程失败:', error);
+    console.error('Failed to create process:', error);
     throw error;
   }
 };
 ```
 
-### 超时处理
+### Timeout Handling
 ```typescript
 import { fork } from '@testring/child-process';
 
@@ -384,7 +384,7 @@ const createWorkerWithTimeout = async (script: string, timeout: number) => {
   const worker = await fork(script);
   
   const timeoutId = setTimeout(() => {
-    console.log('进程超时，强制终止');
+    console.log('Process timeout, force termination');
     worker.kill('SIGTERM');
   }, timeout);
   
@@ -396,9 +396,9 @@ const createWorkerWithTimeout = async (script: string, timeout: number) => {
 };
 ```
 
-## 性能优化
+## Performance Optimization
 
-### 进程池管理
+### Process Pool Management
 ```typescript
 import { fork } from '@testring/child-process';
 
@@ -417,7 +417,7 @@ class WorkerPool {
       return worker;
     }
     
-    // 重用现有工作进程
+    // Reuse existing worker process
     return this.workers[this.workers.length - 1];
   }
   
@@ -435,18 +435,18 @@ class WorkerPool {
 }
 ```
 
-### 内存管理
+### Memory Management
 ```typescript
 import { fork } from '@testring/child-process';
 
 const createManagedWorker = async (script: string) => {
   const worker = await fork(script);
   
-  // 监控内存使用
+  // Monitor memory usage
   const memoryCheck = setInterval(() => {
     const usage = process.memoryUsage();
     if (usage.heapUsed > 100 * 1024 * 1024) { // 100MB
-      console.warn('内存使用过高，考虑重启进程');
+      console.warn('Memory usage too high, consider restarting process');
     }
   }, 5000);
   
@@ -458,25 +458,25 @@ const createManagedWorker = async (script: string) => {
 };
 ```
 
-## 最佳实践
+## Best Practices
 
-### 1. 进程生命周期管理
+### 1. Process Lifecycle Management
 ```typescript
-// 确保进程正确清理
+// Ensure processes are properly cleaned up
 process.on('exit', () => {
-  // 清理所有子进程
+  // Clean up all child processes
   workers.forEach(worker => worker.kill());
 });
 
 process.on('SIGTERM', () => {
-  // 优雅关闭
+  // Graceful shutdown
   workers.forEach(worker => worker.kill('SIGTERM'));
 });
 ```
 
-### 2. 错误边界
+### 2. Error Boundaries
 ```typescript
-// 使用错误边界保护主进程
+// Use error boundaries to protect main process
 const safeExecute = async (script: string, data: any) => {
   try {
     const worker = await fork(script);
@@ -484,7 +484,7 @@ const safeExecute = async (script: string, data: any) => {
     return await new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         worker.kill();
-        reject(new Error('执行超时'));
+        reject(new Error('Execution timeout'));
       }, 30000);
       
       worker.on('message', (result) => {
@@ -500,15 +500,15 @@ const safeExecute = async (script: string, data: any) => {
       worker.send(data);
     });
   } catch (error) {
-    console.error('执行失败:', error);
+    console.error('Execution failed:', error);
     throw error;
   }
 };
 ```
 
-### 3. 调试友好
+### 3. Debug-Friendly
 ```typescript
-// 开发模式下启用调试
+// Enable debugging in development mode
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 const worker = await fork('./worker.js', [], {
@@ -516,23 +516,23 @@ const worker = await fork('./worker.js', [], {
 });
 
 if (isDevelopment && worker.debugPort) {
-  console.log(`🐛 调试端口: ${worker.debugPort}`);
+  console.log(`🐛 Debug port: ${worker.debugPort}`);
 }
 ```
 
-## 安装
+## Installation
 
 ```bash
 npm install @testring/child-process
 ```
 
-## 依赖
+## Dependencies
 
-- `@testring/utils` - 工具函数（端口检测等）
-- `@testring/types` - 类型定义
+- `@testring/utils` - Utility functions (port detection, etc.)
+- `@testring/types` - Type definitions
 
-## 相关模块
+## Related Modules
 
-- `@testring/test-worker` - 测试工作进程管理
-- `@testring/transport` - 进程间通信
-- `@testring/utils` - 实用工具函数
+- `@testring/test-worker` - Test worker process management
+- `@testring/transport` - Inter-process communication
+- `@testring/utils` - Utility functions

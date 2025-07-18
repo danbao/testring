@@ -1,43 +1,43 @@
 # @testring/transport
 
-传输层模块，提供了多进程环境下的通信机制和消息传递功能。
+Transport layer module that provides communication mechanisms and message passing functionality in multi-process environments.
 
-## 功能概述
+## Overview
 
-该模块是 testring 框架的核心通信层，负责：
-- 进程间通信（IPC）管理
-- 消息路由和传递
-- 广播和点对点通信
-- 子进程注册和管理
+This module is the core communication layer of the testring framework, responsible for:
+- Inter-Process Communication (IPC) management
+- Message routing and delivery
+- Broadcast and point-to-point communication
+- Child process registration and management
 
-## 主要组件
+## Main Components
 
 ### Transport
-主要的传输层类，提供完整的通信功能：
+The main transport layer class that provides complete communication functionality:
 
 ```typescript
 export class Transport implements ITransport {
-  // 点对点通信
+  // Point-to-point communication
   send<T>(processID: string, messageType: string, payload: T): Promise<void>
   
-  // 广播通信
+  // Broadcast communication
   broadcast<T>(messageType: string, payload: T): void
   broadcastLocal<T>(messageType: string, payload: T): void
   broadcastUniversally<T>(messageType: string, payload: T): void
   
-  // 事件监听
+  // Event listening
   on<T>(messageType: string, callback: TransportMessageHandler<T>): void
   once<T>(messageType: string, callback: TransportMessageHandler<T>): void
   onceFrom<T>(processID: string, messageType: string, callback: TransportMessageHandler<T>): void
   
-  // 进程管理
+  // Process management
   registerChild(processID: string, child: IWorkerEmitter): void
   getProcessesList(): Array<string>
 }
 ```
 
 ### DirectTransport
-直接传输，用于点对点通信：
+Direct transport for point-to-point communication:
 
 ```typescript
 export class DirectTransport {
@@ -48,7 +48,7 @@ export class DirectTransport {
 ```
 
 ### BroadcastTransport
-广播传输，用于广播通信：
+Broadcast transport for broadcast communication:
 
 ```typescript
 export class BroadcastTransport {
@@ -57,218 +57,218 @@ export class BroadcastTransport {
 }
 ```
 
-## 通信模式
+## Communication Patterns
 
-### 点对点通信
-用于向特定进程发送消息：
+### Point-to-Point Communication
+Used to send messages to specific processes:
 
 ```typescript
 import { transport } from '@testring/transport';
 
-// 向指定进程发送消息
+// Send message to specified process
 await transport.send('worker-1', 'execute-test', {
   testFile: 'test.spec.js',
   config: {...}
 });
 ```
 
-### 广播通信
-用于向所有进程发送消息：
+### Broadcast Communication
+Used to send messages to all processes:
 
 ```typescript
 import { transport } from '@testring/transport';
 
-// 向所有子进程广播
+// Broadcast to all child processes
 transport.broadcast('config-updated', newConfig);
 
-// 向本地进程广播
+// Broadcast to local process
 transport.broadcastLocal('shutdown', null);
 
-// 通用广播（根据环境自动选择）
+// Universal broadcast (automatically selected based on environment)
 transport.broadcastUniversally('status-update', status);
 ```
 
-### 事件监听
-监听来自其他进程的消息：
+### Event Listening
+Listen for messages from other processes:
 
 ```typescript
 import { transport } from '@testring/transport';
 
-// 监听特定类型的消息
+// Listen for specific message types
 transport.on('test-result', (result, processID) => {
-  console.log(`收到来自 ${processID} 的测试结果:`, result);
+  console.log(`Received test result from ${processID}:`, result);
 });
 
-// 一次性监听
+// One-time listening
 transport.once('init-complete', (data) => {
-  console.log('初始化完成');
+  console.log('Initialization complete');
 });
 
-// 监听来自特定进程的消息
+// Listen for messages from specific process
 transport.onceFrom('worker-1', 'ready', () => {
-  console.log('Worker-1 已就绪');
+  console.log('Worker-1 is ready');
 });
 ```
 
-## 进程管理
+## Process Management
 
-### 子进程注册
+### Child Process Registration
 ```typescript
 import { transport } from '@testring/transport';
 
-// 注册子进程
+// Register child process
 const childProcess = fork('./worker.js');
 transport.registerChild('worker-1', childProcess);
 
-// 获取所有已注册的进程
+// Get all registered processes
 const processes = transport.getProcessesList();
-console.log('已注册进程:', processes);
+console.log('Registered processes:', processes);
 ```
 
-### 进程检测
+### Process Detection
 ```typescript
 import { transport } from '@testring/transport';
 
-// 检查是否为子进程
+// Check if running in child process
 if (transport.isChildProcess()) {
-  console.log('运行在子进程中');
+  console.log('Running in child process');
 } else {
-  console.log('运行在主进程中');
+  console.log('Running in main process');
 }
 ```
 
-## 消息格式
+## Message Format
 
-### 标准消息格式
+### Standard Message Format
 ```typescript
 interface ITransportDirectMessage {
-  type: string;    // 消息类型
-  payload: any;    // 消息内容
+  type: string;    // Message type
+  payload: any;    // Message content
 }
 ```
 
-### 消息处理器
+### Message Handler
 ```typescript
 type TransportMessageHandler<T> = (message: T, processID?: string) => void;
 ```
 
-## 使用场景
+## Usage Scenarios
 
-### 测试执行协调
+### Test Execution Coordination
 ```typescript
-// 主进程：分发测试任务
+// Main process: Distribute test tasks
 transport.send('worker-1', 'execute-test', {
   testFile: 'login.spec.js',
   config: testConfig
 });
 
-// 子进程：监听测试任务
+// Child process: Listen for test tasks
 transport.on('execute-test', async (task) => {
   const result = await executeTest(task.testFile, task.config);
   transport.send('main', 'test-result', result);
 });
 ```
 
-### 日志收集
+### Log Collection
 ```typescript
-// 子进程：发送日志
+// Child process: Send logs
 transport.send('main', 'log', {
   level: 'info',
-  message: '测试开始执行'
+  message: 'Test execution started'
 });
 
-// 主进程：收集日志
+// Main process: Collect logs
 transport.on('log', (logEntry, processID) => {
   console.log(`[${processID}] ${logEntry.level}: ${logEntry.message}`);
 });
 ```
 
-### 配置同步
+### Configuration Synchronization
 ```typescript
-// 主进程：广播配置更新
+// Main process: Broadcast configuration updates
 transport.broadcast('config-update', newConfig);
 
-// 所有子进程：接收配置更新
+// All child processes: Receive configuration updates
 transport.on('config-update', (config) => {
   updateLocalConfig(config);
 });
 ```
 
-## 错误处理
+## Error Handling
 
-### 通信错误
+### Communication Errors
 ```typescript
 try {
   await transport.send('worker-1', 'test-command', data);
 } catch (error) {
-  console.error('发送消息失败:', error);
-  // 处理通信错误
+  console.error('Failed to send message:', error);
+  // Handle communication error
 }
 ```
 
-### 超时处理
+### Timeout Handling
 ```typescript
-// 设置超时监听
+// Set timeout listener
 const timeout = setTimeout(() => {
-  console.error('消息响应超时');
+  console.error('Message response timeout');
 }, 5000);
 
 transport.onceFrom('worker-1', 'response', (data) => {
   clearTimeout(timeout);
-  console.log('收到响应:', data);
+  console.log('Response received:', data);
 });
 ```
 
-## 性能优化
+## Performance Optimization
 
-### 消息缓存
-- 自动缓存未送达的消息
-- 进程就绪后自动发送缓存消息
-- 避免消息丢失
+### Message Caching
+- Automatically cache undelivered messages
+- Automatically send cached messages when processes are ready
+- Prevent message loss
 
-### 连接池管理
-- 复用进程连接
-- 自动清理断开的连接
-- 优化内存使用
+### Connection Pool Management
+- Reuse process connections
+- Automatically clean up disconnected connections
+- Optimize memory usage
 
-## 调试功能
+## Debugging Features
 
-### 消息追踪
+### Message Tracing
 ```typescript
-// 启用调试模式
+// Enable debug mode
 process.env.DEBUG = 'testring:transport';
 
-// 会输出详细的消息传递日志
+// Will output detailed message delivery logs
 transport.send('worker-1', 'test-message', data);
-// 输出: [DEBUG] 发送消息 test-message 到 worker-1
+// Output: [DEBUG] Sending message test-message to worker-1
 ```
 
-### 连接状态监控
+### Connection Status Monitoring
 ```typescript
-// 监控进程连接状态
+// Monitor process connection status
 transport.on('process-connected', (processID) => {
-  console.log(`进程 ${processID} 已连接`);
+  console.log(`Process ${processID} connected`);
 });
 
 transport.on('process-disconnected', (processID) => {
-  console.log(`进程 ${processID} 已断开`);
+  console.log(`Process ${processID} disconnected`);
 });
 ```
 
-## 安装
+## Installation
 
 ```bash
 npm install @testring/transport
 ```
 
-## 依赖
+## Dependencies
 
-- `@testring/child-process` - 子进程管理
-- `@testring/types` - 类型定义
-- `events` - Node.js 事件模块
+- `@testring/child-process` - Child process management
+- `@testring/types` - Type definitions
+- `events` - Node.js events module
 
-## 相关模块
+## Related Modules
 
-- `@testring/test-worker` - 测试工作进程
-- `@testring/logger` - 日志系统
-- `@testring/child-process` - 子进程管理
+- `@testring/test-worker` - Test worker processes
+- `@testring/logger` - Logging system
+- `@testring/child-process` - Child process management

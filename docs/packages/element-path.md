@@ -238,158 +238,158 @@ const suffixTextElement = root['*button{Cancel}'];
 const containsTextElement = root['*menu*{Settings}'];
 ```
 
-### 子查询和层级关系
+### Sub-queries and Hierarchical Relationships
 
 ```typescript
-// 子查询语法：父元素(子元素条件)
-const formWithSubmit = root['form(button{提交})'];
-console.log('子查询 XPath:', formWithSubmit.toString());
-// 输出: (//*[@data-test-automation-id='form' and descendant::*[@data-test-automation-id='button' and contains(., "提交")]])[1]
+// Sub-query syntax: parent-element(child-element-condition)
+const formWithSubmit = root['form(button{Submit})'];
+console.log('Sub-query XPath:', formWithSubmit.toString());
+// Output: (//*[@data-test-automation-id='form' and descendant::*[@data-test-automation-id='button' and contains(., "Submit")]])[1]
 
-// 复杂子查询
-const complexSubQuery = root['panel(input*{用户名})'];
-const nestedSubQuery = root['container(form(button{提交}))'];
+// Complex sub-queries
+const complexSubQuery = root['panel(input*{Username})'];
+const nestedSubQuery = root['container(form(button{Submit}))'];
 
-// 子查询与通配符结合
+// Sub-query with wildcards
 const anyPanelWithButton = root['*(button)'];
 const prefixPanelWithInput = root['user*(input)'];
 
-// 子查询与文本结合
-const panelWithTextAndButton = root['panel{用户信息}(button{编辑})'];
+// Sub-query with text
+const panelWithTextAndButton = root['panel{User Info}(button{Edit})'];
 ```
 
-## 索引选择和精确定位
+## Index Selection and Precise Positioning
 
-### 数组索引访问
+### Array Index Access
 
 ```typescript
-// 索引选择（从0开始）
+// Index selection (starting from 0)
 const firstButton = root.button[0];
 const secondInput = root.input[1];
 const thirdListItem = root.listItem[2];
 
-console.log('第一个按钮 XPath:', firstButton.toString());
-// 输出: (//*[@data-test-automation-id='button'])[1]
+console.log('First button XPath:', firstButton.toString());
+// Output: (//*[@data-test-automation-id='button'])[1]
 
-console.log('第二个输入框 XPath:', secondInput.toString());
-// 输出: (//*[@data-test-automation-id='input'])[2]
+console.log('Second input XPath:', secondInput.toString());
+// Output: (//*[@data-test-automation-id='input'])[2]
 
-// 复杂路径的索引选择
+// Complex path index selection
 const secondMenuButton = root.navigation.menu[1].button;
 const thirdFormInput = root.form.fieldset[2].input;
 
-// 索引与查询组合
-const secondSubmitButton = root['button{提交}'][1];
+// Index combined with query
+const secondSubmitButton = root['button{Submit}'][1];
 const firstPrefixElement = root['btn*'][0];
 ```
 
-### 多元素结果处理
+### Multiple Element Result Handling
 
 ```typescript
-// 允许多个结果的 XPath（不添加 [1] 后缀）
+// XPath allowing multiple results (no [1] suffix added)
 const allButtons = root.button.__getInstance().toString(true);
-console.log('所有按钮 XPath:', allButtons);
-// 输出: //*[@data-test-automation-id='button']
+console.log('All buttons XPath:', allButtons);
+// Output: //*[@data-test-automation-id='button']
 
-// 获取所有匹配元素的路径
+// Get paths for all matching elements
 const allMenuItems = root.menuItem.__getInstance().toString(true);
 const allInputFields = root['input*'].__getInstance().toString(true);
 ```
 
-## 自定义 XPath 和元素定位
+## Custom XPath and Element Location
 
-### 直接 XPath 定义
+### Direct XPath Definition
 
 ```typescript
-// 使用自定义 XPath
+// Use custom XPath
 const customElement = root.xpath('custom-1', '//div[@class="special"]');
-console.log('自定义 XPath:', customElement.toString());
-// 输出: (//div[@class="special"])[1]
+console.log('Custom XPath:', customElement.toString());
+// Output: (//div[@class="special"])[1]
 
-// 复杂 XPath 表达式
+// Complex XPath expression
 const complexXPath = root.xpath(
   'complex-query',
   '//form[contains(@class, "login")]//input[@type="password"]'
 );
 
-// XPath 与链式调用结合
+// Combine XPath with chaining
 const xpathElement = root.panel.xpath('custom', '//button[@disabled]');
 const chainedXPath = root.xpath('form', '//form').input.submit;
 ```
 
-### 元素定位器
+### Element Locator
 
 ```typescript
-// 使用元素定位器（推荐使用 xpath 方法）
+// Use element locator (recommended to use xpath method)
 const elementByLocator = root.xpathByElement({
   id: 'special-button',
   xpath: '//button[@data-special="true"]'
 });
 
-// 定位器与索引结合
+// Locator combined with index
 const indexedLocator = root.xpath('indexed', '//div[@class="item"]')[2];
 ```
 
-## 流程（Flow）系统
+## Flow System
 
-### 自定义流程配置
+### Custom Flow Configuration
 
 ```typescript
 import { createElementPath, FlowsObject } from '@testring/element-path';
 
-// 定义自定义流程
+// Define custom flows
 const customFlows: FlowsObject = {
   'loginForm': {
     'quickLogin': () => {
-      console.log('执行快速登录流程');
+      console.log('Execute quick login flow');
       return 'quick-login-completed';
     },
     'socialLogin': () => {
-      console.log('执行社交登录流程');
+      console.log('Execute social login flow');
       return 'social-login-completed';
     }
   },
   'userPanel': {
     'showProfile': () => {
-      console.log('显示用户资料');
+      console.log('Show user profile');
       return 'profile-shown';
     },
     'editSettings': () => {
-      console.log('编辑用户设置');
+      console.log('Edit user settings');
       return 'settings-edited';
     }
   }
 };
 
-// 创建带流程的元素路径
+// Create element path with flows
 const rootWithFlows = createElementPath({ flows: customFlows });
 
-// 检查流程是否存在
+// Check if flow exists
 const loginForm = rootWithFlows.loginForm;
 const hasQuickLogin = loginForm.__getInstance().hasFlow('quickLogin');
-console.log('是否有快速登录流程:', hasQuickLogin);
+console.log('Has quick login flow:', hasQuickLogin);
 
-// 获取并执行流程
+// Get and execute flow
 if (hasQuickLogin) {
   const quickLoginFlow = loginForm.__getInstance().getFlow('quickLogin');
   if (quickLoginFlow) {
     const result = quickLoginFlow();
-    console.log('流程执行结果:', result);
+    console.log('Flow execution result:', result);
   }
 }
 
-// 获取所有可用流程
+// Get all available flows
 const allFlows = loginForm.__getInstance().getFlows();
-console.log('可用流程:', Object.keys(allFlows));
+console.log('Available flows:', Object.keys(allFlows));
 ```
 
-### 动态流程注册
+### Dynamic Flow Registration
 
 ```typescript
 class FlowManager {
   private flows: FlowsObject = {};
   
-  // 注册流程
+  // Register flow
   registerFlow(elementKey: string, flowName: string, flowFn: () => any) {
     if (!this.flows[elementKey]) {
       this.flows[elementKey] = {};
@@ -397,64 +397,64 @@ class FlowManager {
     this.flows[elementKey][flowName] = flowFn;
   }
   
-  // 获取流程配置
+  // Get flow configuration
   getFlows(): FlowsObject {
     return this.flows;
   }
   
-  // 执行流程
+  // Execute flow
   executeFlow(elementPath: ElementPath, flowName: string): any {
     const flow = elementPath.getFlow(flowName);
     if (flow) {
       return flow();
     }
-    throw new Error(`流程 "${flowName}" 不存在`);
+    throw new Error(`Flow "${flowName}" does not exist`);
   }
 }
 
-// 使用流程管理器
+// Use flow manager
 const flowManager = new FlowManager();
 
-// 注册业务流程
+// Register business flows
 flowManager.registerFlow('orderForm', 'submitOrder', () => {
-  console.log('提交订单流程');
+  console.log('Submit order flow');
   return { orderId: '12345', status: 'submitted' };
 });
 
 flowManager.registerFlow('productCard', 'addToCart', () => {
-  console.log('添加到购物车流程');
+  console.log('Add to cart flow');
   return { cartItems: 1, totalPrice: 99.99 };
 });
 
-// 创建带动态流程的元素路径
+// Create element path with dynamic flows
 const dynamicRoot = createElementPath({ flows: flowManager.getFlows() });
 
-// 执行业务流程
+// Execute business flow
 const orderForm = dynamicRoot.orderForm;
 const submitResult = flowManager.executeFlow(
   orderForm.__getInstance(),
   'submitOrder'
 );
-console.log('订单提交结果:', submitResult);
+console.log('Order submission result:', submitResult);
 ```
 
-## 高级功能和扩展
+## Advanced Features and Extensions
 
-### 自定义属性名称
+### Custom Attribute Name
 
 ```typescript
 import { ElementPath } from '@testring/element-path';
 
-// 使用自定义属性名称
+// Use custom attribute name
 const customAttrElement = new ElementPath({
-  attributeName: 'data-qa-id', // 使用 data-qa-id 而非默认的 data-test-automation-id
+  attributeName: 'data-qa-id', // Use data-qa-id instead of default data-test-automation-id
   searchMask: 'submitButton'
 });
 
-console.log('自定义属性 XPath:', customAttrElement.toString());
-// 输出: (//*[@data-qa-id='submitButton'])[1]
+console.log('Custom attribute XPath:', customAttrElement.toString());
+// Output: (//*[@data-qa-id='submitButton'])[1]
 
-// 创建自定义属性的代理
+// Create proxy for custom attribute
 function createCustomElementPath(attributeName: string) {
   const customPath = new ElementPath({ attributeName });
   return require('./proxify').proxify(customPath, false);
@@ -464,7 +464,7 @@ const qaRoot = createCustomElementPath('data-qa');
 const seleniumRoot = createCustomElementPath('data-selenium');
 ```
 
-### 路径链分析和调试
+### Path Chain Analysis and Debugging
 
 ```typescript
 class ElementPathAnalyzer {
@@ -490,20 +490,20 @@ class ElementPathAnalyzer {
   }
   
   static debugElementPath(elementPath: ElementPath, label: string) {
-    console.group(`🔍 元素路径分析: ${label}`);
+    console.group(`🔍 Element Path Analysis: ${label}`);
     
     const analysis = this.analyzeElementPath(elementPath);
     
-    console.log('📏 路径长度:', analysis.pathLength);
-    console.log('🏠 包含根节点:', analysis.hasRoot);
-    console.log('🔤 元素类型:', analysis.elementType.toString());
-    console.log('🎯 XPath 表达式:', analysis.xpath);
-    console.log('🔗 反向链:', analysis.reversedChain);
-    console.log('⚙️ 搜索选项:', analysis.searchOptions);
+    console.log('📏 Path length:', analysis.pathLength);
+    console.log('🏠 Has root node:', analysis.hasRoot);
+    console.log('🔤 Element type:', analysis.elementType.toString());
+    console.log('🎯 XPath expression:', analysis.xpath);
+    console.log('🔗 Reversed chain:', analysis.reversedChain);
+    console.log('⚙️ Search options:', analysis.searchOptions);
     
-    console.group('🌳 路径链详情:');
+    console.group('🌳 Path Chain Details:');
     analysis.pathChain.forEach((node, index) => {
-      console.log(`${index + 1}. ${node.isRoot ? '[根]' : '[节点]'}`, {
+      console.log(`${index + 1}. ${node.isRoot ? '[Root]' : '[Node]'}`, {
         name: node.name,
         query: node.query,
         xpath: node.xpath
@@ -515,35 +515,35 @@ class ElementPathAnalyzer {
   }
 }
 
-// 使用分析器
+// Use analyzer
 const complexPath = root.header.navigation.userMenu.dropdown.profileLink;
 ElementPathAnalyzer.debugElementPath(
   complexPath.__getInstance(),
-  '复杂用户菜单路径'
+  'Complex user menu path'
 );
 
-const queryPath = root['form{登录}(input*{用户名})'][1];
+const queryPath = root['form{Login}(input*{Username})'][1];
 ElementPathAnalyzer.debugElementPath(
   queryPath.__getInstance(),
-  '复杂查询路径'
+  'Complex query path'
 );
 ```
 
-### 元素路径验证和测试
+### Element Path Validation and Testing
 
 ```typescript
 class ElementPathValidator {
-  // 验证 XPath 语法
+  // Validate XPath syntax
   static validateXPath(xpath: string): { valid: boolean; error?: string } {
     try {
-      // 这里可以集成 XPath 解析库进行验证
-      // 简单的基础验证
+      // Here you can integrate an XPath parsing library for validation
+      // Simple basic validation
       if (!xpath || xpath.trim() === '') {
-        return { valid: false, error: 'XPath 不能为空' };
+        return { valid: false, error: 'XPath cannot be empty' };
       }
       
       if (!xpath.startsWith('/') && !xpath.startsWith('(')) {
-        return { valid: false, error: 'XPath 格式不正确' };
+        return { valid: false, error: 'XPath syntax is incorrect' };
       }
       
       return { valid: true };
@@ -552,35 +552,35 @@ class ElementPathValidator {
     }
   }
   
-  // 验证元素路径配置
+  // Validate element path configuration
   static validateSearchOptions(options: SearchObject): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
     
-    // 检查互斥选项
+    // Check conflicting options
     const maskOptions = ['anyKey', 'prefix', 'suffix', 'exactKey', 'containsKey', 'parts'];
     const activeMaskOptions = maskOptions.filter(opt => options[opt] !== undefined);
     
     if (activeMaskOptions.length > 1) {
-      errors.push(`掩码选项冲突: ${activeMaskOptions.join(', ')}`);
+      errors.push(`Mask options conflict: ${activeMaskOptions.join(', ')}`);
     }
     
-    // 检查文本选项
+    // Check text options
     const textOptions = ['containsText', 'equalsText'];
     const activeTextOptions = textOptions.filter(opt => options[opt] !== undefined);
     
     if (activeTextOptions.length > 1) {
-      errors.push(`文本选项冲突: ${activeTextOptions.join(', ')}`);
+      errors.push(`Text options conflict: ${activeTextOptions.join(', ')}`);
     }
     
-    // 检查索引值
+    // Check index value
     if (options.index !== undefined && (!Number.isInteger(options.index) || options.index < 0)) {
-      errors.push('索引必须是非负整数');
+      errors.push('Index must be a non-negative integer');
     }
     
     return { valid: errors.length === 0, errors };
   }
   
-  // 测试元素路径生成
+  // Test element path generation
   static testElementPath(elementPath: ElementPath): {
     success: boolean;
     xpath: string;
@@ -590,23 +590,23 @@ class ElementPathValidator {
     let xpath = '';
     
     try {
-      // 验证搜索选项
+      // Validate search options
       const searchValidation = this.validateSearchOptions(elementPath.getSearchOptions());
       if (!searchValidation.valid) {
         errors.push(...searchValidation.errors);
       }
       
-      // 生成 XPath
+      // Generate XPath
       xpath = elementPath.toString();
       
-      // 验证生成的 XPath
+      // Validate generated XPath
       const xpathValidation = this.validateXPath(xpath);
       if (!xpathValidation.valid) {
-        errors.push(`XPath 验证失败: ${xpathValidation.error}`);
+        errors.push(`XPath validation failed: ${xpathValidation.error}`);
       }
       
     } catch (error) {
-      errors.push(`路径生成异常: ${error.message}`);
+      errors.push(`Path generation exception: ${error.message}`);
     }
     
     return {
@@ -617,51 +617,51 @@ class ElementPathValidator {
   }
 }
 
-// 使用验证器
+// Use validator
 const paths = [
   root.button,
-  root['btn*{提交}'],
-  root['form(input{用户名})'][0],
+  root['btn*{Submit}'],
+  root['form(input{Username})'][0],
   root.xpath('custom', '//invalid xpath')
 ];
 
 paths.forEach((path, index) => {
   const result = ElementPathValidator.testElementPath(path.__getInstance());
-  console.log(`路径 ${index + 1} 验证结果:`, result);
+  console.log(`Path ${index + 1} validation result:`, result);
 });
 ```
 
-## 实际应用场景
+## Actual Application Scenarios
 
-### 页面对象模式（Page Object）
+### Page Object Pattern
 
 ```typescript
 class LoginPageElements {
   private root = createElementPath();
   
-  // 表单元素
+  // Form elements
   get usernameInput() { return this.root.loginForm.usernameInput; }
   get passwordInput() { return this.root.loginForm.passwordInput; }
   get rememberCheckbox() { return this.root.loginForm.rememberMe; }
   get submitButton() { return this.root.loginForm.submitButton; }
   
-  // 验证消息
+  // Validation messages
   get errorMessage() { return this.root.errorPanel.message; }
   get successMessage() { return this.root.successPanel.message; }
   
-  // 社交登录
+  // Social login
   get googleLoginButton() { return this.root.socialLogin.googleButton; }
   get facebookLoginButton() { return this.root.socialLogin.facebookButton; }
   
-  // 链接
+  // Links
   get forgotPasswordLink() { return this.root.footer.forgotPasswordLink; }
   get registerLink() { return this.root.footer.registerLink; }
   
-  // 组合查询示例
-  get visibleErrorMessage() { return this.root['errorPanel{error}']; }
-  get enabledSubmitButton() { return this.root['submitButton{登录}'][0]; }
+  // Combined query example
+  get visibleErrorMessage() { return this.root['errorPanel{Error}']; }
+  get enabledSubmitButton() { return this.root['submitButton{Login}'][0]; }
   
-  // 调试方法
+  // Debug method
   debugElements() {
     const elements = {
       usernameInput: this.usernameInput.toString(),
@@ -674,18 +674,18 @@ class LoginPageElements {
   }
 }
 
-// 使用页面对象
+// Use page object
 const loginPage = new LoginPageElements();
 loginPage.debugElements();
 ```
 
-### 组件库元素定位
+### Component Library Element Location
 
 ```typescript
 class ComponentLibraryElements {
   private root = createElementPath();
   
-  // 按钮组件
+  // Button component
   primaryButton(text?: string) {
     return text 
       ? this.root[`primary-button{${text}}`]
@@ -698,7 +698,7 @@ class ComponentLibraryElements {
       : this.root.secondaryButton;
   }
   
-  // 输入组件
+  // Input component
   textInput(label?: string) {
     return label
       ? this.root[`text-input(label{${label}})`]
@@ -711,7 +711,7 @@ class ComponentLibraryElements {
       : this.root.selectInput;
   }
   
-  // 模态框组件
+  // Modal component
   modal(title?: string) {
     return title
       ? this.root[`modal(header{${title}})`]
@@ -723,7 +723,7 @@ class ComponentLibraryElements {
     return modal.closeButton;
   }
   
-  // 表格组件
+  // Table component
   tableRow(index: number) {
     return this.root.dataTable.tableBody.tableRow[index];
   }
@@ -736,7 +736,7 @@ class ComponentLibraryElements {
     return this.root.dataTable[`tableCell{${text}}`];
   }
   
-  // 导航组件
+  // Navigation component
   navItem(text: string) {
     return this.root.navigation[`navItem{${text}}`];
   }
@@ -746,39 +746,39 @@ class ComponentLibraryElements {
   }
 }
 
-// 使用组件库定位器
+// Use component locator
 const components = new ComponentLibraryElements();
 
-// 获取特定按钮
-const saveButton = components.primaryButton('保存');
-const cancelButton = components.secondaryButton('取消');
+// Get specific buttons
+const saveButton = components.primaryButton('Save');
+const cancelButton = components.secondaryButton('Cancel');
 
-// 获取表单输入框
-const emailInput = components.textInput('邮箱地址');
-const countrySelect = components.selectInput('国家');
+// Get form inputs
+const emailInput = components.textInput('Email Address');
+const countrySelect = components.selectInput('Country');
 
-// 获取模态框元素
-const confirmModal = components.modal('确认删除');
-const confirmModalClose = components.modalCloseButton('确认删除');
+// Get modal elements
+const confirmModal = components.modal('Confirm Delete');
+const confirmModalClose = components.modalCloseButton('Confirm Delete');
 
-// 获取表格元素
+// Get table elements
 const firstRowSecondCell = components.tableCell(0, 1);
-const cellWithUserName = components.tableCellWithText('张三');
+const cellWithUserName = components.tableCellWithText('Zhang San');
 
-console.log('组件 XPath 示例:');
-console.log('保存按钮:', saveButton.toString());
-console.log('邮箱输入框:', emailInput.toString());
-console.log('确认模态框:', confirmModal.toString());
-console.log('表格单元格:', firstRowSecondCell.toString());
+console.log('Component XPath example:');
+console.log('Save button:', saveButton.toString());
+console.log('Email input:', emailInput.toString());
+console.log('Confirm modal:', confirmModal.toString());
+console.log('Table cell:', firstRowSecondCell.toString());
 ```
 
-### 动态元素定位工厂
+### Dynamic Element Factory
 
 ```typescript
 class DynamicElementFactory {
   private root = createElementPath();
   
-  // 按属性创建元素
+  // Create element by attribute
   byAttribute(attributeName: string, value: string) {
     const customPath = new ElementPath({
       attributeName,
@@ -787,12 +787,12 @@ class DynamicElementFactory {
     return require('./proxify').proxify(customPath, false);
   }
   
-  // 按类名创建元素
+  // Create element by class name
   byClassName(className: string) {
     return this.root.xpath('by-class', `//*[@class='${className}']`);
   }
   
-  // 按标签和属性组合创建
+  // Create element by tag and attribute combination
   byTagAndAttribute(tagName: string, attributeName: string, value: string) {
     return this.root.xpath(
       'by-tag-attr',
@@ -800,19 +800,19 @@ class DynamicElementFactory {
     );
   }
   
-  // 按文本内容创建
+  // Create element by text content
   byText(text: string, exact = false) {
     return exact 
       ? this.root[`={${text}}`]
       : this.root[`{${text}}`];
   }
   
-  // 按索引和文本组合创建
+  // Create element by text and index combination
   byTextAndIndex(text: string, index: number) {
     return this.root[`{${text}}`][index];
   }
   
-  // 复杂条件组合
+  // Complex condition combination
   complex(conditions: {
     tag?: string;
     attributes?: Record<string, string>;
@@ -823,14 +823,14 @@ class DynamicElementFactory {
   }) {
     let xpath = '';
     
-    // 构建基础 XPath
+    // Build base XPath
     if (conditions.tag) {
       xpath += `//${conditions.tag}`;
     } else {
       xpath += '//*';
     }
     
-    // 添加属性条件
+    // Add attribute conditions
     const attrConditions: string[] = [];
     if (conditions.attributes) {
       Object.entries(conditions.attributes).forEach(([attr, value]) => {
@@ -838,7 +838,7 @@ class DynamicElementFactory {
       });
     }
     
-    // 添加文本条件
+    // Add text conditions
     if (conditions.text) {
       if (conditions.exactText) {
         attrConditions.push(`. = "${conditions.text}"`);
@@ -847,229 +847,81 @@ class DynamicElementFactory {
       }
     }
     
-    // 组合条件
+    // Combine conditions
     if (attrConditions.length > 0) {
       xpath += `[${attrConditions.join(' and ')}]`;
     }
     
-    // 添加索引
+    // Add index
     if (typeof conditions.index === 'number') {
       xpath += `[${conditions.index + 1}]`;
     }
     
-    // 创建元素
+    // Create element
     const element = (conditions.parent || this.root).xpath('complex', xpath);
     return element;
   }
 }
 
-// 使用动态工厂
+// Use dynamic factory
 const factory = new DynamicElementFactory();
 
-// 各种动态创建方式
+// Various dynamic creation methods
 const qaElement = factory.byAttribute('data-qa', 'submit-button');
 const classElement = factory.byClassName('btn btn-primary');
 const tagAttrElement = factory.byTagAndAttribute('input', 'type', 'email');
-const textElement = factory.byText('点击这里');
-const indexedTextElement = factory.byTextAndIndex('提交', 1);
+const textElement = factory.byText('Click here');
+const indexedTextElement = factory.byTextAndIndex('Submit', 1);
 
-// 复杂条件创建
+// Complex condition creation
 const complexElement = factory.complex({
   tag: 'button',
   attributes: {
     'type': 'submit',
     'class': 'btn-primary'
   },
-  text: '确认提交',
+  text: 'Confirm Submit',
   exactText: false,
   index: 0
 });
 
-console.log('动态元素 XPath:');
-console.log('QA 元素:', qaElement.toString());
-console.log('类名元素:', classElement.toString());
-console.log('复杂元素:', complexElement.toString());
+console.log('Dynamic element XPath:');
+console.log('QA element:', qaElement.toString());
+console.log('Class name element:', classElement.toString());
+console.log('Complex element:', complexElement.toString());
 ```
-
-## 最佳实践
-
-### 1. 选择器设计
-- 优先使用稳定的元素标识符
-- 避免依赖易变的类名和结构
-- 合理使用通配符和模式匹配
-- 建立一致的命名约定
-
-### 2. 路径管理
-- 使用页面对象模式组织元素
-- 避免过深的元素路径嵌套
-- 合理使用索引选择
-- 定期验证和更新元素路径
-
-### 3. 性能优化
-- 避免生成过于复杂的 XPath
-- 使用精确匹配而非模糊搜索
-- 合理使用子查询避免全局搜索
-- 缓存常用的元素路径
-
-### 4. 可维护性
-- 建立清晰的元素命名规范
-- 使用类型化的接口定义
-- 添加必要的注释和文档
-- 实现元素路径的自动化测试
-
-### 5. 调试和故障排除
-- 使用分析工具检查路径结构
-- 验证生成的 XPath 语法
-- 记录元素定位的变更历史
-- 建立错误处理和重试机制
-
-## 故障排除
-
-### 常见问题
-
-#### 元素路径语法错误
-```bash
-TypeError: Invalid query key
-```
-解决方案：检查查询语法、括号匹配、特殊字符转义。
-
-#### XPath 生成错误
-```bash
-Error: Both start and end parts must be defined
-```
-解决方案：确保分段匹配语法正确，检查通配符使用。
-
-#### 索引超出范围
-```bash
-Error: Can not select index element from already sliced element
-```
-解决方案：避免在已索引的元素上再次使用索引。
-
-#### 流程不存在
-```bash
-TypeError: Flow xxx is not a function
-```
-解决方案：检查流程配置、确认流程名称正确。
-
-### 调试技巧
-
-```typescript
-// 启用详细调试
-const debugElement = root.complexElement;
-console.log('元素信息:', {
-  xpath: debugElement.toString(),
-  searchOptions: debugElement.__getInstance().getSearchOptions(),
-  elementType: debugElement.__getInstance().getElementType(),
-  pathChain: debugElement.__getInstance().getElementPathChain()
-});
-
-// 验证查询语法
-try {
-  const testElement = root['invalid{syntax'][0];
-  console.log('查询正常:', testElement.toString());
-} catch (error) {
-  console.error('查询语法错误:', error.message);
-}
-```
-
-## API Reference
-
-### Main Functions
-
-#### createElementPath
-
-```typescript
-function createElementPath(options?: {
-  flows?: FlowsObject;
-  strictMode?: boolean;
-}): ElementPathProxy
-```
-
-Creates a new element path proxy with optional configuration.
-
-#### proxify
-
-```typescript
-function proxify(elementPath: ElementPath, strictMode: boolean): ElementPathProxy
-```
-
-Wraps an ElementPath instance with a proxy for dynamic property access.
-
-### ElementPath Methods
-
-- **`toString(allowMultipleNodesInResult?: boolean): string`** - Generate XPath expression
-- **`getElementPathChain(): NodePath[]`** - Get the complete path chain
-- **`getReversedChain(withRoot?: boolean): string`** - Get human-readable path representation
-- **`generateChildElementsPath(key: string | number): ElementPath`** - Create child element path
-- **`getSearchOptions(): SearchObject`** - Get current search configuration
-- **`getElementType(): string | symbol`** - Get element type identifier
-
-### ElementPathProxy Properties
-
-- **`xpath(id: string, xpath: string): ElementPathProxy`** - Create element with custom XPath
-- **`__getInstance(): ElementPath`** - Get underlying ElementPath instance
-- **`__getReversedChain: ElementPath['getReversedChain']`** - Get reversed chain representation
-- **`[key: string]: ElementPathProxy`** - Dynamic property access for element navigation
-
-## Query Syntax Reference
-
-### Basic Patterns
-
-| Pattern | Description | Example | Generated XPath |
-|---------|-------------|---------|-----------------|
-| `element` | Exact match | `root.button` | `//*[@data-test-automation-id='button']` |
-| `*` | Any element | `root['*']` | `//*[@data-test-automation-id]` |
-| `prefix*` | Prefix match | `root['btn*']` | `//*[starts-with(@data-test-automation-id, 'btn')]` |
-| `*suffix` | Suffix match | `root['*button']` | `//*[substring(@data-test-automation-id, ...)]` |
-| `*contains*` | Contains match | `root['*menu*']` | `//*[contains(@data-test-automation-id, 'menu')]` |
-
-### Text Queries
-
-| Pattern | Description | Example | Generated XPath |
-|---------|-------------|---------|-----------------|
-| `{text}` | Contains text | `root['button{Save}']` | `//*[@data-test-automation-id='button' and contains(., "Save")]` |
-| `={text}` | Exact text | `root['button={Login}']` | `//*[@data-test-automation-id='button' and . = "Login"]` |
-| `{text}` only | Any element with text | `root['{Click here}']` | `//*[contains(., "Click here")]` |
-
-### Sub-queries
-
-| Pattern | Description | Example |
-|---------|-------------|---------|
-| `parent(child)` | Parent with child | `root['form(button{Submit})']` |
-| `parent(child{text})` | Parent with child containing text | `root['panel(input{Username})']` |
-
-### Index Selection
-
-| Pattern | Description | Example |
-|---------|-------------|---------|
-| `element[n]` | Nth element (0-based) | `root.button[0]` |
-| `element[n]` | Multiple indices | `root.input[1].button[0]` |
 
 ## Best Practices
 
-### 1. Element Selector Design
-- **Use stable identifiers**: Prefer `data-test-automation-id` over CSS classes or structure-dependent selectors
+### 1. Selector Design
+- **Prefer stable identifiers**: Use `data-test-automation-id` over CSS classes or structure-dependent selectors
 - **Avoid deep nesting**: Keep element paths reasonably shallow for maintainability
 - **Use meaningful names**: Choose descriptive element identifiers that reflect their purpose
 - **Establish naming conventions**: Maintain consistent naming patterns across your test suite
 
-### 2. Query Optimization
-- **Prefer exact matches**: Use exact matching when possible for better performance
-- **Minimize wildcard usage**: Wildcards can be slower than specific selectors
+### 2. Path Management
+- **Organize with Page Objects**: Use page object pattern to group related elements
+- **Avoid excessive deep nesting**: Keep element paths reasonably shallow for maintainability
+- **Use index selection wisely**: Use index only on the final element in the chain
+- **Regularly validate and update element paths**: Track changes to element identifiers
+
+### 3. Performance Optimization
+- **Avoid generating overly complex XPath**: Generate precise XPath expressions
+- **Use exact matching when possible**: Exact matching is faster than fuzzy search
 - **Use sub-queries wisely**: Sub-queries are powerful but can impact performance
 - **Cache frequently used paths**: Store commonly used element paths in variables
 
-### 3. Maintainability
+### 4. Maintainability
 - **Organize with Page Objects**: Use page object pattern to group related elements
 - **Document complex queries**: Add comments for non-obvious selector patterns
 - **Validate XPath output**: Regularly check generated XPath expressions
 - **Version control element maps**: Track changes to element identifiers
 
-### 4. Error Handling
-- **Validate element paths**: Check that generated XPath is syntactically correct
-- **Handle missing elements**: Implement proper error handling for element not found scenarios
-- **Use timeouts appropriately**: Set reasonable timeouts for element location
-- **Log debugging information**: Include element path details in error messages
+### 5. Debugging and Troubleshooting
+- **Use analysis tools to check path structure**: Analyze element paths for debugging
+- **Validate XPath syntax**: Regularly check generated XPath expressions
+- **Record changes to element location**: Track changes to element identifiers
+- **Implement error handling and retries**: Handle element not found scenarios
 
 ## Troubleshooting
 

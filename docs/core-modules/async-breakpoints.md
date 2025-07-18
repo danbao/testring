@@ -69,110 +69,110 @@ import { AsyncBreakpoints } from '@testring/async-breakpoints';
 
 const breakpoints = new AsyncBreakpoints();
 
-// 设置指令前断点
+// Set before-instruction breakpoint
 breakpoints.addBeforeInstructionBreakpoint();
 
-// 等待断点
+// Wait for breakpoint
 await breakpoints.waitBeforeInstructionBreakpoint();
 
-// 在另一个地方解析断点
+// Resolve breakpoint elsewhere
 breakpoints.resolveBeforeInstructionBreakpoint();
 ```
 
-### 使用默认实例
+### Using Default Instance
 ```typescript
 import { asyncBreakpoints } from '@testring/async-breakpoints';
 
-// 使用全局默认实例
+// Use global default instance
 asyncBreakpoints.addBeforeInstructionBreakpoint();
 await asyncBreakpoints.waitBeforeInstructionBreakpoint();
 asyncBreakpoints.resolveBeforeInstructionBreakpoint();
 ```
 
-### 指令前断点
+### Before-Instruction Breakpoints
 ```typescript
 import { asyncBreakpoints } from '@testring/async-breakpoints';
 
-// 设置指令前断点
+// Set before-instruction breakpoint
 asyncBreakpoints.addBeforeInstructionBreakpoint();
 
-// 检查断点状态
+// Check breakpoint status
 if (asyncBreakpoints.isBeforeInstructionBreakpointActive()) {
-  console.log('指令前断点已激活');
+  console.log('Before-instruction breakpoint activated');
 }
 
-// 等待断点（会阻塞直到断点被解析）
+// Wait for breakpoint (blocks until breakpoint is resolved)
 await asyncBreakpoints.waitBeforeInstructionBreakpoint();
 
-// 解析断点（通常在另一个执行流中）
+// Resolve breakpoint (usually in another execution flow)
 asyncBreakpoints.resolveBeforeInstructionBreakpoint();
 ```
 
-### 指令后断点
+### After-Instruction Breakpoints
 ```typescript
 import { asyncBreakpoints } from '@testring/async-breakpoints';
 
-// 设置指令后断点
+// Set after-instruction breakpoint
 asyncBreakpoints.addAfterInstructionBreakpoint();
 
-// 等待断点
+// Wait for breakpoint
 await asyncBreakpoints.waitAfterInstructionBreakpoint();
 
-// 解析断点
+// Resolve breakpoint
 asyncBreakpoints.resolveAfterInstructionBreakpoint();
 ```
 
-### 断点回调
+### Breakpoint Callbacks
 ```typescript
 import { asyncBreakpoints } from '@testring/async-breakpoints';
 
 asyncBreakpoints.addBeforeInstructionBreakpoint();
 
-// 带回调的断点等待
+// Wait for breakpoint with callback
 await asyncBreakpoints.waitBeforeInstructionBreakpoint(async (hasBreakpoint) => {
   if (hasBreakpoint) {
-    console.log('断点已设置，等待解析...');
+    console.log('Breakpoint set, waiting for resolution...');
   } else {
-    console.log('没有断点，继续执行');
+    console.log('No breakpoint, continuing execution');
   }
 });
 ```
 
-## 断点控制
+## Breakpoint Control
 
-### 中断断点
+### Interrupting Breakpoints
 ```typescript
 import { asyncBreakpoints, BreakStackError } from '@testring/async-breakpoints';
 
 asyncBreakpoints.addBeforeInstructionBreakpoint();
 
-// 等待断点
+// Wait for breakpoint
 asyncBreakpoints.waitBeforeInstructionBreakpoint()
   .catch((error) => {
     if (error instanceof BreakStackError) {
-      console.log('断点被中断');
+      console.log('Breakpoint interrupted');
     }
   });
 
-// 中断所有断点
+// Interrupt all breakpoints
 asyncBreakpoints.breakStack();
 ```
 
-### 并发断点处理
+### Concurrent Breakpoint Handling
 ```typescript
 import { asyncBreakpoints } from '@testring/async-breakpoints';
 
-// 同时设置多个断点
+// Set multiple breakpoints simultaneously
 asyncBreakpoints.addBeforeInstructionBreakpoint();
 asyncBreakpoints.addAfterInstructionBreakpoint();
 
-// 并发等待
+// Concurrent waiting
 const promises = Promise.all([
   asyncBreakpoints.waitBeforeInstructionBreakpoint(),
   asyncBreakpoints.waitAfterInstructionBreakpoint()
 ]);
 
-// 按顺序解析断点
+// Resolve breakpoints in sequence
 setTimeout(() => {
   asyncBreakpoints.resolveBeforeInstructionBreakpoint();
   asyncBreakpoints.resolveAfterInstructionBreakpoint();
@@ -181,75 +181,75 @@ setTimeout(() => {
 await promises;
 ```
 
-## 实际应用场景
+## Real-World Application Scenarios
 
-### 测试协调
+### Test Coordination
 ```typescript
 import { asyncBreakpoints } from '@testring/async-breakpoints';
 
-// 在测试执行前设置断点
+// Set breakpoint before test execution
 asyncBreakpoints.addBeforeInstructionBreakpoint();
 
-// 测试执行流程
+// Test execution flow
 async function runTest() {
-  console.log('准备执行测试');
+  console.log('Preparing to execute test');
   
-  // 等待断点解析
+  // Wait for breakpoint resolution
   await asyncBreakpoints.waitBeforeInstructionBreakpoint();
   
-  console.log('开始执行测试');
-  // 实际测试逻辑
+  console.log('Starting test execution');
+  // Actual test logic
 }
 
-// 控制流程
+// Control flow
 async function controlFlow() {
   setTimeout(() => {
-    console.log('解析断点，允许测试继续');
+    console.log('Resolving breakpoint, allowing test to continue');
     asyncBreakpoints.resolveBeforeInstructionBreakpoint();
   }, 2000);
 }
 
-// 并发执行
+// Concurrent execution
 Promise.all([runTest(), controlFlow()]);
 ```
 
-### 调试支持
+### Debug Support
 ```typescript
 import { asyncBreakpoints } from '@testring/async-breakpoints';
 
-// 调试模式下的断点
+// Breakpoints in debug mode
 if (process.env.DEBUG_MODE) {
   asyncBreakpoints.addBeforeInstructionBreakpoint();
   
-  // 等待用户输入或调试器连接
+  // Wait for user input or debugger connection
   await asyncBreakpoints.waitBeforeInstructionBreakpoint(async (hasBreakpoint) => {
     if (hasBreakpoint) {
-      console.log('调试断点激活，等待调试器...');
+      console.log('Debug breakpoint activated, waiting for debugger...');
     }
   });
 }
 ```
 
-### 多进程同步
+### Multi-Process Synchronization
 ```typescript
 import { asyncBreakpoints } from '@testring/async-breakpoints';
 
-// 子进程中设置断点
+// Set breakpoint in child process
 asyncBreakpoints.addAfterInstructionBreakpoint();
 
-// 执行某些操作
+// Perform some operations
 performSomeOperation();
 
-// 等待主进程信号
+// Wait for main process signal
 await asyncBreakpoints.waitAfterInstructionBreakpoint();
 
-// 继续执行
+// Continue execution
 continueExecution();
 ```
 
-## 错误处理
+## Error Handling
 
-### BreakStackError 处理
+### BreakStackError Handling
 ```typescript
 import { asyncBreakpoints, BreakStackError } from '@testring/async-breakpoints';
 
@@ -258,23 +258,23 @@ try {
   await asyncBreakpoints.waitBeforeInstructionBreakpoint();
 } catch (error) {
   if (error instanceof BreakStackError) {
-    console.log('断点被强制中断:', error.message);
-    // 处理中断逻辑
+    console.log('Breakpoint forcibly interrupted:', error.message);
+    // Handle interruption logic
   } else {
-    console.error('其他错误:', error);
+    console.error('Other error:', error);
   }
 }
 ```
 
-### 超时处理
+### Timeout Handling
 ```typescript
 import { asyncBreakpoints } from '@testring/async-breakpoints';
 
 asyncBreakpoints.addBeforeInstructionBreakpoint();
 
-// 设置超时
+// Set timeout
 const timeoutPromise = new Promise((_, reject) => {
-  setTimeout(() => reject(new Error('断点超时')), 5000);
+  setTimeout(() => reject(new Error('Breakpoint timeout')), 5000);
 });
 
 try {
@@ -283,80 +283,80 @@ try {
     timeoutPromise
   ]);
 } catch (error) {
-  console.log('断点处理失败:', error.message);
-  // 强制中断断点
+  console.log('Breakpoint handling failed:', error.message);
+  // Force interrupt breakpoint
   asyncBreakpoints.breakStack();
 }
 ```
 
-## 事件监听
+## Event Listening
 
-### 自定义事件处理
+### Custom Event Handling
 ```typescript
 import { asyncBreakpoints, BreakpointEvents } from '@testring/async-breakpoints';
 
-// 监听断点解析事件
+// Listen for breakpoint resolution events
 asyncBreakpoints.on(BreakpointEvents.resolverEvent, (type) => {
-  console.log(`断点类型 ${type} 已解析`);
+  console.log(`Breakpoint type ${type} resolved`);
 });
 
-// 监听断点中断事件
+// Listen for breakpoint interruption events
 asyncBreakpoints.on(BreakpointEvents.breakStackEvent, () => {
-  console.log('断点栈被中断');
+  console.log('Breakpoint stack interrupted');
 });
 ```
 
-## 最佳实践
+## Best Practices
 
-### 1. 断点生命周期管理
+### 1. Breakpoint Lifecycle Management
 ```typescript
-// 确保断点被正确清理
+// Ensure breakpoints are properly cleaned up
 try {
   asyncBreakpoints.addBeforeInstructionBreakpoint();
   await asyncBreakpoints.waitBeforeInstructionBreakpoint();
 } finally {
-  // 确保断点被清理
+  // Ensure breakpoints are cleaned up
   if (asyncBreakpoints.isBeforeInstructionBreakpointActive()) {
     asyncBreakpoints.resolveBeforeInstructionBreakpoint();
   }
 }
 ```
 
-### 2. 避免死锁
+### 2. Avoid Deadlocks
 ```typescript
-// 使用超时避免无限等待
+// Use timeouts to avoid infinite waiting
 const waitWithTimeout = (breakpointPromise, timeout = 5000) => {
   return Promise.race([
     breakpointPromise,
     new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('断点超时')), timeout)
+      setTimeout(() => reject(new Error('Breakpoint timeout')), timeout)
     )
   ]);
 };
 ```
 
-### 3. 调试信息
+### 3. Debug Information
 ```typescript
-// 添加调试信息
+// Add debug information
 const debugBreakpoint = async (name: string) => {
-  console.log(`[DEBUG] 设置断点: ${name}`);
+  console.log(`[DEBUG] Setting breakpoint: ${name}`);
   asyncBreakpoints.addBeforeInstructionBreakpoint();
   
   await asyncBreakpoints.waitBeforeInstructionBreakpoint(async (hasBreakpoint) => {
-    console.log(`[DEBUG] 断点 ${name} 状态: ${hasBreakpoint ? '激活' : '未激活'}`);
+    console.log(`[DEBUG] Breakpoint ${name} status: ${hasBreakpoint ? 'active' : 'inactive'}`);
   });
   
-  console.log(`[DEBUG] 断点 ${name} 已解析`);
+  console.log(`[DEBUG] Breakpoint ${name} resolved`);
 };
 ```
 
-## 安装
+## Installation
 
 ```bash
 npm install @testring/async-breakpoints
 ```
 
-## 类型定义
+## Type Definitions
 
 ```typescript
 type HasBreakpointCallback = (state: boolean) => Promise<void> | void;
@@ -376,8 +376,8 @@ interface AsyncBreakpoints extends EventEmitter {
 }
 ```
 
-## 相关模块
+## Related Modules
 
-- `@testring/api` - 测试 API，使用断点进行流程控制
-- `@testring/test-worker` - 测试工作进程，使用断点进行进程同步
-- `@testring/devtool-backend` - 开发工具后端，使用断点进行调试
+- `@testring/api` - Test API, uses breakpoints for flow control
+- `@testring/test-worker` - Test worker processes, uses breakpoints for process synchronization
+- `@testring/devtool-backend` - Devtool backend, uses breakpoints for debugging

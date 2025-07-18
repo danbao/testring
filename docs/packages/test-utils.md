@@ -189,174 +189,174 @@ interface CompatibilityTestConfig {
 }
 ```
 
-## 基本用法
+## Basic Usage
 
-### 传输层模拟使用
+### Transport Layer Mock Usage
 
 ```typescript
 import { TransportMock } from '@testring/test-utils';
 
-// 创建传输层模拟
+// Create transport layer mock
 const transportMock = new TransportMock();
 
-// 监听消息
+// Listen to messages
 transportMock.on('test.start', (payload, source) => {
-  console.log('测试开始:', payload, '来源:', source);
+  console.log('Test started:', payload, 'Source:', source);
 });
 
 transportMock.on('test.complete', (payload) => {
-  console.log('测试完成:', payload);
+  console.log('Test completed:', payload);
 });
 
-// 测试消息广播
+// Test message broadcasting
 transportMock.broadcast('test.start', {
   testName: 'example-test',
   timestamp: Date.now()
 });
 
-// 测试指向消息
+// Test directed messages
 transportMock.send('worker-1', 'test.execute', {
   testFile: './test/example.test.js'
 });
 
-// 测试来源消息
+// Test source messages
 transportMock.broadcastFrom('test.result', {
   success: true,
   duration: 1500
 }, 'worker-1');
 
-// 清理监听器
+// Clean up listeners
 const removeListener = transportMock.on('test.error', (error) => {
-  console.error('测试错误:', error);
+  console.error('Test error:', error);
 });
 
-// 移除监听器
+// Remove listener
 removeListener();
 
-// 单次监听
+// One-time listener
 transportMock.once('test.finish', () => {
-  console.log('测试结束（仅触发一次）');
+  console.log('Test finished (triggered only once)');
 });
 
-// 来源特定监听
+// Source-specific listener
 transportMock.onceFrom('worker-2', 'test.status', (status) => {
-  console.log('工作器 2 状态:', status);
+  console.log('Worker 2 status:', status);
 });
 ```
 
-### 测试工作器模拟使用
+### Test Worker Mock Usage
 
 ```typescript
 import { TestWorkerMock } from '@testring/test-utils';
 
-// 创建成功的测试工作器模拟
-const successWorker = new TestWorkerMock(false, 1000); // 不失败，1秒延迟
+// Create successful test worker mock
+const successWorker = new TestWorkerMock(false, 1000); // No failure, 1 second delay
 
-// 创建失败的测试工作器模拟
-const failingWorker = new TestWorkerMock(true, 500); // 失败，0.5秒延迟
+// Create failing test worker mock
+const failingWorker = new TestWorkerMock(true, 500); // Failure, 0.5 second delay
 
-// 创建即时测试工作器模拟
-const instantWorker = new TestWorkerMock(false, 0); // 不失败，无延迟
+// Create instant test worker mock
+const instantWorker = new TestWorkerMock(false, 0); // No failure, no delay
 
-// 生成工作器实例
+// Spawn worker instances
 const worker1 = successWorker.spawn();
 const worker2 = failingWorker.spawn();
 const worker3 = instantWorker.spawn();
 
-console.log('工作器 ID:', worker1.getWorkerID());
+console.log('Worker ID:', worker1.getWorkerID());
 
-// 测试成功执行
+// Test successful execution
 async function testSuccessfulExecution() {
   try {
-    console.log('开始执行成功测试...');
+    console.log('Starting successful test execution...');
     await worker1.execute();
-    console.log('测试执行成功');
+    console.log('Test execution successful');
   } catch (error) {
-    console.error('测试执行失败:', error);
+    console.error('Test execution failed:', error);
   }
 }
 
-// 测试失败执行
+// Test failed execution
 async function testFailedExecution() {
   try {
-    console.log('开始执行失败测试...');
+    console.log('Starting failed test execution...');
     await worker2.execute();
-    console.log('意外成功！');
+    console.log('Unexpected success!');
   } catch (error) {
-    console.log('按预期失败:', error);
+    console.log('Failed as expected:', error);
   }
 }
 
-// 测试工作器管理
+// Test worker management
 async function testWorkerManagement() {
-  // 执行多个任务
+  // Execute multiple tasks
   await worker1.execute();
   await worker3.execute();
   
-  // 查看统计信息
-  console.log('生成实例数:', successWorker.$getSpawnedCount());
-  console.log('执行次数:', successWorker.$getExecutionCallsCount());
-  console.log('终止次数:', successWorker.$getKillCallsCount());
+  // View statistics
+  console.log('Spawned instances:', successWorker.$getSpawnedCount());
+  console.log('Execution count:', successWorker.$getExecutionCallsCount());
+  console.log('Kill count:', successWorker.$getKillCallsCount());
   
-  // 终止工作器
+  // Kill workers
   await worker1.kill();
   await worker3.kill();
   
-  console.log('终止后统计:', successWorker.$getKillCallsCount());
+  console.log('Statistics after kill:', successWorker.$getKillCallsCount());
 }
 
-// 执行测试
+// Execute tests
 testSuccessfulExecution();
 testFailedExecution();
 testWorkerManagement();
 ```
 
-### 文件系统工具使用
+### File System Tools Usage
 
 ```typescript
 import { fileReaderFactory, fileResolverFactory } from '@testring/test-utils';
 import * as path from 'path';
 
-// 创建路径解析器
+// Create path resolvers
 const resolveProjectPath = fileResolverFactory(__dirname, '..');
 const resolveTestPath = fileResolverFactory(__dirname, '../test');
 const resolveSrcPath = fileResolverFactory(__dirname, '../src');
 
-// 使用路径解析器
+// Use path resolvers
 const configPath = resolveProjectPath('tsconfig.json');
 const testFile = resolveTestPath('example.test.ts');
 const sourceFile = resolveSrcPath('index.ts');
 
-console.log('配置文件路径:', configPath);
-console.log('测试文件路径:', testFile);
-console.log('源码文件路径:', sourceFile);
+console.log('Config file path:', configPath);
+console.log('Test file path:', testFile);
+console.log('Source file path:', sourceFile);
 
-// 创建文件读取器
+// Create file readers
 const readProjectFile = fileReaderFactory(__dirname, '..');
 const readTestFile = fileReaderFactory(__dirname, '../test');
 const readSourceFile = fileReaderFactory(__dirname, '../src');
 
-// 使用文件读取器
+// Use file readers
 async function readFiles() {
   try {
-    // 读取配置文件
+    // Read config file
     const packageJson = await readProjectFile('package.json');
-    console.log('package.json 内容长度:', packageJson.length);
+    console.log('package.json content length:', packageJson.length);
     
-    // 读取测试文件
+    // Read test file
     const testContent = await readTestFile('example.test.ts');
-    console.log('测试文件内容长度:', testContent.length);
+    console.log('Test file content length:', testContent.length);
     
-    // 读取源码文件
+    // Read source file
     const sourceContent = await readSourceFile('index.ts');
-    console.log('源码文件内容长度:', sourceContent.length);
+    console.log('Source file content length:', sourceContent.length);
     
   } catch (error) {
-    console.error('文件读取失败:', error.message);
+    console.error('File reading failed:', error.message);
   }
 }
 
-// 批量读取文件
+// Batch read files
 async function readMultipleFiles() {
   const files = [
     'package.json',
@@ -370,9 +370,9 @@ async function readMultipleFiles() {
   
   results.forEach((result, index) => {
     if (result.status === 'fulfilled') {
-      console.log(`${files[index]}: 读取成功，长度 ${result.value.length}`);
+      console.log(`${files[index]}: Read successful, length ${result.value.length}`);
     } else {
-      console.log(`${files[index]}: 读取失败 - ${result.reason.message}`);
+      console.log(`${files[index]}: Read failed - ${result.reason.message}`);
     }
   });
 }
@@ -381,14 +381,14 @@ readFiles();
 readMultipleFiles();
 ```
 
-## 高级用法和模式
+## Advanced Usage and Patterns
 
-### 集成测试环境搭建
+### Integrated Test Environment Setup
 
 ```typescript
 import { TransportMock, TestWorkerMock, fileReaderFactory } from '@testring/test-utils';
 
-// 集成测试环境类
+// Integrated test environment class
 class IntegratedTestEnvironment {
   public transport: TransportMock;
   public workers: Map<string, TestWorkerMock>;
@@ -403,7 +403,7 @@ class IntegratedTestEnvironment {
     this.setupMessageLogging();
   }
   
-  // 设置消息日志
+  // Setup message logging
   private setupMessageLogging() {
     const originalBroadcast = this.transport.broadcast.bind(this.transport);
     
@@ -418,19 +418,19 @@ class IntegratedTestEnvironment {
     };
   }
   
-  // 创建测试工作器
+  // Create test worker
   createTestWorker(name: string, shouldFail = false, delay = 0): TestWorkerMock {
     const worker = new TestWorkerMock(shouldFail, delay);
     this.workers.set(name, worker);
     return worker;
   }
   
-  // 获取测试工作器
+  // Get test worker
   getTestWorker(name: string): TestWorkerMock | undefined {
     return this.workers.get(name);
   }
   
-  // 批量创建工作器
+  // Create multiple workers
   createMultipleWorkers(configs: Array<{
     name: string;
     shouldFail?: boolean;
@@ -443,14 +443,14 @@ class IntegratedTestEnvironment {
     return this.workers;
   }
   
-  // 模拟测试执行流程
+  // Simulate test execution process
   async simulateTestExecution(workerName: string, testFiles: string[]) {
     const worker = this.getTestWorker(workerName);
     if (!worker) {
-      throw new Error(`工作器 '${workerName}' 不存在`);
+      throw new Error(`Worker '${workerName}' does not exist`);
     }
     
-    // 广播测试开始
+    // Broadcast test start
     this.transport.broadcast('test.session.start', {
       workerName,
       testFiles,
@@ -460,7 +460,7 @@ class IntegratedTestEnvironment {
     const results = [];
     
     for (const testFile of testFiles) {
-      // 广播测试文件开始
+      // Broadcast test file start
       this.transport.broadcast('test.file.start', {
         workerName,
         testFile,
@@ -468,13 +468,13 @@ class IntegratedTestEnvironment {
       });
       
       try {
-        // 生成工作器实例并执行
+        // Spawn worker instance and execute
         const instance = worker.spawn();
         await instance.execute();
         
         results.push({ testFile, success: true, error: null });
         
-        // 广播测试文件成功
+        // Broadcast test file success
         this.transport.broadcast('test.file.success', {
           workerName,
           testFile,
@@ -484,7 +484,7 @@ class IntegratedTestEnvironment {
       } catch (error) {
         results.push({ testFile, success: false, error });
         
-        // 广播测试文件失败
+        // Broadcast test file failure
         this.transport.broadcast('test.file.failure', {
           workerName,
           testFile,
@@ -494,7 +494,7 @@ class IntegratedTestEnvironment {
       }
     }
     
-    // 广播测试会话结束
+    // Broadcast test session end
     this.transport.broadcast('test.session.complete', {
       workerName,
       results,
@@ -504,7 +504,7 @@ class IntegratedTestEnvironment {
     return results;
   }
   
-  // 获取测试统计
+  // Get test statistics
   getTestStatistics() {
     const stats = {
       totalWorkers: this.workers.size,
@@ -523,7 +523,7 @@ class IntegratedTestEnvironment {
     return stats;
   }
   
-  // 获取消息历史
+  // Get message history
   getMessageHistory(messageType?: string) {
     if (messageType) {
       return this.messageHistory.filter(msg => msg.type === messageType);
@@ -531,9 +531,9 @@ class IntegratedTestEnvironment {
     return [...this.messageHistory];
   }
   
-  // 清理环境
+  // Clean up environment
   async cleanup() {
-    // 终止所有工作器
+    // Kill all workers
     for (const [name, worker] of this.workers) {
       for (let i = 0; i < worker.$getSpawnedCount(); i++) {
         const instance = worker.spawn();
@@ -541,34 +541,34 @@ class IntegratedTestEnvironment {
       }
     }
     
-    // 清理消息历史
+    // Clear message history
     this.messageHistory = [];
     
-    // 清理传输层监听器
+    // Clear transport layer listeners
     this.transport.removeAllListeners();
     
-    console.log('测试环境已清理');
+    console.log('Test environment cleaned up');
   }
 }
 
-// 使用集成测试环境
+// Use integrated test environment
 async function runIntegratedTest() {
   const testEnv = new IntegratedTestEnvironment();
   
-  // 监听测试事件
+  // Listen to test events
   testEnv.transport.on('test.session.start', (data) => {
-    console.log('测试会话开始:', data);
+    console.log('Test session started:', data);
   });
   
   testEnv.transport.on('test.file.success', (data) => {
-    console.log('测试文件成功:', data.testFile);
+    console.log('Test file success:', data.testFile);
   });
   
   testEnv.transport.on('test.file.failure', (data) => {
-    console.log('测试文件失败:', data.testFile, data.error);
+    console.log('Test file failure:', data.testFile, data.error);
   });
   
-  // 创建工作器
+  // Create workers
   testEnv.createMultipleWorkers([
     { name: 'unit-tests', shouldFail: false, delay: 100 },
     { name: 'integration-tests', shouldFail: false, delay: 500 },
@@ -576,7 +576,7 @@ async function runIntegratedTest() {
   ]);
   
   try {
-    // 模拟测试执行
+    // Simulate test execution
     await testEnv.simulateTestExecution('unit-tests', [
       'unit/parser.test.js',
       'unit/validator.test.js'
@@ -590,13 +590,13 @@ async function runIntegratedTest() {
       'e2e/user-flow.test.js'
     ]);
     
-    // 输出统计信息
+    // Output statistics
     const stats = testEnv.getTestStatistics();
-    console.log('测试统计:', stats);
+    console.log('Test statistics:', stats);
     
-    // 输出消息历史
+    // Output message history
     const messages = testEnv.getMessageHistory();
-    console.log(`共产生 ${messages.length} 条消息`);
+    console.log(`Total messages generated: ${messages.length}`);
     
   } finally {
     await testEnv.cleanup();
@@ -606,10 +606,10 @@ async function runIntegratedTest() {
 runIntegratedTest().catch(console.error);
 ```
 
-### 高级测试场景模拟
+### Advanced Test Scenario Simulation
 
 ```typescript
-// 复杂测试场景模拟器
+// Complex test scenario simulator
 class AdvancedTestScenarios {
   private testEnv: IntegratedTestEnvironment;
   
@@ -617,18 +617,18 @@ class AdvancedTestScenarios {
     this.testEnv = new IntegratedTestEnvironment();
   }
   
-  // 模拟并发测试执行
+  // Simulate concurrent test execution
   async simulateConcurrentExecution() {
-    console.log('开始并发测试模拟...');
+    console.log('Starting concurrent test simulation...');
     
-    // 创建多个工作器
+    // Create multiple workers
     this.testEnv.createMultipleWorkers([
       { name: 'worker-1', shouldFail: false, delay: 200 },
       { name: 'worker-2', shouldFail: false, delay: 300 },
       { name: 'worker-3', shouldFail: true, delay: 150 }
     ]);
     
-    // 并发执行测试
+    // Concurrent test execution
     const concurrentTasks = [
       this.testEnv.simulateTestExecution('worker-1', ['test1.js', 'test2.js']),
       this.testEnv.simulateTestExecution('worker-2', ['test3.js']),
@@ -639,61 +639,61 @@ class AdvancedTestScenarios {
     
     results.forEach((result, index) => {
       if (result.status === 'fulfilled') {
-        console.log(`工作器 ${index + 1} 执行成功:`, result.value);
+        console.log(`Worker ${index + 1} execution successful:`, result.value);
       } else {
-        console.log(`工作器 ${index + 1} 执行失败:`, result.reason);
+        console.log(`Worker ${index + 1} execution failed:`, result.reason);
       }
     });
   }
   
-  // 模拟网络延迟和重试
+  // Simulate network delays and retries
   async simulateNetworkIssues() {
-    console.log('模拟网络问题场景...');
+    console.log('Simulating network issue scenarios...');
     
     const unstableWorker = this.testEnv.createTestWorker('unstable', false, 0);
     
-    // 模拟不稳定的网络环境
+    // Simulate unstable network environment
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        console.log(`第 ${attempt} 次尝试...`);
+        console.log(`Attempt ${attempt}...`);
         
-        // 随机延迟模拟网络抖动
+        // Random delay to simulate network jitter
         const delay = Math.random() * 1000;
         await new Promise(resolve => setTimeout(resolve, delay));
         
         const instance = unstableWorker.spawn();
         await instance.execute();
         
-        console.log(`第 ${attempt} 次尝试成功`);
+        console.log(`Attempt ${attempt} successful`);
         break;
         
       } catch (error) {
-        console.log(`第 ${attempt} 次尝试失败:`, error.message);
+        console.log(`Attempt ${attempt} failed:`, error.message);
         
         if (attempt === 3) {
-          console.log('所有重试均失败');
+          console.log('All retries failed');
         } else {
-          // 指数退避重试
+          // Exponential backoff retry
           await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
         }
       }
     }
   }
   
-  // 模拟资源限制场景
+  // Simulate resource constraint scenarios
   async simulateResourceConstraints() {
-    console.log('模拟资源限制场景...');
+    console.log('Simulating resource constraint scenarios...');
     
     const maxConcurrentWorkers = 3;
     const totalTasks = 10;
     
-    // 创建有限的工作器集
+    // Create limited worker set
     const workers = [];
     for (let i = 0; i < maxConcurrentWorkers; i++) {
       workers.push(this.testEnv.createTestWorker(`limited-worker-${i}`, false, 100));
     }
     
-    // 模拟任务队列
+    // Simulate task queue
     const taskQueue = [];
     for (let i = 0; i < totalTasks; i++) {
       taskQueue.push({
@@ -702,12 +702,12 @@ class AdvancedTestScenarios {
       });
     }
     
-    // 限流执行任务
+    // Rate-limited task execution
     const executingTasks = new Set();
     const completedTasks = [];
     
     while (taskQueue.length > 0 || executingTasks.size > 0) {
-      // 启动新任务
+      // Start new tasks
       while (executingTasks.size < maxConcurrentWorkers && taskQueue.length > 0) {
         const task = taskQueue.shift()!;
         const workerIndex = executingTasks.size;
@@ -719,46 +719,46 @@ class AdvancedTestScenarios {
             executingTasks.delete(execution);
           })
           .catch(error => {
-            console.error(`任务 ${task.id} 失败:`, error.message);
+            console.error(`Task ${task.id} failed:`, error.message);
             executingTasks.delete(execution);
           });
         
         executingTasks.add(execution);
       }
       
-      // 等待至少一个任务完成
+      // Wait for at least one task to complete
       if (executingTasks.size > 0) {
         await Promise.race(Array.from(executingTasks));
       }
     }
     
-    console.log(`所有任务完成，成功: ${completedTasks.length}/${totalTasks}`);
+    console.log(`All tasks completed, successful: ${completedTasks.length}/${totalTasks}`);
   }
   
   private async executeTask(worker: TestWorkerMock, task: any) {
-    console.log(`开始执行任务 ${task.id}`);
+    console.log(`Starting task ${task.id}`);
     const instance = worker.spawn();
     await instance.execute();
-    console.log(`任务 ${task.id} 完成`);
+    console.log(`Task ${task.id} completed`);
     return { taskId: task.id, success: true };
   }
   
-  // 清理资源
+  // Clean up resources
   async cleanup() {
     await this.testEnv.cleanup();
   }
 }
 
-// 运行高级测试场景
+// Run advanced test scenarios
 async function runAdvancedScenarios() {
   const scenarios = new AdvancedTestScenarios();
   
   try {
     await scenarios.simulateConcurrentExecution();
-    console.log('\n--- 分割线 ---\n');
+    console.log('\n--- Separator ---\n');
     
     await scenarios.simulateNetworkIssues();
-    console.log('\n--- 分割线 ---\n');
+    console.log('\n--- Separator ---\n');
     
     await scenarios.simulateResourceConstraints();
     
@@ -770,130 +770,130 @@ async function runAdvancedScenarios() {
 runAdvancedScenarios().catch(console.error);
 ```
 
-## PluginCompatibilityTester 使用指南
+## PluginCompatibilityTester Usage Guide
 
-### 基本用法
+### Basic Usage
 
 ```typescript
 import { PluginCompatibilityTester, CompatibilityTestConfig } from '../../../test-utils/plugin-compatibility-tester';
 
-// 配置兼容性测试
+// Configure compatibility testing
 const config: CompatibilityTestConfig = {
     pluginName: 'my-browser-plugin',
-    skipTests: ['screenshots'], // 可选：跳过特定测试
-    customTimeouts: {           // 可选：自定义超时设置
+    skipTests: ['screenshots'], // Optional: skip specific tests
+    customTimeouts: {           // Optional: custom timeout settings
         waitForExist: 10000,
         waitForVisible: 8000
     }
 };
 
-// 创建测试器实例
+// Create tester instance
 const tester = new PluginCompatibilityTester(plugin, config);
 
-// 运行单个测试方法
+// Run individual test methods
 await tester.testMethodImplementation();
 await tester.testBasicNavigation();
 await tester.testElementQueries();
 
-// 或运行所有测试
+// Or run all tests
 const results = await tester.runAllTests();
-console.log(`通过: ${results.passed}, 失败: ${results.failed}, 跳过: ${results.skipped}`);
+console.log(`Passed: ${results.passed}, Failed: ${results.failed}, Skipped: ${results.skipped}`);
 ```
 
-### 可用的测试方法
+### Available Test Methods
 
-- `testMethodImplementation()` - 验证所有必需的 IBrowserProxyPlugin 方法已实现
-- `testBasicNavigation()` - 测试 URL 导航、页面标题、刷新和源码获取
-- `testElementQueries()` - 测试元素存在性和可见性检查
-- `testFormInteractions()` - 测试表单输入操作
-- `testJavaScriptExecution()` - 测试 JavaScript 执行能力
-- `testScreenshots()` - 测试截图功能
-- `testWaitOperations()` - 测试等待操作
-- `testSessionManagement()` - 测试多会话处理
-- `testErrorHandling()` - 测试错误场景
+- `testMethodImplementation()` - Verify all required IBrowserProxyPlugin methods are implemented
+- `testBasicNavigation()` - Test URL navigation, page title, refresh, and source code retrieval
+- `testElementQueries()` - Test element existence and visibility checks
+- `testFormInteractions()` - Test form input operations
+- `testJavaScriptExecution()` - Test JavaScript execution capabilities
+- `testScreenshots()` - Test screenshot functionality
+- `testWaitOperations()` - Test wait operations
+- `testSessionManagement()` - Test multi-session handling
+- `testErrorHandling()` - Test error scenarios
 
-### 配置选项
+### Configuration Options
 
-#### skipTests 跳过测试
-测试名称应为小写且无空格的格式：
+#### skipTests Skip Tests
+Test names should be lowercase and without spaces:
 ```typescript
 skipTests: [
-    'methodimplementation',  // 跳过方法实现测试
-    'basicnavigation',       // 跳过基本导航测试
-    'elementqueries',        // 跳过元素查询测试
-    'forminteractions',      // 跳过表单交互测试
-    'javascriptexecution',   // 跳过 JavaScript 执行测试
-    'screenshots',           // 跳过截图测试
-    'waitoperations',        // 跳过等待操作测试
-    'sessionmanagement',     // 跳过会话管理测试
-    'errorhandling'          // 跳过错误处理测试
+    'methodimplementation',  // Skip method implementation tests
+    'basicnavigation',       // Skip basic navigation tests
+    'elementqueries',        // Skip element query tests
+    'forminteractions',      // Skip form interaction tests
+    'javascriptexecution',   // Skip JavaScript execution tests
+    'screenshots',           // Skip screenshot tests
+    'waitoperations',        // Skip wait operation tests
+    'sessionmanagement',     // Skip session management tests
+    'errorhandling'          // Skip error handling tests
 ]
 ```
 
-#### customTimeouts 自定义超时
+#### customTimeouts Custom Timeouts
 ```typescript
 customTimeouts: {
-    waitForExist: 10000,     // 元素存在等待超时（毫秒）
-    waitForVisible: 8000,    // 元素可见等待超时（毫秒）
-    executeAsync: 15000      // 异步执行超时（毫秒）
+    waitForExist: 10000,     // Element existence wait timeout (milliseconds)
+    waitForVisible: 8000,    // Element visibility wait timeout (milliseconds)
+    executeAsync: 15000      // Async execution timeout (milliseconds)
 }
 ```
 
-## 单元测试
+## Unit Tests
 
-本包现在包含了 PluginCompatibilityTester 的完整单元测试：
+This package now includes complete unit tests for PluginCompatibilityTester:
 
-### 测试文件结构
+### Test File Structure
 
 ```
 test/
-├── plugin-compatibility-tester.spec.ts      # PluginCompatibilityTester 类的单元测试
-├── plugin-compatibility-integration.spec.ts # 使用 PluginCompatibilityTester 的集成测试
-├── plugin-compatibility-usage.spec.ts       # 使用示例和文档测试
+├── plugin-compatibility-tester.spec.ts      # PluginCompatibilityTester class unit tests
+├── plugin-compatibility-integration.spec.ts # Integration tests using PluginCompatibilityTester
+├── plugin-compatibility-usage.spec.ts       # Usage examples and documentation tests
 ├── mocks/
-│   └── browser-proxy-plugin.mock.ts         # 测试用的模拟实现
-└── setup.ts                                 # 测试环境设置
+│   └── browser-proxy-plugin.mock.ts         # Mock implementation for testing
+└── setup.ts                                 # Test environment setup
 ```
 
-### 运行测试
+### Running Tests
 
 ```bash
-# 仅运行此包的测试
+# Run only this package's tests
 cd packages/test-utils
 npm test
 
-# 运行所有项目测试（包含此包）
+# Run all project tests (including this package)
 npm run test
 ```
 
-### 测试覆盖范围
+### Test Coverage
 
-单元测试覆盖了：
-- 构造函数和配置处理
-- 各个测试方法的功能
-- 错误处理场景
-- 跳过测试功能
-- 与实际插件实现的集成
-- 使用模式和示例
+Unit tests cover:
+- Constructor and configuration handling
+- Functionality of individual test methods
+- Error handling scenarios
+- Skip test functionality
+- Integration with actual plugin implementations
+- Usage patterns and examples
 
-## 迁移说明
+## Migration Notes
 
-原始的 `test-utils/plugin-compatibility-tester.ts` 文件已转换为适当的单元测试。功能保持不变，但现在已经过适当测试并集成到项目的测试套件中。
+The original `test-utils/plugin-compatibility-tester.ts` file has been converted to appropriate unit tests. Functionality remains unchanged, but is now properly tested and integrated into the project's test suite.
 
-### 变更内容
+### Changes Made
 
-1. **添加了单元测试** - PluginCompatibilityTester 类的全面单元测试
-2. **添加了集成测试** - 演示如何与实际插件一起使用 PluginCompatibilityTester 的测试
-3. **添加了模拟工具** - 用于测试的可重用模拟实现
-4. **更新了包配置** - 添加了测试脚本和依赖项
-5. **与项目测试集成** - 测试现在作为 `npm run test` 的一部分运行
+1. **Added Unit Tests** - Comprehensive unit tests for the PluginCompatibilityTester class
+2. **Added Integration Tests** - Tests demonstrating how to use PluginCompatibilityTester with actual plugins
+3. **Added Mock Tools** - Reusable mock implementations for testing
+4. **Updated Package Configuration** - Added test scripts and dependencies
+5. **Integrated with Project Tests** - Tests now run as part of `npm run test`
 
-### 保持不变的内容
+### Unchanged Content
 
-- PluginCompatibilityTester 类 API 保持不变
-- 所有测试方法的工作方式完全相同
-- 配置选项完全相同
-- 原始文件位置 (`test-utils/plugin-compatibility-tester.ts`) 得到保留
+- PluginCompatibilityTester class API remains unchanged
+- All test methods work exactly the same way
+- Configuration options are identical
+- Original file location (`test-utils/plugin-compatibility-tester.ts`) is preserved
 
 ## API Reference
 

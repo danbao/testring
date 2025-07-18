@@ -165,19 +165,19 @@ class TestEnvironment {
   
   constructor() {
     this.devtoolServer = new DevtoolServerController(transport);
-    this.testRunner = new TestRunner(/* 测试运行器配置 */);
+    this.testRunner = new TestRunner(/* Test runner configuration */);
   }
   
   async setupDevelopmentEnvironment() {
-    console.log('正在设置开发环境...');
+    console.log('Setting up development environment...');
     
-    // 启动开发者工具服务器
+    // Start devtools server
     await this.devtoolServer.init();
     
     const config = this.devtoolServer.getRuntimeConfiguration();
-    console.log(`开发者工具已启动: http://${config.host}:${config.httpPort}`);
+    console.log(`Devtools started: http://${config.host}:${config.httpPort}`);
     
-    // 配置测试运行器使用开发者工具
+    // Configure test runner to use devtools
     this.testRunner.configure({
       devtool: {
         extensionId: config.extensionId,
@@ -187,55 +187,55 @@ class TestEnvironment {
       }
     });
     
-    console.log('开发环境设置完成');
+    console.log('Development environment setup complete');
   }
   
   async runTestsWithDebugging() {
     try {
       await this.setupDevelopmentEnvironment();
       
-      console.log('正在运行测试（启用调试模式）...');
+      console.log('Running tests (debug mode enabled)...');
       const results = await this.testRunner.run();
       
-      console.log('测试结果:', results);
+      console.log('Test results:', results);
       return results;
       
     } catch (error) {
-      console.error('测试执行失败:', error);
+      console.error('Test execution failed:', error);
       throw error;
     }
   }
   
   async teardown() {
-    console.log('正在清理开发环境...');
+    console.log('Cleaning up development environment...');
     
     if (this.devtoolServer) {
       await this.devtoolServer.kill();
     }
     
-    console.log('开发环境已清理');
+    console.log('Development environment cleaned up');
   }
 }
 
-// 使用示例
+// Usage example
 const testEnv = new TestEnvironment();
 
-// 运行带调试的测试
+// Run tests with debugging
 testEnv.runTestsWithDebugging()
   .then(results => {
-    console.log('测试完成:', results);
+    console.log('Tests completed:', results);
   })
   .catch(error => {
-    console.error('测试失败:', error);
+    console.error('Tests failed:', error);
   })
   .finally(() => {
     return testEnv.teardown();
   });
 ```
 
-## 插件系统和扩展
+## Plugin System and Extensions
 
-### 自定义插件开发
+### Custom Plugin Development
 
 ```typescript
 import {
@@ -247,11 +247,11 @@ import {
 class CustomDevtoolPlugin {
   private name = 'CustomDevtoolPlugin';
   
-  // 服务器启动前的配置修改
+  // Configuration modification before server start
   async beforeStart(config: IDevtoolServerConfig): Promise<IDevtoolServerConfig> {
-    console.log(`[${this.name}] 服务器启动前配置:`, config);
+    console.log(`[${this.name}] Server configuration before start:`, config);
     
-    // 修改默认配置
+    // Modify default configuration
     return {
       ...config,
       host: process.env.DEVTOOL_HOST || config.host,
@@ -259,7 +259,7 @@ class CustomDevtoolPlugin {
       wsPort: parseInt(process.env.DEVTOOL_WS_PORT || config.wsPort.toString()),
       router: [
         ...config.router,
-        // 添加自定义路由
+        // Add custom routes
         {
           method: 'get',
           mask: '/api/custom',
@@ -269,71 +269,71 @@ class CustomDevtoolPlugin {
     };
   }
   
-  // 服务器启动后的初始化
+  // Initialization after server start
   async afterStart(): Promise<void> {
-    console.log(`[${this.name}] 服务器启动完成，执行自定义初始化...`);
+    console.log(`[${this.name}] Server start complete, executing custom initialization...`);
     
-    // 执行自定义初始化逻辑
+    // Execute custom initialization logic
     await this.initializeCustomFeatures();
   }
   
-  // 服务器停止前的清理
+  // Cleanup before server stop
   async beforeStop(): Promise<void> {
-    console.log(`[${this.name}] 服务器停止前，执行清理...`);
+    console.log(`[${this.name}] Before server stop, executing cleanup...`);
     
-    // 执行清理逻辑
+    // Execute cleanup logic
     await this.cleanup();
   }
   
-  // 服务器停止后的最终化
+  // Finalization after server stop
   async afterStop(): Promise<void> {
-    console.log(`[${this.name}] 服务器已停止，执行最终清理...`);
+    console.log(`[${this.name}] Server stopped, executing final cleanup...`);
     
-    // 执行最终清理逻辑
+    // Execute final cleanup logic
     await this.finalCleanup();
   }
   
   private getCustomApiHandler(): string {
-    // 返回自定义 API 处理器路径
+    // Return custom API handler path
     return require.resolve('./custom-api-handler');
   }
   
   private async initializeCustomFeatures(): Promise<void> {
-    // 初始化自定义功能
-    console.log('初始化自定义功能...');
+    // Initialize custom features
+    console.log('Initializing custom features...');
     
-    // 示例: 设置定时任务
+    // Example: Set up scheduled tasks
     setInterval(() => {
-      console.log('自定义定时任务执行...');
+      console.log('Custom scheduled task executing...');
     }, 10000);
   }
   
   private async cleanup(): Promise<void> {
-    // 清理资源
-    console.log('清理自定义资源...');
+    // Clean up resources
+    console.log('Cleaning up custom resources...');
   }
   
   private async finalCleanup(): Promise<void> {
-    // 最终清理
-    console.log('最终清理完成');
+    // Final cleanup
+    console.log('Final cleanup completed');
   }
 }
 
-// 使用自定义插件
+// Use custom plugin
 const customPlugin = new CustomDevtoolPlugin();
 const devtoolServer = new DevtoolServerController(transport);
 
-// 注册插件钩子
+// Register plugin hooks
 devtoolServer.registerPluginHook(DevtoolPluginHooks.beforeStart, customPlugin.beforeStart.bind(customPlugin));
 devtoolServer.registerPluginHook(DevtoolPluginHooks.afterStart, customPlugin.afterStart.bind(customPlugin));
 devtoolServer.registerPluginHook(DevtoolPluginHooks.beforeStop, customPlugin.beforeStop.bind(customPlugin));
 devtoolServer.registerPluginHook(DevtoolPluginHooks.afterStop, customPlugin.afterStop.bind(customPlugin));
 
-// 启动带插件的服务器
+// Start server with plugins
 await devtoolServer.init();
 ```
 
-### 配置管理器
+### Configuration Manager
 
 ```typescript
 class DevtoolConfigManager {
@@ -344,7 +344,7 @@ class DevtoolConfigManager {
     this.defaultConfig = this.loadDefaultConfig();
   }
   
-  // 加载默认配置
+  // Load default configuration
   private loadDefaultConfig(): IDevtoolServerConfig {
     return {
       host: 'localhost',
@@ -376,7 +376,7 @@ class DevtoolConfigManager {
     };
   }
   
-  // 从环境变量加载配置
+  // Load configuration from environment variables
   loadFromEnvironment(): IDevtoolServerConfig {
     const config = { ...this.defaultConfig };
     
@@ -395,18 +395,18 @@ class DevtoolConfigManager {
     return config;
   }
   
-  // 从文件加载配置
+  // Load configuration from file
   loadFromFile(configPath: string): IDevtoolServerConfig {
     try {
       const fileConfig = require(configPath);
       return this.mergeConfigs(this.defaultConfig, fileConfig);
     } catch (error) {
-      console.warn(`无法加载配置文件 ${configPath}:`, error.message);
+      console.warn(`Unable to load configuration file ${configPath}:`, error.message);
       return this.defaultConfig;
     }
   }
   
-  // 合并配置
+  // Merge configurations
   private mergeConfigs(base: IDevtoolServerConfig, override: Partial<IDevtoolServerConfig>): IDevtoolServerConfig {
     return {
       ...base,
@@ -422,38 +422,38 @@ class DevtoolConfigManager {
     };
   }
   
-  // 验证配置
+  // Validate configuration
   validateConfig(config: IDevtoolServerConfig): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
     
     if (!config.host) {
-      errors.push('主机地址不能为空');
+      errors.push('Host address cannot be empty');
     }
     
     if (!config.httpPort || config.httpPort <= 0 || config.httpPort > 65535) {
-      errors.push('HTTP 端口必须在 1-65535 范围内');
+      errors.push('HTTP port must be in range 1-65535');
     }
     
     if (!config.wsPort || config.wsPort <= 0 || config.wsPort > 65535) {
-      errors.push('WebSocket 端口必须在 1-65535 范围内');
+      errors.push('WebSocket port must be in range 1-65535');
     }
     
     if (config.httpPort === config.wsPort) {
-      errors.push('HTTP 端口和 WebSocket 端口不能相同');
+      errors.push('HTTP port and WebSocket port cannot be the same');
     }
     
     return { valid: errors.length === 0, errors };
   }
   
-  // 获取路由器路径
+  // Get router path
   private getRouterPath(filename: string): string {
     return require.resolve(`./routes/${filename}`);
   }
   
-  // 获取最终配置
+  // Get final configuration
   getConfig(): IDevtoolServerConfig {
     if (!this.runtimeConfig) {
-      // 优先级: 文件配置 > 环境变量 > 默认配置
+      // Priority: File config > Environment variables > Default config
       let config = this.loadFromEnvironment();
       
       const configFile = process.env.DEVTOOL_CONFIG_FILE;
@@ -463,7 +463,7 @@ class DevtoolConfigManager {
       
       const validation = this.validateConfig(config);
       if (!validation.valid) {
-        throw new Error(`配置验证失败: ${validation.errors.join(', ')}`);
+        throw new Error(`Configuration validation failed: ${validation.errors.join(', ')}`);
       }
       
       this.runtimeConfig = config;
@@ -473,22 +473,22 @@ class DevtoolConfigManager {
   }
 }
 
-// 使用配置管理器
+// Use configuration manager
 const configManager = new DevtoolConfigManager();
 
-// 自定义配置加载插件
+// Custom configuration loading plugin
 class ConfigurableDevtoolPlugin {
   async beforeStart(config: IDevtoolServerConfig): Promise<IDevtoolServerConfig> {
-    // 使用配置管理器加载配置
+    // Use configuration manager to load configuration
     const managedConfig = configManager.getConfig();
     
-    console.log('使用管理的配置:', managedConfig);
+    console.log('Using managed configuration:', managedConfig);
     
     return managedConfig;
   }
 }
 
-// 集成配置管理器
+// Integrate configuration manager
 const configurablePlugin = new ConfigurableDevtoolPlugin();
 const devtoolServer = new DevtoolServerController(transport);
 
@@ -500,9 +500,9 @@ devtoolServer.registerPluginHook(
 await devtoolServer.init();
 ```
 
-## 消息代理和通信
+## Message Proxy and Communication
 
-### 消息代理系统
+### Message Proxy System
 
 ```typescript
 class DevtoolMessageProxy {
@@ -514,47 +514,47 @@ class DevtoolMessageProxy {
     this.initializeProxyHandlers();
   }
   
-  // 初始化代理处理器
+  // Initialize proxy handlers
   private initializeProxyHandlers() {
-    // 测试进程消息代理
+    // Test process message proxy
     this.registerProxyHandler('test.register', this.proxyTestRegister.bind(this));
     this.registerProxyHandler('test.unregister', this.proxyTestUnregister.bind(this));
     this.registerProxyHandler('test.updateState', this.proxyTestUpdateState.bind(this));
     
-    // Web 应用消息代理
+    // Web application message proxy
     this.registerProxyHandler('webApp.register', this.proxyWebAppRegister.bind(this));
     this.registerProxyHandler('webApp.unregister', this.proxyWebAppUnregister.bind(this));
     this.registerProxyHandler('webApp.action', this.proxyWebAppAction.bind(this));
     
-    // 自定义消息代理
+    // Custom message proxy
     this.registerProxyHandler('custom.debug', this.proxyCustomDebug.bind(this));
   }
   
-  // 注册代理处理器
+  // Register proxy handler
   private registerProxyHandler(messageType: string, handler: Function) {
     this.proxyHandlers.set(messageType, handler);
     
-    // 监听消息并代理
+    // Listen for messages and proxy
     this.transport.on(messageType, (messageData: any, processID?: string) => {
       this.proxyMessage(messageType, messageData, processID);
     });
   }
   
-  // 代理消息
+  // Proxy message
   private proxyMessage(messageType: string, messageData: any, processID?: string) {
     const handler = this.proxyHandlers.get(messageType);
     if (handler) {
       handler(messageData, processID);
     } else {
-      console.warn(`未知消息类型: ${messageType}`);
+      console.warn(`Unknown message type: ${messageType}`);
     }
   }
   
-  // 测试注册代理
+  // Test registration proxy
   private proxyTestRegister(messageData: any, processID?: string) {
-    console.log(`测试注册: ${processID}`, messageData);
+    console.log(`Test registration: ${processID}`, messageData);
     
-    // 转发给开发者工具前端
+    // Forward to devtool frontend
     this.sendToDevtoolFrontend({
       type: 'test.register',
       data: {
@@ -564,11 +564,11 @@ class DevtoolMessageProxy {
     });
   }
   
-  // 测试状态更新代理
+  // Test state update proxy
   private proxyTestUpdateState(messageData: any, processID?: string) {
-    console.log(`测试状态更新: ${processID}`, messageData);
+    console.log(`Test state update: ${processID}`, messageData);
     
-    // 转发给开发者工具前端
+    // Forward to devtool frontend
     this.sendToDevtoolFrontend({
       type: 'test.stateUpdate',
       data: {
@@ -578,11 +578,11 @@ class DevtoolMessageProxy {
     });
   }
   
-  // Web 应用注册代理
+  // Web application registration proxy
   private proxyWebAppRegister(messageData: any, processID?: string) {
-    console.log(`Web 应用注册: ${processID}`, messageData);
+    console.log(`Web application registration: ${processID}`, messageData);
     
-    // 转发给开发者工具前端
+    // Forward to devtool frontend
     this.sendToDevtoolFrontend({
       type: 'webApp.register',
       data: {
@@ -592,11 +592,11 @@ class DevtoolMessageProxy {
     });
   }
   
-  // Web 应用动作代理
+  // Web application action proxy
   private proxyWebAppAction(messageData: any, processID?: string) {
-    console.log(`Web 应用动作: ${processID}`, messageData);
+    console.log(`Web application action: ${processID}`, messageData);
     
-    // 转发给开发者工具前端
+    // Forward to devtool frontend
     this.sendToDevtoolFrontend({
       type: 'webApp.action',
       data: {
@@ -608,11 +608,11 @@ class DevtoolMessageProxy {
     });
   }
   
-  // 自定义调试代理
+  // Custom debug proxy
   private proxyCustomDebug(messageData: any, processID?: string) {
-    console.log(`自定义调试: ${processID}`, messageData);
+    console.log(`Custom debug: ${processID}`, messageData);
     
-    // 转发给开发者工具前端
+    // Forward to devtool frontend
     this.sendToDevtoolFrontend({
       type: 'custom.debug',
       data: {
@@ -623,11 +623,11 @@ class DevtoolMessageProxy {
     });
   }
   
-  // 清理代理处理器
+  // Cleanup proxy handler
   private proxyTestUnregister(messageData: any, processID?: string) {
-    console.log(`测试清理: ${processID}`, messageData);
+    console.log(`Test cleanup: ${processID}`, messageData);
     
-    // 转发给开发者工具前端
+    // Forward to devtool frontend
     this.sendToDevtoolFrontend({
       type: 'test.unregister',
       data: {
@@ -637,50 +637,50 @@ class DevtoolMessageProxy {
     });
   }
   
-  // 发送消息到开发者工具前端
+  // Send message to devtool frontend
   private sendToDevtoolFrontend(message: any) {
-    // 这里实际上会通过 WebSocket 发送给前端
+    // This will actually send to frontend via WebSocket
     this.transport.send('devtool-frontend', 'devtool.message', message);
   }
   
-  // 发送命令到测试进程
+  // Send command to test process
   sendCommandToProcess(processID: string, command: string, data?: any) {
     this.transport.send(processID, command, data);
   }
   
-  // 广播消息给所有进程
+  // Broadcast message to all processes
   broadcastMessage(messageType: string, messageData: any) {
     this.transport.broadcastLocal(messageType, messageData);
   }
 }
 
-// 使用消息代理
+// Use message proxy
 const messageProxy = new DevtoolMessageProxy(transport);
 
-// 发送命令到指定进程
+// Send commands to specific processes
 messageProxy.sendCommandToProcess('test-process-1', 'pause');
 messageProxy.sendCommandToProcess('test-process-2', 'resume');
 messageProxy.sendCommandToProcess('web-app-1', 'takeScreenshot');
 
-// 广播消息
-messageProxy.broadcastMessage('global.pause', { reason: '用户请求暂停' });
-messageProxy.broadcastMessage('global.resume', { reason: '用户请求恢复' });
+// Broadcast messages
+messageProxy.broadcastMessage('global.pause', { reason: 'User requested pause' });
+messageProxy.broadcastMessage('global.resume', { reason: 'User requested resume' });
 ```
 
-## 路由和静态资源
+## Routing and Static Resources
 
-### 自定义路由处理器
+### Custom Route Handlers
 
 ```typescript
 // routes/custom-api-handler.ts
 module.exports = (req, res) => {
   const { method, url, query, body } = req;
   
-  console.log(`自定义 API 请求: ${method} ${url}`);
+  console.log(`Custom API request: ${method} ${url}`);
   
   switch (method) {
     case 'GET':
-      // 获取测试状态
+      // Get test status
       if (url === '/api/test/status') {
         res.json({
           status: 'running',
@@ -689,7 +689,7 @@ module.exports = (req, res) => {
           timestamp: new Date().toISOString()
         });
       }
-      // 获取系统信息
+      // Get system information
       else if (url === '/api/system/info') {
         res.json({
           version: '1.0.0',
@@ -699,7 +699,7 @@ module.exports = (req, res) => {
           uptime: process.uptime()
         });
       }
-      // 获取测试结果
+      // Get test results
       else if (url.startsWith('/api/test/results/')) {
         const testId = url.split('/').pop();
         res.json({
@@ -717,46 +717,46 @@ module.exports = (req, res) => {
         });
       }
       else {
-        res.status(404).json({ error: 'API 路径不存在' });
+        res.status(404).json({ error: 'API path does not exist' });
       }
       break;
       
     case 'POST':
-      // 控制测试执行
+      // Control test execution
       if (url === '/api/test/control') {
         const { action, testId } = body;
         
-        console.log(`测试控制动作: ${action} for ${testId}`);
+        console.log(`Test control action: ${action} for ${testId}`);
         
-        // 这里可以集成与测试进程的通信
+        // Can integrate communication with test processes here
         // messageProxy.sendCommandToProcess(testId, action);
         
         res.json({
           success: true,
-          message: `动作 ${action} 已执行`,
+          message: `Action ${action} executed`,
           timestamp: new Date().toISOString()
         });
       }
-      // 保存测试配置
+      // Save test configuration
       else if (url === '/api/config/save') {
         const config = body;
         
-        console.log('保存测试配置:', config);
+        console.log('Saving test configuration:', config);
         
-        // 这里可以实际保存配置到文件或数据库
+        // Can actually save configuration to file or database here
         
         res.json({
           success: true,
-          message: '配置保存成功'
+          message: 'Configuration saved successfully'
         });
       }
       else {
-        res.status(404).json({ error: 'API 路径不存在' });
+        res.status(404).json({ error: 'API path does not exist' });
       }
       break;
       
     default:
-      res.status(405).json({ error: 'HTTP 方法不支持' });
+      res.status(405).json({ error: 'HTTP method not supported' });
   }
 };
 
@@ -776,7 +776,7 @@ module.exports = (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Testring 开发者工具</title>
+      <title>Testring Developer Tools</title>
       <meta charset="utf-8">
       <style>
         body { font-family: Arial, sans-serif; margin: 2em; }
@@ -788,20 +788,20 @@ module.exports = (req, res) => {
     </head>
     <body>
       <div class="container">
-        <h1>Testring 开发者工具</h1>
+        <h1>Testring Developer Tools</h1>
         <div class="status">
-          <h2>状态信息</h2>
-          <p><strong>状态:</strong> 正常运行</p>
-          <p><strong>时间:</strong> ${new Date().toLocaleString()}</p>
-          <p><strong>运行时间:</strong> ${Math.floor(process.uptime())} 秒</p>
+          <h2>Status Information</h2>
+          <p><strong>Status:</strong> Running normally</p>
+          <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+          <p><strong>Uptime:</strong> ${Math.floor(process.uptime())} seconds</p>
         </div>
         <div class="links">
-          <h2>快速链接</h2>
-          <a href="/editor">测试编辑器</a>
-          <a href="/popup">弹窗调试器</a>
-          <a href="/api/system/info">系统信息 API</a>
-          <a href="/api/test/status">测试状态 API</a>
-          <a href="/static">静态资源</a>
+          <h2>Quick Links</h2>
+          <a href="/editor">Test Editor</a>
+          <a href="/popup">Popup Debugger</a>
+          <a href="/api/system/info">System Info API</a>
+          <a href="/api/test/status">Test Status API</a>
+          <a href="/static">Static Resources</a>
         </div>
       </div>
     </body>
@@ -810,89 +810,89 @@ module.exports = (req, res) => {
 };
 ```
 
-## 最佳实践
+## Best Practices
 
-### 1. 服务器管理
-- 使用适当的端口配置避免冲突
-- 实现优雅的服务器关闭和资源清理
-- 监控服务器状态和性能指标
-- 实现健康检查和自动重启机制
+### 1. Server Management
+- Use appropriate port configuration to avoid conflicts
+- Implement graceful server shutdown and resource cleanup
+- Monitor server status and performance metrics
+- Implement health checks and automatic restart mechanisms
 
-### 2. 消息处理
-- 合理设计消息代理和路由策略
-- 实现消息的错误处理和重试机制
-- 使用适当的消息序列化和反序列化
-- 实现消息的限流和防抖动处理
+### 2. Message Handling
+- Reasonably design message proxy and routing strategies
+- Implement error handling and retry mechanisms for messages
+- Use appropriate message serialization and deserialization
+- Implement message throttling and debouncing
 
-### 3. 安全考虑
-- 实现适当的身份验证和授权机制
-- 限制只在开发环境中启用调试工具
-- 避免暴露敏感的系统信息和测试数据
-- 实现请求限流和防止滥用的机制
+### 3. Security Considerations
+- Implement appropriate authentication and authorization mechanisms
+- Restrict debug tools to development environments only
+- Avoid exposing sensitive system information and test data
+- Implement request throttling and abuse prevention mechanisms
 
-### 4. 性能优化
-- 合理使用缓存和静态资源压缩
-- 优化消息传输的性能和延迟
-- 实现适当的连接池和资源管理
-- 监控内存使用和防止内存泄漏
+### 4. Performance Optimization
+- Reasonably use caching and static resource compression
+- Optimize message transmission performance and latency
+- Implement appropriate connection pooling and resource management
+- Monitor memory usage and prevent memory leaks
 
-### 5. 开发体验
-- 提供清晰的错误信息和调试信息
-- 实现实时的状态反馈和进度显示
-- 提供丰富的日志和调试信息
-- 实现用户友好的配置和定制选项
+### 5. Development Experience
+- Provide clear error messages and debugging information
+- Implement real-time status feedback and progress display
+- Provide rich logging and debugging information
+- Implement user-friendly configuration and customization options
 
-## 故障排除
+## Troubleshooting
 
-### 常见问题
+### Common Issues
 
-#### 服务器启动失败
+#### Server Startup Failure
 ```bash
 Error: listen EADDRINUSE: address already in use
 ```
-解决方案：检查端口占用情况，修改配置中的端口号。
+Solution: Check port usage, modify port numbers in configuration.
 
-#### 子进程通信失败
+#### Child Process Communication Failure
 ```bash
 Error: Worker process communication failed
 ```
-解决方案：检查传输层配置、子进程状态、消息格式。
+Solution: Check transport layer configuration, child process status, message format.
 
-#### 前端资源加载失败
+#### Frontend Resource Loading Failure
 ```bash
 Error: Cannot find module '@testring/devtool-frontend'
 ```
-解决方案：检查前端模块安装、静态资源路径配置。
+Solution: Check frontend module installation, static resource path configuration.
 
-#### 消息代理错误
+#### Message Proxy Error
 ```bash
 Error: Message proxy handler not found
 ```
-解决方案：检查消息类型注册、处理器配置、传输层状态。
+Solution: Check message type registration, handler configuration, transport layer status.
 
-### 调试技巧
+### Debugging Tips
 
 ```typescript
-// 启用详细调试日志
+// Enable detailed debug logging
 process.env.DEBUG = 'testring:devtool*';
 
-// 检查服务器状态
+// Check server status
 const devtoolServer = new DevtoolServerController(transport);
 
-// 调试配置
-console.log('默认配置:', devtoolServer.getConfig());
+// Debug configuration
+console.log('Default configuration:', devtoolServer.getConfig());
 
-// 调试运行时配置
+// Debug runtime configuration
 try {
   const runtimeConfig = devtoolServer.getRuntimeConfiguration();
-  console.log('运行时配置:', runtimeConfig);
+  console.log('Runtime configuration:', runtimeConfig);
 } catch (error) {
-  console.error('配置未初始化:', error.message);
+  console.error('Configuration not initialized:', error.message);
 }
 
-// 调试子进程通信
+// Debug child process communication
 transport.on('*', (messageType, messageData, sourceId) => {
-  console.log(`消息 [${messageType}] 从 [${sourceId}]:`, messageData);
+  console.log(`Message [${messageType}] from [${sourceId}]:`, messageData);
 });
 ```
 
