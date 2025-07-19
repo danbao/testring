@@ -131,6 +131,8 @@ jobs:
       with:
         projectBaseDir: .
         args: >
+          -Dsonar.organization=${{ github.repository_owner }}
+          -Dsonar.projectKey=${{ github.repository_owner }}_${{ github.event.repository.name }}
           -Dsonar.sources=core,packages
           -Dsonar.tests=core,packages
           -Dsonar.test.inclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js
