@@ -89,116 +89,116 @@ describe('Example Test', () => {
 npx testring
 ```
 
-## 命令行使用
+## Command Line Usage
 
-### 基本命令
+### Basic Commands
 
 ```bash
-# 运行测试（使用默认配置）
+# Run tests (using default configuration)
 testring
 
-# 显式运行测试
+# Explicitly run tests
 testring run
 
-# 显示帮助信息
+# Show help information
 testring --help
 
-# 显示版本信息
+# Show version information
 testring --version
 ```
 
-### 常用参数
+### Common Parameters
 
-#### 测试文件配置
+#### Test File Configuration
 ```bash
-# 指定测试文件路径
+# Specify test file path
 testring run --tests "./tests/**/*.spec.js"
 
-# 指定多个测试路径
+# Specify multiple test paths
 testring run --tests "./unit/**/*.test.js" --tests "./e2e/**/*.spec.js"
 
-# 使用配置文件
+# Use configuration file
 testring run --config ./custom-config.json
 ```
 
-#### 并发控制
+#### Concurrency Control
 ```bash
-# 设置并行工作进程数
+# Set parallel worker process count
 testring run --workerLimit 4
 
-# 单进程运行（调试时有用）
+# Single process run (useful for debugging)
 testring run --workerLimit 1
 ```
 
-#### 重试机制
+#### Retry Mechanism
 ```bash
-# 设置重试次数
+# Set retry count
 testring run --retryCount 3
 
-# 设置重试延迟（毫秒）
+# Set retry delay (milliseconds)
 testring run --retryDelay 2000
 ```
 
-#### 日志控制
+#### Log Control
 ```bash
-# 设置日志级别
+# Set log level
 testring run --logLevel debug
 
-# 静默模式
+# Silent mode
 testring run --logLevel silent
 
-# 详细输出
+# Verbose output
 testring run --logLevel verbose
 ```
 
-#### 插件配置
+#### Plugin Configuration
 ```bash
-# 使用插件
+# Use plugins
 testring run --plugins @testring/plugin-selenium-driver
 
-# 使用多个插件
+# Use multiple plugins
 testring run --plugins @testring/plugin-selenium-driver --plugins @testring/plugin-babel
 ```
 
-#### 环境配置
+#### Environment Configuration
 ```bash
-# 使用环境配置文件
+# Use environment configuration file
 testring run --envConfig ./env/staging.json
 
-# 同时使用主配置和环境配置
+# Use both main config and environment config
 testring run --config ./base-config.json --envConfig ./env/production.json
 ```
 
-### 高级参数
+### Advanced Parameters
 
 ```bash
-# 测试失败后立即停止
+# Stop immediately after test failure
 testring run --bail
 
-# 启用调试模式
+# Enable debug mode
 testring run --debug
 
-# 设置超时时间
+# Set timeout
 testring run --timeout 30000
 
-# 过滤测试文件
+# Filter test files
 testring run --grep "login"
 
-# 排除某些测试
+# Exclude certain tests
 testring run --exclude "**/skip/**"
 ```
 
-## 编程 API
+## Programming API
 
-### 基本用法
+### Basic Usage
 
 ```typescript
 import { run } from 'testring';
 
-// 使用默认配置运行测试
+// Run tests with default configuration
 await run();
 
-// 使用自定义配置
+// Run with custom configuration
 await run({
   tests: './tests/**/*.spec.js',
   workerLimit: 2,
@@ -207,49 +207,49 @@ await run({
 });
 ```
 
-### 高级配置
+### Advanced Configuration
 
 ```typescript
 import { run } from 'testring';
 
 await run({
-  // 测试文件配置
+  // Test file configuration
   tests: [
     './tests/unit/**/*.spec.js',
     './tests/integration/**/*.spec.js'
   ],
   
-  // 插件配置
+  // Plugin configuration
   plugins: [
     '@testring/plugin-selenium-driver',
     '@testring/plugin-babel',
     './custom-plugin.js'
   ],
   
-  // 执行配置
+  // Execution configuration
   workerLimit: 4,
   retryCount: 3,
   retryDelay: 2000,
   timeout: 30000,
   bail: false,
   
-  // 日志配置
+  // Log configuration
   logLevel: 'info',
   silent: false,
   
-  // 浏览器配置
+  // Browser configuration
   browserOptions: {
     headless: true,
     width: 1920,
     height: 1080
   },
   
-  // 环境配置
+  // Environment configuration
   envConfig: './env/staging.json'
 });
 ```
 
-### 异步操作
+### Asynchronous Operations
 
 ```typescript
 import { run } from 'testring';
@@ -261,9 +261,9 @@ async function runTests() {
       workerLimit: 2
     });
     
-    console.log('测试运行完成:', result);
+    console.log('Test run completed:', result);
   } catch (error) {
-    console.error('测试运行失败:', error);
+    console.error('Test run failed:', error);
     process.exit(1);
   }
 }
@@ -271,7 +271,7 @@ async function runTests() {
 runTests();
 ```
 
-### 生命周期钩子
+### Lifecycle Hooks
 
 ```typescript
 import { run } from 'testring';
@@ -279,29 +279,29 @@ import { run } from 'testring';
 await run({
   tests: './tests/**/*.spec.js',
   
-  // 测试开始前
+  // Before test starts
   beforeRun: async () => {
-    console.log('准备开始测试');
+    console.log('Preparing to start tests');
     await setupTestData();
   },
   
-  // 测试完成后
+  // After test completion
   afterRun: async () => {
-    console.log('测试执行完毕');
+    console.log('Test execution completed');
     await cleanupTestData();
   },
   
-  // 测试失败时
+  // On test failure
   onError: async (error) => {
-    console.error('测试执行失败:', error);
+    console.error('Test execution failed:', error);
     await sendFailureNotification(error);
   }
 });
 ```
 
-## 配置文件
+## Configuration Files
 
-### JSON 配置文件
+### JSON Configuration File
 
 `.testringrc`:
 ```json
@@ -325,7 +325,7 @@ await run({
 }
 ```
 
-### JavaScript 配置文件
+### JavaScript Configuration File
 
 `.testringrc.js`:
 ```javascript
@@ -338,7 +338,7 @@ module.exports = {
   retryCount: process.env.CI ? 1 : 3,
   logLevel: process.env.DEBUG ? 'debug' : 'info',
   
-  // 动态配置
+  // Dynamic configuration
   browserOptions: {
     headless: !process.env.SHOW_BROWSER,
     width: parseInt(process.env.BROWSER_WIDTH) || 1920,
@@ -347,7 +347,7 @@ module.exports = {
 };
 ```
 
-### 异步配置文件
+### Asynchronous Configuration File
 
 ```javascript
 module.exports = async () => {
@@ -358,15 +358,15 @@ module.exports = async () => {
     plugins: config.plugins,
     workerLimit: config.workerLimit,
     
-    // 从外部服务获取配置
+    // Get configuration from external service
     browserOptions: await getBrowserConfig()
   };
 };
 ```
 
-### 环境特定配置
+### Environment-Specific Configuration
 
-主配置文件 `config.json`:
+Main configuration file `config.json`:
 ```json
 {
   "tests": "./tests/**/*.spec.js",
@@ -375,7 +375,7 @@ module.exports = async () => {
 }
 ```
 
-开发环境配置 `env/dev.json`:
+Development environment config `env/dev.json`:
 ```json
 {
   "workerLimit": 1,
@@ -386,7 +386,7 @@ module.exports = async () => {
 }
 ```
 
-生产环境配置 `env/prod.json`:
+Production environment config `env/prod.json`:
 ```json
 {
   "workerLimit": 4,
@@ -397,60 +397,60 @@ module.exports = async () => {
 }
 ```
 
-使用环境配置：
+Using environment configuration:
 ```bash
-# 开发环境
+# Development environment
 testring run --config config.json --envConfig env/dev.json
 
-# 生产环境
+# Production environment
 testring run --config config.json --envConfig env/prod.json
 ```
 
-## 插件系统
+## Plugin System
 
-### 使用现有插件
+### Using Existing Plugins
 
 ```bash
-# 安装 Selenium 驱动插件
+# Install Selenium driver plugin
 npm install @testring/plugin-selenium-driver
 
-# 在配置中使用
+# Use in configuration
 testring run --plugins @testring/plugin-selenium-driver
 ```
 
-### 自定义插件
+### Custom Plugins
 
-创建自定义插件 `my-plugin.js`:
+Create custom plugin `my-plugin.js`:
 ```javascript
 module.exports = (pluginAPI) => {
   const logger = pluginAPI.getLogger();
   
-  // 在测试开始前执行
+  // Execute before test starts
   pluginAPI.beforeRun(() => {
-    logger.info('自定义插件：测试开始');
+    logger.info('Custom plugin: Test starting');
   });
   
-  // 在测试完成后执行
+  // Execute after test completion
   pluginAPI.afterRun(() => {
-    logger.info('自定义插件：测试完成');
+    logger.info('Custom plugin: Test completed');
   });
 };
 ```
 
-使用自定义插件：
+Using custom plugin:
 ```json
 {
   "plugins": ["./my-plugin.js"]
 }
 ```
 
-## 实际应用场景
+## Real-World Application Scenarios
 
-### CI/CD 集成
+### CI/CD Integration
 
 ```yaml
-# GitHub Actions 示例
-name: 测试
+# GitHub Actions example
+name: Tests
 on: [push, pull_request]
 
 jobs:
@@ -462,14 +462,14 @@ jobs:
       with:
         node-version: '18'
     
-    - name: 安装依赖
+    - name: Install dependencies
       run: npm ci
     
-    - name: 运行测试
+    - name: Run tests
       run: npx testring run --workerLimit 2 --retryCount 1
 ```
 
-### Docker 环境
+### Docker Environment
 
 ```dockerfile
 FROM node:18-alpine
@@ -480,11 +480,11 @@ RUN npm ci
 
 COPY . .
 
-# 运行测试
+# Run tests
 CMD ["npx", "testring", "run", "--workerLimit", "1"]
 ```
 
-### 多环境测试
+### Multi-Environment Testing
 
 ```javascript
 // test-runner.js
@@ -493,7 +493,7 @@ import { run } from 'testring';
 const environments = ['dev', 'staging', 'prod'];
 
 for (const env of environments) {
-  console.log(`运行 ${env} 环境测试`);
+  console.log(`Running ${env} environment tests`);
   
   await run({
     tests: './tests/**/*.spec.js',
@@ -503,17 +503,17 @@ for (const env of environments) {
 }
 ```
 
-### 分布式测试
+### Distributed Testing
 
 ```javascript
-// 主节点
+// Master node
 import { run } from 'testring';
 
 await run({
   tests: './tests/**/*.spec.js',
   workerLimit: 8,
   
-  // 分布式配置
+  // Distributed configuration
   cluster: {
     nodes: ['node1:3000', 'node2:3000', 'node3:3000'],
     master: true
@@ -521,12 +521,12 @@ await run({
 });
 ```
 
-## 性能优化
+## Performance Optimization
 
-### 并发控制
+### Concurrency Control
 
 ```typescript
-// 根据 CPU 核心数调整并发
+// Adjust concurrency based on CPU cores
 import os from 'os';
 
 const workerLimit = Math.min(os.cpus().length, 4);
@@ -537,16 +537,16 @@ await run({
 });
 ```
 
-### 内存管理
+### Memory Management
 
 ```typescript
 await run({
   tests: './tests/**/*.spec.js',
   
-  // 限制内存使用
+  // Limit memory usage
   memoryLimit: '2GB',
   
-  // 垃圾回收配置
+  // Garbage collection configuration
   gcOptions: {
     maxOldSpaceSize: 4096,
     maxSemiSpaceSize: 256
@@ -554,44 +554,44 @@ await run({
 });
 ```
 
-### 缓存优化
+### Cache Optimization
 
 ```typescript
 await run({
   tests: './tests/**/*.spec.js',
   
-  // 启用文件缓存
+  // Enable file caching
   cache: {
     enabled: true,
     directory: './.test-cache',
-    maxAge: 3600000 // 1小时
+    maxAge: 3600000 // 1 hour
   }
 });
 ```
 
-## 错误处理
+## Error Handling
 
-### 常见错误
+### Common Errors
 
-#### 配置文件错误
+#### Configuration File Error
 ```bash
 Error: Configuration file not found: .testringrc
 ```
-解决方案：创建配置文件或使用 `--config` 参数指定配置文件路径。
+Solution: Create configuration file or use `--config` parameter to specify configuration file path.
 
-#### 测试文件未找到
+#### Test Files Not Found
 ```bash
 Error: No test files found matching pattern: ./tests/**/*.spec.js
 ```
-解决方案：检查测试文件路径是否正确，确认文件存在。
+Solution: Check if test file path is correct, confirm files exist.
 
-#### 插件加载失败
+#### Plugin Loading Failure
 ```bash
 Error: Plugin not found: @testring/plugin-selenium-driver
 ```
-解决方案：安装缺失的插件包。
+Solution: Install missing plugin package.
 
-### 错误恢复
+### Error Recovery
 
 ```typescript
 import { run } from 'testring';
@@ -604,44 +604,44 @@ async function runWithRetry(maxRetries = 3) {
         workerLimit: 2
       });
       
-      console.log('测试运行成功');
+      console.log('Test run successful');
       return;
     } catch (error) {
-      console.error(`测试运行失败 (尝试 ${i + 1}/${maxRetries}):`, error);
+      console.error(`Test run failed (attempt ${i + 1}/${maxRetries}):`, error);
       
       if (i === maxRetries - 1) {
         throw error;
       }
       
-      // 等待后重试
+      // Wait before retry
       await new Promise(resolve => setTimeout(resolve, 5000));
     }
   }
 }
 ```
 
-### 调试模式
+### Debug Mode
 
 ```bash
-# 启用详细日志
+# Enable detailed logging
 testring run --logLevel debug
 
-# 单进程运行（便于调试）
+# Single process run (for debugging)
 testring run --workerLimit 1
 
-# 保留浏览器窗口
+# Keep browser window open
 testring run --browserOptions.headless=false
 ```
 
-## 监控和报告
+## Monitoring and Reporting
 
-### 测试报告
+### Test Reports
 
 ```typescript
 await run({
   tests: './tests/**/*.spec.js',
   
-  // 生成报告
+  // Generate reports
   reporters: [
     'console',
     'html',
@@ -649,7 +649,7 @@ await run({
     'allure'
   ],
   
-  // 报告配置
+  // Report configuration
   reporterOptions: {
     html: {
       outputDir: './reports/html'
@@ -661,31 +661,31 @@ await run({
 });
 ```
 
-### 性能监控
+### Performance Monitoring
 
 ```typescript
 await run({
   tests: './tests/**/*.spec.js',
   
-  // 性能监控
+  // Performance monitoring
   monitoring: {
     enabled: true,
     
-    // 收集性能指标
+    // Collect performance metrics
     metrics: ['memory', 'cpu', 'duration'],
     
-    // 报告阈值
+    // Report thresholds
     thresholds: {
       memory: '1GB',
-      duration: 300000 // 5分钟
+      duration: 300000 // 5 minutes
     }
   }
 });
 ```
 
-## 最佳实践
+## Best Practices
 
-### 1. 项目结构
+### 1. Project Structure
 ```
 project/
 ├── tests/
@@ -700,67 +700,61 @@ project/
 └── package.json
 ```
 
-### 2. 配置管理
-- 使用环境特定的配置文件
-- 将敏感信息存储在环境变量中
-- 使用配置验证确保配置正确性
+### 2. Configuration Management
+- Use environment-specific configuration files
+- Store sensitive information in environment variables
+- Use configuration validation to ensure correctness
 
-### 3. 性能优化
-- 根据硬件资源调整并发数
-- 使用适当的重试策略
-- 启用缓存机制
+### 3. Performance Optimization
+- Adjust concurrency based on hardware resources
+- Use appropriate retry strategies
+- Enable caching mechanisms
 
-### 4. 错误处理
-- 实现完善的错误捕获机制
-- 提供详细的错误信息
-- 使用适当的退出码
+### 4. Error Handling
+- Implement comprehensive error capture mechanisms
+- Provide detailed error information
+- Use appropriate exit codes
 
-### 5. 可维护性
-- 使用有意义的测试文件命名
-- 保持配置文件的简洁性
-- 定期更新插件和依赖
+### 5. Maintainability
+- Use meaningful test file naming
+- Keep configuration files concise
+- Regularly update plugins and dependencies
 
-## 故障排除
+## Troubleshooting
 
-### 性能问题
-- 检查内存使用情况
-- 调整并发进程数
-- 优化测试文件大小
+### Performance Issues
+- Check memory usage
+- Adjust concurrent process count
+- Optimize test file size
 
-### 兼容性问题
-- 确认 Node.js 版本兼容性
-- 检查插件版本兼容性
-- 验证浏览器驱动版本
+### Compatibility Issues
+- Confirm Node.js version compatibility
+- Check plugin version compatibility
+- Verify browser driver versions
 
-### 网络问题
-- 配置代理设置
-- 调整超时时间
-- 使用重试机制
+### Network Issues
+- Configure proxy settings
+- Adjust timeout values
+- Use retry mechanisms
 
-## 依赖
+## Dependencies
 
-### 核心依赖
-- `@testring/api` - 测试 API 控制器
-- `@testring/cli` - 命令行界面
+### Core Dependencies
+- `@testring/api` - Test API controller
+- `@testring/cli` - Command line interface
 
-### 可选插件
-- `@testring/plugin-selenium-driver` - Selenium WebDriver 支持
-- `@testring/plugin-playwright-driver` - Playwright 支持
-- `@testring/plugin-babel` - Babel 转译支持
+### Optional Plugins
+- `@testring/plugin-selenium-driver` - Selenium WebDriver support
+- `@testring/plugin-playwright-driver` - Playwright support
+- `@testring/plugin-babel` - Babel transpilation support
 
-## 相关资源
+## Installation
 
-- [GitHub 仓库](https://github.com/ringcentral/testring)
-- [API 文档](../api/README.md)
-- [CLI 文档](cli.md)
-- [插件开发指南](../guides/plugin-development.md)
-- [配置参考](../configuration/README.md)
+```bash
+npm install testring
+```
 
-## 贡献
-
-欢迎贡献代码！请参考项目的贡献指南。
-
-## 许可证
+## License
 
 MIT License
 

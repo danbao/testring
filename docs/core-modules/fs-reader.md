@@ -68,63 +68,63 @@ if (file) {
 }
 ```
 
-## 支持的文件格式
+## Supported File Formats
 
-### JavaScript 文件
+### JavaScript Files
 ```javascript
 // tests/example.spec.js
-describe('示例测试', () => {
-  it('应该通过测试', () => {
+describe('Example Test', () => {
+  it('should pass the test', () => {
     expect(true).toBe(true);
   });
 });
 ```
 
-### TypeScript 文件
+### TypeScript Files
 ```typescript
 // tests/example.spec.ts
-describe('示例测试', () => {
-  it('应该通过测试', () => {
+describe('Example Test', () => {
+  it('should pass the test', () => {
     expect(true).toBe(true);
   });
 });
 ```
 
-### 模块化测试
+### Modular Tests
 ```javascript
 // tests/modular.spec.js
 import { helper } from './helper';
 
-describe('模块化测试', () => {
-  it('使用辅助函数', () => {
+describe('Modular Test', () => {
+  it('uses helper functions', () => {
     expect(helper.add(1, 2)).toBe(3);
   });
 });
 ```
 
-## 插件支持
+## Plugin Support
 
-FSReader 支持插件来扩展文件处理功能：
+FSReader supports plugins to extend file processing functionality:
 
-### 插件钩子
-- `beforeResolve` - 文件解析前处理
-- `afterResolve` - 文件解析后处理
+### Plugin Hooks
+- `beforeResolve` - Pre-file resolution processing
+- `afterResolve` - Post-file resolution processing
 
-### 自定义文件处理插件
+### Custom File Processing Plugin
 ```typescript
 export default (pluginAPI) => {
   const fsReader = pluginAPI.getFSReader();
   
   if (fsReader) {
-    // 文件解析前处理
+    // Pre-file resolution processing
     fsReader.beforeResolve((files) => {
-      // 过滤掉某些文件
+      // Filter out certain files
       return files.filter(file => !file.path.includes('skip'));
     });
     
-    // 文件解析后处理
+    // Post-file resolution processing
     fsReader.afterResolve((files) => {
-      // 添加额外的文件信息
+      // Add additional file information
       return files.map(file => ({
         ...file,
         lastModified: fs.statSync(file.path).mtime
@@ -134,142 +134,142 @@ export default (pluginAPI) => {
 };
 ```
 
-## Glob 模式支持
+## Glob Pattern Support
 
-### 基本模式
+### Basic Patterns
 ```typescript
-// 匹配所有 .js 文件
+// Match all .js files
 await fsReader.find('**/*.js');
 
-// 匹配特定目录
+// Match specific directory
 await fsReader.find('./tests/**/*.spec.js');
 
-// 匹配多种文件类型
+// Match multiple file types
 await fsReader.find('**/*.{js,ts}');
 ```
 
-### 高级模式
+### Advanced Patterns
 ```typescript
-// 排除某些文件
+// Exclude certain files
 await fsReader.find('**/*.spec.js', { ignore: ['**/node_modules/**'] });
 
-// 匹配特定命名模式
+// Match specific naming patterns
 await fsReader.find('**/*.{test,spec}.{js,ts}');
 
-// 深度限制
+// Depth limitation
 await fsReader.find('**/!(node_modules)/**/*.spec.js');
 ```
 
-## 文件解析
+## File Parsing
 
-### 依赖解析
-自动解析文件依赖关系：
+### Dependency Resolution
+Automatically resolve file dependencies:
 
 ```typescript
-// 主测试文件
+// Main test file
 import { helper } from './helper';
 import { config } from '../config';
 
-// FSReader 会自动识别依赖
+// FSReader will automatically identify dependencies
 const files = await fsReader.find('./tests/**/*.spec.js');
-// 结果中包含依赖信息
+// Results include dependency information
 // file.dependencies = ['./helper.js', '../config.js']
 ```
 
-### 内容解析
-解析文件内容并提取信息：
+### Content Parsing
+Parse file content and extract information:
 
 ```typescript
 const file = await fsReader.readFile('./tests/example.spec.js');
-// file.content 包含完整的文件内容
-// 可以进一步解析 AST 或提取测试用例信息
+// file.content contains complete file content
+// Can further parse AST or extract test case information
 ```
 
-## 性能优化
+## Performance Optimization
 
-### 文件缓存
-- 自动缓存已读取的文件
-- 监听文件变化，自动更新缓存
-- 减少重复的文件系统访问
+### File Caching
+- Automatically cache read files
+- Monitor file changes, automatically update cache
+- Reduce repeated file system access
 
-### 并行处理
-- 并行读取多个文件
-- 异步处理文件内容
-- 优化大量文件的处理性能
+### Parallel Processing
+- Read multiple files in parallel
+- Asynchronously process file content
+- Optimize performance for large numbers of files
 
-### 内存管理
-- 智能的内存使用
-- 及时释放不需要的文件内容
-- 支持大型项目的文件处理
+### Memory Management
+- Intelligent memory usage
+- Timely release of unnecessary file content
+- Support for large project file processing
 
-## 错误处理
+## Error Handling
 
-### 文件不存在
+### File Not Found
 ```typescript
 try {
   const files = await fsReader.find('./nonexistent/**/*.js');
 } catch (error) {
-  console.error('没有找到匹配的文件:', error.message);
+  console.error('No matching files found:', error.message);
 }
 ```
 
-### 文件读取错误
+### File Read Error
 ```typescript
 const file = await fsReader.readFile('./protected-file.js');
 if (!file) {
-  console.log('文件读取失败或文件不存在');
+  console.log('File read failed or file does not exist');
 }
 ```
 
-### 权限问题
+### Permission Issues
 ```typescript
 try {
   await fsReader.find('./protected-dir/**/*.js');
 } catch (error) {
   if (error.code === 'EACCES') {
-    console.error('没有权限访问文件');
+    console.error('No permission to access file');
   }
 }
 ```
 
-## 配置选项
+## Configuration Options
 
-### 查找选项
+### Find Options
 ```typescript
 interface FindOptions {
-  ignore?: string[];      // 忽略的文件模式
-  absolute?: boolean;     // 返回绝对路径
-  maxDepth?: number;      // 最大搜索深度
+  ignore?: string[];      // File patterns to ignore
+  absolute?: boolean;     // Return absolute paths
+  maxDepth?: number;      // Maximum search depth
 }
 ```
 
-### 读取选项
+### Read Options
 ```typescript
 interface ReadOptions {
-  encoding?: string;      // 文件编码
-  cache?: boolean;        // 是否使用缓存
+  encoding?: string;      // File encoding
+  cache?: boolean;        // Whether to use cache
 }
 ```
 
-## 使用示例
+## Usage Examples
 
-### 基本用法
+### Basic Usage
 ```typescript
 import { FSReader } from '@testring/fs-reader';
 
 const fsReader = new FSReader();
 
-// 查找所有测试文件
+// Find all test files
 const testFiles = await fsReader.find('./tests/**/*.spec.js');
 
-// 处理每个文件
+// Process each file
 for (const file of testFiles) {
-  console.log(`处理文件: ${file.path}`);
-  // 执行测试或其他处理
+  console.log(`Processing file: ${file.path}`);
+  // Execute tests or other processing
 }
 ```
 
-### 与其他模块集成
+### Integration with Other Modules
 ```typescript
 import { FSReader } from '@testring/fs-reader';
 import { TestRunner } from '@testring/test-runner';
@@ -277,28 +277,28 @@ import { TestRunner } from '@testring/test-runner';
 const fsReader = new FSReader();
 const testRunner = new TestRunner();
 
-// 查找并执行测试
+// Find and execute tests
 const files = await fsReader.find('./tests/**/*.spec.js');
 for (const file of files) {
   await testRunner.execute(file);
 }
 ```
 
-## 安装
+## Installation
 
 ```bash
 npm install @testring/fs-reader
 ```
 
-## 依赖
+## Dependencies
 
-- `@testring/pluggable-module` - 插件支持
-- `@testring/logger` - 日志记录
-- `@testring/types` - 类型定义
-- `glob` - 文件模式匹配
+- `@testring/pluggable-module` - Plugin support
+- `@testring/logger` - Logging
+- `@testring/types` - Type definitions
+- `glob` - File pattern matching
 
-## 相关模块
+## Related Modules
 
-- `@testring/test-run-controller` - 测试运行控制器
-- `@testring/dependencies-builder` - 依赖构建器
-- `@testring/plugin-api` - 插件 API
+- `@testring/test-run-controller` - Test run controller
+- `@testring/dependencies-builder` - Dependency builder
+- `@testring/plugin-api` - Plugin API

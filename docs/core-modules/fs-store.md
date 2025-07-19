@@ -200,12 +200,12 @@ const lockId = client.getLock(
 const accessId = client.getAccess(
   { ext: 'log' },
   (fullPath, requestId) => {
-    console.log('文件访问权限获取成功:', fullPath);
+    console.log('File access permission obtained successfully:', fullPath);
     
-    // 执行文件读写
+    // Perform file read/write operations
     // ...
     
-    // 释放访问权限
+    // Release file access
     client.release(requestId);
   }
 );
@@ -216,28 +216,28 @@ const accessId = client.getAccess(
 ```typescript
 import { FSStoreFile } from '@testring/fs-store';
 
-// 创建文件对象
+// Create file object
 const file = new FSStoreFile({
   meta: { ext: 'txt' },
   fsOptions: { encoding: 'utf8' }
 });
 
-// 写入文件
+// Write to file
 await file.write(Buffer.from('Hello World'));
-console.log('文件路径:', file.getFullPath());
+console.log('File path:', file.getFullPath());
 
-// 读取文件
+// Read file
 const content = await file.read();
-console.log('文件内容:', content.toString());
+console.log('File content:', content.toString());
 
-// 追加内容
-await file.append(Buffer.from('\n追加内容'));
+// Append content
+await file.append(Buffer.from('\nAppended content'));
 
-// 获取文件状态
+// Get file status
 const stats = await file.stat();
-console.log('文件大小:', stats.size);
+console.log('File size:', stats.size);
 
-// 删除文件
+// Delete file
 await file.unlink();
 ```
 
@@ -248,18 +248,18 @@ await file.unlink();
 ```typescript
 import { FSTextFileFactory } from '@testring/fs-store';
 
-// 创建文本文件
+// Create text file
 const textFile = FSTextFileFactory.create(
-  { ext: 'txt' },  // 文件元数据
-  { fsOptions: { encoding: 'utf8' } }  // 文件选项
+  { ext: 'txt' },  // File metadata
+  { fsOptions: { encoding: 'utf8' } }  // File options
 );
 
-// 写入文本内容
-await textFile.write(Buffer.from('文本内容'));
+// Write text content
+await textFile.write(Buffer.from('Text content'));
 
-// 读取文本内容
+// Read text content
 const content = await textFile.read();
-console.log('文本内容:', content.toString());
+console.log('Text content:', content.toString());
 ```
 
 ### Binary File Factory
@@ -267,19 +267,19 @@ console.log('文本内容:', content.toString());
 ```typescript
 import { FSBinaryFileFactory } from '@testring/fs-store';
 
-// 创建二进制文件
+// Create binary file
 const binaryFile = FSBinaryFileFactory.create(
   { ext: 'bin' },
   { fsOptions: { encoding: 'binary' } }
 );
 
-// 写入二进制数据
+// Write binary data
 const binaryData = Buffer.from([0x89, 0x50, 0x4E, 0x47]);
 await binaryFile.write(binaryData);
 
-// 读取二进制数据
+// Read binary data
 const data = await binaryFile.read();
-console.log('二进制数据:', data);
+console.log('Binary data:', data);
 ```
 
 ### Screenshot File Factory
@@ -287,17 +287,17 @@ console.log('二进制数据:', data);
 ```typescript
 import { FSScreenshotFileFactory } from '@testring/fs-store';
 
-// 创建截图文件
+// Create screenshot file
 const screenshotFile = FSScreenshotFileFactory.create(
   { ext: 'png' },
   { fsOptions: { encoding: 'binary' } }
 );
 
-// 保存截图数据
-const screenshotData = Buffer.from(/* 截图数据 */);
+// Save screenshot data
+const screenshotData = Buffer.from(/* Screenshot data */);
 await screenshotFile.write(screenshotData);
 
-console.log('截图文件路径:', screenshotFile.getFullPath());
+console.log('Screenshot file path:', screenshotFile.getFullPath());
 ```
 
 ## Advanced Usage
@@ -312,16 +312,16 @@ const file = new FSStoreFile({
   fsOptions: { encoding: 'utf8' }
 });
 
-// 使用事务确保操作的原子性
+// Use transactions to ensure atomicity of operations
 await file.transaction(async () => {
-  // 在事务中执行多个操作
-  await file.write(Buffer.from('开始记录\n'));
-  await file.append(Buffer.from('操作1完成\n'));
-  await file.append(Buffer.from('操作2完成\n'));
-  await file.append(Buffer.from('记录结束\n'));
+  // Execute multiple operations within transaction
+  await file.write(Buffer.from('Start recording\n'));
+  await file.append(Buffer.from('Operation 1 completed\n'));
+  await file.append(Buffer.from('Operation 2 completed\n'));
+  await file.append(Buffer.from('Recording ended\n'));
 });
 
-console.log('事务完成，文件路径:', file.getFullPath());
+console.log('Transaction completed, file path:', file.getFullPath());
 ```
 
 ### Manual Transaction Control
@@ -333,25 +333,25 @@ const file = new FSStoreFile({
 });
 
 try {
-  // 开始事务
+  // Start transaction
   await file.startTransaction();
   
-  // 执行多个操作
-  await file.write(Buffer.from('数据头\n'));
+  // Execute multiple operations
+  await file.write(Buffer.from('Data header\n'));
   
   for (let i = 0; i < 10; i++) {
-    await file.append(Buffer.from(`数据行 ${i}\n`));
+    await file.append(Buffer.from(`Data row ${i}\n`));
   }
   
-  await file.append(Buffer.from('数据尾\n'));
+  await file.append(Buffer.from('Data footer\n'));
   
-  // 提交事务
+  // Commit transaction
   await file.endTransaction();
   
-  console.log('手动事务完成');
+  console.log('Manual transaction completed');
 } catch (error) {
-  // 事务会自动结束
-  console.error('事务失败:', error);
+  // Transaction will automatically end
+  console.error('Transaction failed:', error);
 }
 ```
 
@@ -361,24 +361,24 @@ try {
 const file = new FSStoreFile({
   meta: { ext: 'shared' },
   fsOptions: { encoding: 'utf8' },
-  lock: true  // 创建时自动加锁
+  lock: true  // Auto-lock on creation
 });
 
-// 检查锁状态
+// Check lock status
 if (file.isLocked()) {
-  console.log('文件已被锁定');
+  console.log('File is locked');
 }
 
-// 手动加锁
+// Manual lock
 await file.lock();
 
-// 执行需要锁保护的操作
-await file.write(Buffer.from('受保护的数据'));
+// Execute operations that need lock protection
+await file.write(Buffer.from('Protected data'));
 
-// 解锁
+// Unlock
 await file.unlock();
 
-// 解锁所有锁
+// Unlock all locks
 await file.unlockAll();
 ```
 
@@ -390,11 +390,11 @@ const file = new FSStoreFile({
   fsOptions: { encoding: 'utf8' }
 });
 
-// 等待文件解锁
+// Wait for file unlock
 await file.waitForUnlock();
 
-// 现在可以安全地操作文件
-await file.write(Buffer.from('文件现在可写'));
+// Now can safely operate on file
+await file.write(Buffer.from('File is now writable'));
 ```
 
 ## Static Method Usage
@@ -404,31 +404,31 @@ await file.write(Buffer.from('文件现在可写'));
 ```typescript
 import { FSStoreFile } from '@testring/fs-store';
 
-// 快速写入文件
+// Quick file write
 const filePath = await FSStoreFile.write(
-  Buffer.from('快速写入的内容'),
+  Buffer.from('Quick write content'),
   {
     meta: { ext: 'txt' },
     fsOptions: { encoding: 'utf8' }
   }
 );
 
-// 快速追加文件
+// Quick file append
 await FSStoreFile.append(
-  Buffer.from('追加的内容'),
+  Buffer.from('Appended content'),
   {
     meta: { fileName: 'existing-file.txt' },
     fsOptions: { encoding: 'utf8' }
   }
 );
 
-// 快速读取文件
+// Quick file read
 const content = await FSStoreFile.read({
   meta: { fileName: 'existing-file.txt' },
   fsOptions: { encoding: 'utf8' }
 });
 
-// 快速删除文件
+// Quick file delete
 await FSStoreFile.unlink({
   meta: { fileName: 'file-to-delete.txt' }
 });
@@ -443,13 +443,13 @@ import { FSStoreServer, fsStoreServerHooks } from '@testring/fs-store';
 
 const server = new FSStoreServer();
 
-// 自定义文件命名策略
+// Custom file naming strategy
 server.getHook(fsStoreServerHooks.ON_FILENAME)?.writeHook(
   'customNaming',
   (fileName, context) => {
     const { workerId, requestId, meta } = context;
     
-    // 根据工作进程ID和请求信息生成自定义文件名
+    // Generate custom filename based on worker ID and request info
     const timestamp = Date.now();
     const customName = `${workerId}-${timestamp}-${fileName}`;
     
@@ -466,7 +466,7 @@ server.getHook(fsStoreServerHooks.ON_QUEUE)?.writeHook(
   (defaultQueue, meta, context) => {
     const { workerId } = context;
     
-    // 为特定工作进程提供专用队列
+    // Provide dedicated queue for specific worker process
     if (workerId === 'high-priority-worker') {
       return new CustomHighPriorityQueue();
     }
@@ -484,9 +484,9 @@ server.getHook(fsStoreServerHooks.ON_RELEASE)?.readHook(
   (context) => {
     const { workerId, requestId, fullPath, fileName, action } = context;
     
-    console.log(`文件释放: ${fileName} (${action}) by ${workerId}`);
+    console.log(`File released: ${fileName} (${action}) by ${workerId}`);
     
-    // 记录文件操作统计
+    // Record file operation statistics
     recordFileOperationStats(workerId, action, fullPath);
   }
 );
@@ -498,8 +498,8 @@ server.getHook(fsStoreServerHooks.ON_RELEASE)?.readHook(
 
 ```typescript
 const server = new FSStoreServer(
-  20,  // 增加并发线程数到20
-  'production-fs-store'  // 生产环境消息前缀
+  20,  // Increase concurrent thread count to 20
+  'production-fs-store'  // Production environment message prefix
 );
 ```
 
@@ -508,7 +508,7 @@ const server = new FSStoreServer(
 ```typescript
 const client = new FSStoreClient('production-fs-store');
 
-// 配置文件选项
+// Configure file options
 const fileOptions = {
   meta: {
     ext: 'log',
@@ -517,9 +517,9 @@ const fileOptions = {
   },
   fsOptions: {
     encoding: 'utf8',
-    flag: 'a'  // 追加模式
+    flag: 'a'  // Append mode
   },
-  lock: true  // 自动加锁
+  lock: true  // Auto-lock
 };
 
 const file = new FSStoreFile(fileOptions);
@@ -530,7 +530,7 @@ const file = new FSStoreFile(fileOptions);
 ```typescript
 import { FSStoreFile, FSStoreType, FSFileUniqPolicy } from '@testring/fs-store';
 
-// 创建自定义 JSON 文件工厂
+// Create custom JSON file factory
 export function createJSONFileFactory(
   extraMeta?: requestMeta,
   extraData?: FSStoreDataOptions
@@ -552,7 +552,7 @@ export function createJSONFileFactory(
   });
 }
 
-// 使用自定义工厂
+// Use custom factory
 const jsonFile = createJSONFileFactory({ fileName: 'config.json' });
 await jsonFile.write(Buffer.from(JSON.stringify({ test: true })));
 ```
@@ -567,8 +567,8 @@ import { FSStoreServer } from '@testring/fs-store';
 
 const server = new FSStoreServer(10, 'shared-fs');
 
-// 启动服务器
-console.log('文件存储服务器已启动');
+// Start server
+console.log('File storage server started');
 ```
 
 ### Worker Process Usage
@@ -579,16 +579,16 @@ import { FSStoreClient, FSTextFileFactory } from '@testring/fs-store';
 
 const client = new FSStoreClient('shared-fs');
 
-// 在工作进程中创建文件
+// Create file in worker process
 const file = FSTextFileFactory.create({ ext: 'log' });
 
-// 写入工作进程特定的内容
-await file.write(Buffer.from(`工作进程 ${process.pid} 的日志\n`));
+// Write worker process specific content
+await file.write(Buffer.from(`Worker process ${process.pid} log\n`));
 
-// 追加时间戳
-await file.append(Buffer.from(`时间: ${new Date().toISOString()}\n`));
+// Append timestamp
+await file.append(Buffer.from(`Time: ${new Date().toISOString()}\n`));
 
-console.log('工作进程文件路径:', file.getFullPath());
+console.log('Worker process file path:', file.getFullPath());
 ```
 
 ## Error Handling and Debugging
@@ -605,14 +605,14 @@ class SafeFileOperations {
       const filePath = await file.write(data);
       return filePath;
     } catch (error) {
-      console.error('文件写入失败:', error.message);
+      console.error('File write failed:', error.message);
       
       if (error.message.includes('permission')) {
-        console.error('权限不足，请检查文件权限');
+        console.error('Insufficient permissions, please check file permissions');
       } else if (error.message.includes('space')) {
-        console.error('磁盘空间不足');
+        console.error('Insufficient disk space');
       } else if (error.message.includes('lock')) {
-        console.error('文件被锁定，请稍后重试');
+        console.error('File is locked, please try again later');
       }
       
       return null;
@@ -628,7 +628,7 @@ class SafeFileOperations {
       });
       return true;
     } catch (error) {
-      console.error('事务失败:', error.message);
+      console.error('Transaction failed:', error.message);
       return false;
     }
   }
@@ -657,12 +657,12 @@ class DebuggableFileStore {
   }
   
   private setupDebugging() {
-    // 监控服务器状态
+    // Monitor server status
     setInterval(() => {
       const fileList = this.server.getNameList();
       const serverState = this.server.getState();
       
-      console.log('服务器状态:', {
+      console.log('Server status:', {
         state: serverState,
         managedFiles: fileList.length,
         files: fileList
@@ -719,7 +719,7 @@ class BatchFileOperations {
   async executeBatch() {
     const batch = this.operations.splice(0, this.batchSize);
     
-    // 并行执行批处理操作
+    // Execute batch operations in parallel
     await Promise.all(batch.map(operation => operation()));
   }
   
@@ -730,18 +730,18 @@ class BatchFileOperations {
   }
 }
 
-// 使用批处理
+// Use batching
 const batchOps = new BatchFileOperations();
 
-// 添加多个文件操作
+// Add multiple file operations
 for (let i = 0; i < 100; i++) {
   batchOps.addOperation(async () => {
     const file = FSTextFileFactory.create({ ext: 'txt' });
-    await file.write(Buffer.from(`文件 ${i} 的内容`));
+    await file.write(Buffer.from(`File ${i} content`));
   });
 }
 
-// 执行剩余操作
+// Execute remaining operations
 await batchOps.executeAll();
 ```
 
@@ -750,15 +750,15 @@ await batchOps.executeAll();
 ```typescript
 class CachedFileStore {
   private cache = new Map<string, Buffer>();
-  private cacheMaxSize = 50; // 最大缓存文件数
+  private cacheMaxSize = 50; // Maximum cached files
   
   async readWithCache(filePath: string): Promise<Buffer> {
-    // 检查缓存
+    // Check cache
     if (this.cache.has(filePath)) {
       return this.cache.get(filePath)!;
     }
     
-    // 从文件系统读取
+    // Read from file system
     const file = new FSStoreFile({
       meta: { fileName: path.basename(filePath) },
       fsOptions: { encoding: 'utf8' }
@@ -766,14 +766,14 @@ class CachedFileStore {
     
     const content = await file.read();
     
-    // 更新缓存
+    // Update cache
     this.updateCache(filePath, content);
     
     return content;
   }
   
   private updateCache(filePath: string, content: Buffer) {
-    // 如果缓存已满，删除最老的项
+    // If cache is full, remove oldest item
     if (this.cache.size >= this.cacheMaxSize) {
       const firstKey = this.cache.keys().next().value;
       this.cache.delete(firstKey);
@@ -846,16 +846,16 @@ Solution: Ensure FSStoreServer has been properly initialized and started.
 ### Debugging Tips
 
 ```typescript
-// 启用详细日志
+// Enable detailed logging
 process.env.DEBUG = 'testring:fs-store';
 
-// 创建调试版本的文件存储
+// Create debug version of file storage
 const debugServer = new FSStoreServer(5, 'debug-fs');
 const debugClient = new FSStoreClient('debug-fs');
 
-// 监控文件操作
+// Monitor file operations
 debugServer.getHook('ON_RELEASE')?.readHook('debug', (context) => {
-  console.log('文件操作完成:', context);
+  console.log('File operation completed:', context);
 });
 ```
 

@@ -1,58 +1,58 @@
 # @testring/pluggable-module
 
-可插拔模块系统，为 testring 框架提供了强大的插件机制。通过 Hook（钩子）系统，允许外部插件在核心功能的关键节点注入自定义逻辑，实现框架的灵活扩展。
+Pluggable module system that provides powerful plugin mechanisms for the testring framework. Through the Hook system, external plugins can inject custom logic at key points of core functionality, enabling flexible framework extension.
 
 [![npm version](https://badge.fury.io/js/@testring/pluggable-module.svg)](https://www.npmjs.com/package/@testring/pluggable-module)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## 功能概述
+## Feature Overview
 
-该模块是 testring 框架插件系统的核心基础，提供了：
-- 基于事件的插件钩子机制
-- 灵活的生命周期管理
-- 异步插件执行支持
-- 完善的错误处理机制
-- 数据修改和只读钩子支持
+This module is the core foundation of the testring framework's plugin system, providing:
+- Event-based plugin hook mechanisms
+- Flexible lifecycle management
+- Asynchronous plugin execution support
+- Comprehensive error handling mechanisms
+- Data modification and read-only hook support
 
-## 主要特性
+## Key Features
 
-### 事件驱动架构
-- 基于 Hook 的事件系统
-- 支持多个插件同时注册
-- 按顺序执行插件逻辑
-- 异步操作支持
+### Event-Driven Architecture
+- Hook-based event system
+- Support for multiple plugins registering simultaneously
+- Sequential plugin logic execution
+- Asynchronous operation support
 
-### 灵活的钩子类型
-- **Write Hook** - 可修改数据的钩子
-- **Read Hook** - 只读监听钩子
-- 支持链式数据处理
-- 完整的错误传播
+### Flexible Hook Types
+- **Write Hook** - Hooks that can modify data
+- **Read Hook** - Read-only monitoring hooks
+- Support for chained data processing
+- Complete error propagation
 
-### 完善的错误处理
-- 插件级别的错误隔离
-- 详细的错误信息提供
-- 错误堆栈保留
-- 优雅的故障处理
+### Comprehensive Error Handling
+- Plugin-level error isolation
+- Detailed error information provision
+- Error stack preservation
+- Graceful failure handling
 
-## 核心概念
+## Core Concepts
 
-### Hook（钩子）
-Hook 是插件系统的核心概念，代表一个可以注册回调函数的事件点：
+### Hook
+Hook is the core concept of the plugin system, representing an event point where callback functions can be registered:
 
 ```typescript
-// Write Hook - 可以修改传入的数据
+// Write Hook - Can modify incoming data
 hook.writeHook('myPlugin', (data) => {
   return modifiedData;
 });
 
-// Read Hook - 只读访问数据
+// Read Hook - Read-only data access
 hook.readHook('myPlugin', (data) => {
-  console.log('处理数据:', data);
+  console.log('Processing data:', data);
 });
 ```
 
-### PluggableModule（可插拔模块）
-PluggableModule 是可插拔功能的基类，内部维护一组命名的 Hook：
+### PluggableModule
+PluggableModule is the base class for pluggable functionality, internally maintaining a set of named Hooks:
 
 ```typescript
 class MyModule extends PluggableModule {
@@ -61,30 +61,30 @@ class MyModule extends PluggableModule {
   }
 
   async doSomething() {
-    // 在关键节点调用钩子
+    // Call hooks at key points
     await this.callHook('beforeStart');
-    // 核心逻辑...
+    // Core logic...
     await this.callHook('afterStart');
   }
 }
 ```
 
-## 安装
+## Installation
 
 ```bash
 npm install @testring/pluggable-module
 ```
 
-## 基本用法
+## Basic Usage
 
-### 创建可插拔模块
+### Creating Pluggable Modules
 
 ```typescript
 import { PluggableModule } from '@testring/pluggable-module';
 
 class FileProcessor extends PluggableModule {
   constructor() {
-    // 定义钩子名称
+    // Define hook names
     super([
       'beforeRead',
       'afterRead', 
@@ -94,71 +94,71 @@ class FileProcessor extends PluggableModule {
   }
 
   async readFile(filePath: string) {
-    // 读取前钩子
+    // Pre-read hook
     const processedPath = await this.callHook('beforeRead', filePath);
     
-    // 核心逻辑：读取文件
+    // Core logic: read file
     const content = await fs.readFile(processedPath, 'utf8');
     
-    // 读取后钩子
+    // Post-read hook
     const processedContent = await this.callHook('afterRead', content, filePath);
     
     return processedContent;
   }
 
   async writeFile(filePath: string, content: string) {
-    // 写入前钩子
+    // Pre-write hook
     const { path, data } = await this.callHook('beforeWrite', {
       path: filePath,
       content: content
     });
     
-    // 核心逻辑：写入文件
+    // Core logic: write file
     await fs.writeFile(path, data);
     
-    // 写入后钩子
+    // Post-write hook
     await this.callHook('afterWrite', path, data);
   }
 }
 ```
 
-### 注册插件
+### Registering Plugins
 
 ```typescript
 const fileProcessor = new FileProcessor();
 
-// 获取钩子并注册插件
+// Get hooks and register plugins
 const beforeReadHook = fileProcessor.getHook('beforeRead');
 const afterReadHook = fileProcessor.getHook('afterRead');
 
-// 路径预处理插件
+// Path preprocessing plugin
 beforeReadHook?.writeHook('pathNormalizer', (filePath) => {
   return path.resolve(filePath);
 });
 
-// 内容缓存插件
+// Content caching plugin
 afterReadHook?.writeHook('contentCache', (content, filePath) => {
   cache.set(filePath, content);
   return content;
 });
 
-// 日志记录插件
+// Logging plugin
 afterReadHook?.readHook('logger', (content, filePath) => {
-  console.log(`已读取文件: ${filePath}, 大小: ${content.length}`);
+  console.log(`File read: ${filePath}, size: ${content.length}`);
 });
 ```
 
-## Hook 类型详解
+## Hook Types Explained
 
-### Write Hook（写入钩子）
-Write Hook 可以修改传递的数据，支持链式处理：
+### Write Hook
+Write Hook can modify passed data and supports chained processing:
 
 ```typescript
 import { Hook } from '@testring/pluggable-module';
 
 const hook = new Hook();
 
-// 注册多个 Write Hook
+// Register multiple Write Hooks
 hook.writeHook('plugin1', (data) => {
   return { ...data, processed: true };
 });
@@ -171,26 +171,26 @@ hook.writeHook('plugin3', (data) => {
   return { ...data, id: generateId() };
 });
 
-// 调用钩子 - 数据会按顺序被每个插件处理
+// Call hooks - data will be processed by each plugin in sequence
 const result = await hook.callHooks({ message: 'hello' });
-// 结果: { message: 'hello', processed: true, timestamp: 1234567890, id: 'abc123' }
+// Result: { message: 'hello', processed: true, timestamp: 1234567890, id: 'abc123' }
 ```
 
-### Read Hook（读取钩子）
-Read Hook 只能读取数据，不能修改，适用于监听和日志记录：
+### Read Hook
+Read Hook can only read data, cannot modify, suitable for monitoring and logging:
 
 ```typescript
 const hook = new Hook();
 
-// 注册读取钩子
+// Register read hooks
 hook.readHook('monitor', (data) => {
   metrics.increment('data.processed');
-  console.log('处理数据:', data);
+  console.log('Processing data:', data);
 });
 
 hook.readHook('validator', (data) => {
   if (!data.isValid) {
-    throw new Error('数据验证失败');
+    throw new Error('Data validation failed');
   }
 });
 
@@ -200,31 +200,31 @@ hook.readHook('notifier', (data) => {
   }
 });
 
-// 调用钩子
+// Call hooks
 await hook.callHooks(inputData);
 ```
 
-### 混合使用
-Write Hook 和 Read Hook 可以同时使用：
+### Mixed Usage
+Write Hook and Read Hook can be used together:
 
 ```typescript
 const hook = new Hook();
 
-// 先执行所有 Write Hook（修改数据）
+// Execute all Write Hooks first (modify data)
 hook.writeHook('transformer', (data) => transformData(data));
 hook.writeHook('validator', (data) => validateAndFix(data));
 
-// 再执行所有 Read Hook（只读访问）
+// Then execute all Read Hooks (read-only access)
 hook.readHook('logger', (data) => logData(data));
 hook.readHook('metrics', (data) => recordMetrics(data));
 
-// 执行顺序：writeHook1 -> writeHook2 -> readHook1 -> readHook2
+// Execution order: writeHook1 -> writeHook2 -> readHook1 -> readHook2
 const result = await hook.callHooks(originalData);
 ```
 
-## 高级用法
+## Advanced Usage
 
-### 复杂的数据处理流水线
+### Complex Data Processing Pipeline
 
 ```typescript
 class DataProcessor extends PluggableModule {
@@ -241,46 +241,46 @@ class DataProcessor extends PluggableModule {
 
   async processData(rawData: any) {
     try {
-      // 验证阶段
+      // Validation phase
       const validatedData = await this.callHook('beforeValidation', rawData);
       const validationResult = this.validate(validatedData);
       await this.callHook('afterValidation', validationResult);
 
-      // 转换阶段
+      // Transformation phase
       const preTransformData = await this.callHook('beforeTransform', validationResult);
       const transformedData = this.transform(preTransformData);
       const postTransformData = await this.callHook('afterTransform', transformedData);
 
-      // 保存阶段
+      // Save phase
       const preSaveData = await this.callHook('beforeSave', postTransformData);
       const savedData = await this.save(preSaveData);
       await this.callHook('afterSave', savedData);
 
       return savedData;
     } catch (error) {
-      console.error('数据处理失败:', error);
+      console.error('Data processing failed:', error);
       throw error;
     }
   }
 
   private validate(data: any) {
-    // 验证逻辑
+    // Validation logic
     return data;
   }
 
   private transform(data: any) {
-    // 转换逻辑
+    // Transformation logic
     return data;
   }
 
   private async save(data: any) {
-    // 保存逻辑
+    // Save logic
     return data;
   }
 }
 ```
 
-### 插件管理系统
+### Plugin Management System
 
 ```typescript
 class PluginManager {
@@ -321,17 +321,17 @@ class PluginManager {
 
   unregisterPlugin(name: string) {
     this.plugins.delete(name);
-    // 重新应用所有插件（实际实现中可以更精确地移除）
+    // Reapply all plugins (actual implementation can remove more precisely)
     this.reapplyAllPlugins();
   }
 
   private reapplyAllPlugins() {
-    // 清除所有钩子
+    // Clear all hooks
     for (const module of this.modules.values()) {
-      // 实际实现需要清除钩子的方法
+      // Actual implementation needs hook clearing methods
     }
     
-    // 重新应用所有插件
+    // Reapply all plugins
     for (const [name, plugin] of this.plugins) {
       this.applyPlugin(name, plugin);
     }
@@ -339,9 +339,9 @@ class PluginManager {
 }
 ```
 
-## 实际应用场景
+## Real-World Application Scenarios
 
-### 文件系统扩展
+### File System Extension
 
 ```typescript
 class FileSystem extends PluggableModule {
@@ -362,7 +362,7 @@ class FileSystem extends PluggableModule {
   }
 }
 
-// 插件：文件压缩
+// Plugin: File compression
 const compressionPlugin = {
   afterRead: {
     write: (content) => decompress(content)
@@ -375,7 +375,7 @@ const compressionPlugin = {
   }
 };
 
-// 插件：文件加密
+// Plugin: File encryption
 const encryptionPlugin = {
   afterRead: {
     write: (content) => decrypt(content)
@@ -388,18 +388,18 @@ const encryptionPlugin = {
   }
 };
 
-// 插件：访问日志
+// Plugin: Access logging
 const loggingPlugin = {
   afterRead: {
-    read: (content, path) => console.log(`读取文件: ${path}`)
+    read: (content, path) => console.log(`File read: ${path}`)
   },
   afterWrite: {
-    read: (path, content) => console.log(`写入文件: ${path}`)
+    read: (path, content) => console.log(`File written: ${path}`)
   }
 };
 ```
 
-### 测试执行扩展
+### Test Execution Extension
 
 ```typescript
 class TestRunner extends PluggableModule {
@@ -440,12 +440,12 @@ class TestRunner extends PluggableModule {
   }
 
   private async executeTest(test: Test) {
-    // 测试执行逻辑
+    // Test execution logic
     return { test, status: 'passed' };
   }
 }
 
-// 截图插件
+// Screenshot plugin
 const screenshotPlugin = {
   onTestFail: {
     read: async (test, error) => {
@@ -455,7 +455,7 @@ const screenshotPlugin = {
   }
 };
 
-// 性能监控插件
+// Performance monitoring plugin
 const performancePlugin = {
   beforeTest: {
     write: (test) => {
@@ -466,12 +466,12 @@ const performancePlugin = {
   afterTest: {
     read: (result) => {
       const duration = Date.now() - result.test.startTime;
-      console.log(`测试 ${result.test.name} 耗时: ${duration}ms`);
+      console.log(`Test ${result.test.name} duration: ${duration}ms`);
     }
   }
 };
 
-// 报告生成插件
+// Report generation plugin
 const reportPlugin = {
   afterSuite: {
     read: (testSuite) => {
@@ -482,9 +482,9 @@ const reportPlugin = {
 };
 ```
 
-## 错误处理
+## Error Handling
 
-### 插件错误隔离
+### Plugin Error Isolation
 
 ```typescript
 class RobustModule extends PluggableModule {
@@ -496,252 +496,177 @@ class RobustModule extends PluggableModule {
     try {
       return await this.callHook('process', data);
     } catch (error) {
-      console.error('插件执行失败:', error);
+      console.error('Plugin execution failed:', error);
       
-      // 根据错误类型决定处理策略
-      if (error.message.includes('Plugin')) {
-        // 插件错误，可以继续执行
-        console.warn('插件执行失败，使用默认处理');
-        return this.defaultProcess(data);
-      } else {
-        // 系统错误，需要中断
-        throw error;
-      }
+      // Provide fallback behavior
+      return this.fallbackProcess(data);
     }
   }
 
-  private defaultProcess(data: any) {
-    // 默认处理逻辑
-    return data;
+  private fallbackProcess(data: any) {
+    // Fallback processing logic
+    return { ...data, processed: false, error: true };
   }
 }
 ```
 
-### 错误恢复机制
+### Error Recovery Strategies
 
 ```typescript
 class ErrorRecoveryModule extends PluggableModule {
-  private errorCount = 0;
-  private maxErrors = 3;
-
   constructor() {
-    super(['transform']);
+    super(['process']);
   }
 
-  async transformWithRecovery(data: any) {
-    try {
-      const result = await this.callHook('transform', data);
-      this.errorCount = 0; // 重置错误计数
-      return result;
-    } catch (error) {
-      this.errorCount++;
-      
-      if (this.errorCount >= this.maxErrors) {
-        console.error('错误次数超限，停用插件系统');
-        return this.fallbackTransform(data);
+  async processWithRecovery(data: any) {
+    const maxRetries = 3;
+    let lastError: Error | null = null;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await this.callHook('process', data);
+      } catch (error) {
+        lastError = error as Error;
+        console.warn(`Attempt ${attempt} failed:`, error.message);
+        
+        if (attempt < maxRetries) {
+          // Wait before retry
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
       }
-      
-      console.warn(`插件错误 ${this.errorCount}/${this.maxErrors}:`, error);
-      return this.fallbackTransform(data);
     }
-  }
 
-  private fallbackTransform(data: any) {
-    // 备用处理逻辑
-    return data;
+    // All attempts failed
+    throw new Error(`All processing attempts failed. Last error: ${lastError?.message}`);
   }
 }
 ```
 
-## 性能优化
+## Performance Optimization
 
-### 异步并行执行
-
-```typescript
-class ParallelModule extends PluggableModule {
-  constructor() {
-    super(['parallelProcess']);
-  }
-
-  async processInParallel(items: any[]) {
-    // 并行处理多个项目
-    const promises = items.map(async (item) => {
-      return await this.callHook('parallelProcess', item);
-    });
-    
-    return await Promise.all(promises);
-  }
-}
-```
-
-### 插件缓存
+### Hook Execution Optimization
 
 ```typescript
-class CachedModule extends PluggableModule {
-  private cache = new Map();
+class OptimizedModule extends PluggableModule {
+  private hookCache = new Map<string, any>();
 
   constructor() {
-    super(['cachedProcess']);
+    super(['process']);
   }
 
   async processWithCache(data: any) {
-    const cacheKey = JSON.stringify(data);
+    const cacheKey = this.generateCacheKey(data);
     
-    if (this.cache.has(cacheKey)) {
-      return this.cache.get(cacheKey);
+    if (this.hookCache.has(cacheKey)) {
+      return this.hookCache.get(cacheKey);
     }
-    
-    const result = await this.callHook('cachedProcess', data);
-    this.cache.set(cacheKey, result);
+
+    const result = await this.callHook('process', data);
+    this.hookCache.set(cacheKey, result);
     
     return result;
   }
 
-  clearCache() {
-    this.cache.clear();
+  private generateCacheKey(data: any): string {
+    return JSON.stringify(data);
   }
 }
 ```
 
-## 调试和监控
-
-### 插件执行监控
+### Batch Processing
 
 ```typescript
-class MonitoredModule extends PluggableModule {
+class BatchProcessor extends PluggableModule {
   constructor() {
-    super(['monitored']);
+    super(['process']);
   }
 
-  async processWithMonitoring(data: any) {
-    const startTime = Date.now();
+  async processBatch(items: any[]) {
+    const results = [];
     
-    try {
-      const result = await this.callHook('monitored', data);
-      
-      const duration = Date.now() - startTime;
-      console.log(`插件执行完成，耗时: ${duration}ms`);
-      
-      return result;
-    } catch (error) {
-      const duration = Date.now() - startTime;
-      console.error(`插件执行失败，耗时: ${duration}ms`, error);
-      throw error;
-    }
-  }
-}
-```
-
-### 调试模式
-
-```typescript
-class DebuggableModule extends PluggableModule {
-  private debug: boolean;
-
-  constructor(debug = false) {
-    super(['debug']);
-    this.debug = debug;
-  }
-
-  protected async callHook<T = any>(name: string, ...args: any[]): Promise<T> {
-    if (this.debug) {
-      console.log(`[DEBUG] 调用钩子: ${name}`, args);
+    // Process items in batches
+    const batchSize = 10;
+    for (let i = 0; i < items.length; i += batchSize) {
+      const batch = items.slice(i, i + batchSize);
+      const batchResults = await Promise.all(
+        batch.map(item => this.callHook('process', item))
+      );
+      results.push(...batchResults);
     }
     
-    try {
-      const result = await super.callHook(name, ...args);
-      
-      if (this.debug) {
-        console.log(`[DEBUG] 钩子 ${name} 执行成功`, result);
-      }
-      
-      return result;
-    } catch (error) {
-      if (this.debug) {
-        console.error(`[DEBUG] 钩子 ${name} 执行失败:`, error);
-      }
-      throw error;
-    }
+    return results;
   }
 }
 ```
 
-## 最佳实践
+## Best Practices
 
-### 1. 钩子命名规范
-- 使用描述性的钩子名称
-- 遵循 `before/after` + `动作` 的命名模式
-- 保持命名一致性
+### 1. Hook Design
+- Use descriptive hook names that clearly indicate their purpose
+- Separate read and write operations appropriately
+- Design hooks to be composable and reusable
 
+### 2. Plugin Development
+- Keep plugins focused on single responsibilities
+- Implement proper error handling within plugins
+- Document plugin interfaces and expected behaviors
+
+### 3. Performance Considerations
+- Minimize synchronous operations in hooks
+- Use caching for expensive operations
+- Implement batch processing for large datasets
+
+### 4. Error Handling
+- Implement comprehensive error isolation
+- Provide meaningful error messages
+- Include fallback mechanisms for critical operations
+
+### 5. Testing
+- Test plugins in isolation
+- Mock dependencies appropriately
+- Verify hook execution order and data flow
+
+## Troubleshooting
+
+### Common Issues
+
+#### Hook Not Executing
 ```typescript
-// 好的命名
-['beforeRead', 'afterRead', 'beforeWrite', 'afterWrite']
-
-// 避免的命名
-['read1', 'read2', 'doSomething', 'hook1']
+// Check if hook is properly registered
+const hook = module.getHook('myHook');
+if (!hook) {
+  console.error('Hook "myHook" not found');
+}
 ```
 
-### 2. 错误处理策略
-- 总是提供错误恢复机制
-- 记录详细的错误信息
-- 避免插件错误影响核心功能
-
-### 3. 性能考虑
-- 避免在钩子中执行重计算
-- 使用缓存减少重复处理
-- 考虑异步并行执行
-
-### 4. 插件设计原则
-- 单一职责原则
-- 最小影响原则
-- 可配置性原则
-
-## 与 testring 框架集成
-
-在 testring 框架中，多个核心模块都继承自 PluggableModule：
-
+#### Plugin Order Issues
 ```typescript
-// fs-reader 模块
-class FSReader extends PluggableModule {
-  constructor() {
-    super(['beforeResolve', 'afterResolve']);
-  }
-}
-
-// logger 模块  
-class Logger extends PluggableModule {
-  constructor() {
-    super(['beforeLog', 'afterLog']);
-  }
-}
-
-// test-run-controller 模块
-class TestRunController extends PluggableModule {
-  constructor() {
-    super(['beforeRun', 'afterRun', 'onTestComplete']);
-  }
-}
+// Ensure plugins are registered in correct order
+hook.writeHook('plugin1', handler1);
+hook.writeHook('plugin2', handler2);
+// Execution order: plugin1 -> plugin2
 ```
 
-这样的设计使得整个框架具有高度的可扩展性。
-
-## 安装
-
-```bash
-npm install @testring/pluggable-module
+#### Memory Leaks
+```typescript
+// Clean up plugin references when no longer needed
+module.removeHook('myHook');
+// or
+pluginManager.unregisterPlugin('myPlugin');
 ```
 
-## 依赖
+## Dependencies
 
-- `@testring/types` - 类型定义
+- `@testring/logger` - Logging functionality
+- `@testring/types` - Type definitions
+- `@testring/utils` - Utility functions
 
-## 相关模块
+## Related Modules
 
-- `@testring/plugin-api` - 插件 API 接口
-- `@testring/fs-reader` - 文件系统读取器
-- `@testring/logger` - 日志系统
-- `@testring/test-run-controller` - 测试运行控制器
+- `@testring/plugin-api` - Plugin API management
+- `@testring/transport` - Inter-process communication
+- `@testring/cli-config` - Configuration management
 
-## 许可证
+## License
 
 MIT License

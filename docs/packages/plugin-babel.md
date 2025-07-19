@@ -195,14 +195,14 @@ const pluginAPI = new PluginAPI(/* configuration parameters */);
 registerBabelPluginWithConfig(pluginAPI);
 ```
 
-### TypeScript 支持配置
+### TypeScript Support Configuration
 
 ```typescript
-// TypeScript 项目的 Babel 配置
+// Babel configuration for TypeScript projects
 function registerBabelForTypeScript(pluginAPI: PluginAPI) {
   babelPlugin(pluginAPI, {
     presets: [
-      // TypeScript 预设
+      // TypeScript preset
       [
         '@babel/preset-typescript',
         {
@@ -211,7 +211,7 @@ function registerBabelForTypeScript(pluginAPI: PluginAPI) {
           onlyRemoveTypeImports: true
         }
       ],
-      // 环境预设
+      // Environment preset
       [
         '@babel/preset-env',
         {
@@ -225,7 +225,7 @@ function registerBabelForTypeScript(pluginAPI: PluginAPI) {
     ],
     
     plugins: [
-      // TypeScript 相关插件
+      // TypeScript related plugins
       ['@babel/plugin-proposal-decorators', { legacy: true }],
       ['@babel/plugin-proposal-class-properties', { loose: true }],
       '@babel/plugin-proposal-object-rest-spread',
@@ -235,16 +235,16 @@ function registerBabelForTypeScript(pluginAPI: PluginAPI) {
       '@babel/plugin-syntax-dynamic-import'
     ],
     
-    // TypeScript 文件扩展名
+    // TypeScript file extensions
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     
-    // 源码映射配置
+    // Source map configuration
     sourceMaps: 'inline',
     sourceRoot: process.cwd()
   });
 }
 
-// React + TypeScript 配置
+// React + TypeScript configuration
 function registerBabelForReactTypeScript(pluginAPI: PluginAPI) {
   babelPlugin(pluginAPI, {
     presets: [
@@ -252,7 +252,7 @@ function registerBabelForReactTypeScript(pluginAPI: PluginAPI) {
       [
         '@babel/preset-react',
         {
-          runtime: 'automatic', // 新的 JSX 转换
+          runtime: 'automatic', // New JSX transform
           development: process.env.NODE_ENV === 'development'
         }
       ],
@@ -268,17 +268,17 @@ function registerBabelForReactTypeScript(pluginAPI: PluginAPI) {
     ],
     
     plugins: [
-      // React 相关插件
+      // React related plugins
       '@babel/plugin-proposal-class-properties',
       '@babel/plugin-proposal-object-rest-spread',
       '@babel/plugin-syntax-dynamic-import',
       
-      // 开发环境热重载
+      // Development environment hot reload
       ...(process.env.NODE_ENV === 'development' ? [
         'react-hot-loader/babel'
       ] : []),
       
-      // 生产环境优化
+      // Production environment optimization
       ...(process.env.NODE_ENV === 'production' ? [
         'babel-plugin-transform-react-remove-prop-types',
         'babel-plugin-transform-react-constant-elements'
@@ -288,28 +288,28 @@ function registerBabelForReactTypeScript(pluginAPI: PluginAPI) {
 }
 ```
 
-## 高级配置和自定义
+## Advanced Configuration and Customization
 
-### 自定义插件开发
+### Custom Plugin Development
 
 ```typescript
-// 自定义 Babel 插件示例
+// Custom Babel plugin example
 function createCustomBabelPlugin() {
   return {
     name: 'custom-testring-plugin',
     visitor: {
-      // 转换测试相关的装饰器
+      // Transform test-related decorators
       Decorator(path: any) {
         if (path.node.expression.name === 'test') {
-          // 自定义转换逻辑
+          // Custom transformation logic
           path.node.expression.name = 'testTransformed';
         }
       },
       
-      // 处理异步函数
+      // Handle async functions
       FunctionDeclaration(path: any) {
         if (path.node.async && path.node.id?.name?.startsWith('test')) {
-          // 为测试函数添加错误处理
+          // Add error handling for test functions
           const body = path.node.body;
           body.body.unshift({
             type: 'ExpressionStatement',
@@ -329,13 +329,13 @@ function createCustomBabelPlugin() {
         }
       },
       
-      // 转换导入语句
+      // Transform import statements
       ImportDeclaration(path: any) {
         const source = path.node.source.value;
         
-        // 转换测试工具导入
+        // Transform test utility imports
         if (source.startsWith('@testring/')) {
-          // 添加运行时检查
+          // Add runtime checks
           console.log(`Loading testring module: ${source}`);
         }
       }
@@ -343,27 +343,27 @@ function createCustomBabelPlugin() {
   };
 }
 
-// 使用自定义插件
+// Use custom plugin
 function registerBabelWithCustomPlugin(pluginAPI: PluginAPI) {
   babelPlugin(pluginAPI, {
     plugins: [
-      // 内置插件
+      // Built-in plugins
       '@babel/plugin-transform-modules-commonjs',
       
-      // 自定义插件
+      // Custom plugin
       createCustomBabelPlugin(),
       
-      // 其他插件
+      // Other plugins
       '@babel/plugin-proposal-optional-chaining'
     ]
   });
 }
 ```
 
-### 条件编译和环境优化
+### Conditional Compilation and Environment Optimization
 
 ```typescript
-// 环境感知的 Babel 配置
+// Environment-aware Babel configuration
 class BabelConfigManager {
   private environment: string;
   private projectRoot: string;
@@ -373,7 +373,7 @@ class BabelConfigManager {
     this.projectRoot = process.cwd();
   }
   
-  // 获取基础配置
+  // Get base configuration
   getBaseConfig(): any {
     return {
       sourceRoot: this.projectRoot,
@@ -385,7 +385,7 @@ class BabelConfigManager {
     };
   }
   
-  // 获取插件列表
+  // Get plugin list
   getPlugins(): any[] {
     const basePlugins = [
       ['@babel/plugin-transform-modules-commonjs', { strictMode: false }],
@@ -423,11 +423,11 @@ class BabelConfigManager {
     ];
   }
   
-  // 获取预设列表
+  // Get preset list
   getPresets(): any[] {
     const basePresets = [];
     
-    // TypeScript 支持
+    // TypeScript support
     if (this.hasTypeScript()) {
       basePresets.push([
         '@babel/preset-typescript',
@@ -438,7 +438,7 @@ class BabelConfigManager {
       ]);
     }
     
-    // 环境预设
+    // Environment preset
     basePresets.push([
       '@babel/preset-env',
       {
@@ -452,7 +452,7 @@ class BabelConfigManager {
     return basePresets;
   }
   
-  // 获取目标环境
+  // Get target environment
   private getTargets(): any {
     const targets = {
       development: { node: 'current' },
@@ -466,7 +466,7 @@ class BabelConfigManager {
     return targets[this.environment] || targets.development;
   }
   
-  // 检查 TypeScript 支持
+  // Check TypeScript support
   private hasTypeScript(): boolean {
     try {
       require.resolve('typescript');
@@ -476,7 +476,7 @@ class BabelConfigManager {
     }
   }
   
-  // 生成完整配置
+  // Generate complete configuration
   generateConfig(): any {
     return {
       ...this.getBaseConfig(),
@@ -486,33 +486,33 @@ class BabelConfigManager {
   }
 }
 
-// 使用配置管理器
+// Use configuration manager
 function registerBabelWithManager(pluginAPI: PluginAPI, environment?: string) {
   const configManager = new BabelConfigManager(environment);
   const config = configManager.generateConfig();
   
-  console.log('Babel 配置:', JSON.stringify(config, null, 2));
+  console.log('Babel configuration:', JSON.stringify(config, null, 2));
   
   babelPlugin(pluginAPI, config);
 }
 
-// 在不同环境中使用
+// Use in different environments
 registerBabelWithManager(pluginAPI, 'development');
 registerBabelWithManager(pluginAPI, 'test');
 registerBabelWithManager(pluginAPI, 'production');
 ```
 
-### 代码覆盖率和分析
+### Code Coverage and Analysis
 
 ```typescript
-// 代码覆盖率配置
+// Code coverage configuration
 function registerBabelWithCoverage(pluginAPI: PluginAPI) {
   const coverageConfig = {
     plugins: [
-      // 基础转换插件
+      // Basic transformation plugins
       ['@babel/plugin-transform-modules-commonjs', { strictMode: false }],
       
-      // Istanbul 代码覆盖率插件
+      // Istanbul code coverage plugin
       [
         'babel-plugin-istanbul',
         {
@@ -536,15 +536,15 @@ function registerBabelWithCoverage(pluginAPI: PluginAPI) {
         }
       ],
       
-      // 源码映射支持
+      // Source map support
       'babel-plugin-source-map-support'
     ],
     
-    // 启用源码映射
+    // Enable source maps
     sourceMaps: 'both',
     sourceRoot: process.cwd(),
     
-    // 保留注释和调试信息
+    // Preserve comments and debug information
     comments: true,
     compact: false
   };
@@ -552,13 +552,13 @@ function registerBabelWithCoverage(pluginAPI: PluginAPI) {
   babelPlugin(pluginAPI, coverageConfig);
 }
 
-// 性能分析配置
+// Performance analysis configuration
 function registerBabelWithProfiling(pluginAPI: PluginAPI) {
   babelPlugin(pluginAPI, {
     plugins: [
       ['@babel/plugin-transform-modules-commonjs', { strictMode: false }],
       
-      // 性能分析插件
+      // Performance analysis plugin
       [
         'babel-plugin-transform-function-profiling',
         {
@@ -567,26 +567,26 @@ function registerBabelWithProfiling(pluginAPI: PluginAPI) {
         }
       ],
       
-      // 内存使用分析
+      // Memory usage analysis
       'babel-plugin-transform-memory-usage'
     ],
     
-    // 添加运行时检查
+    // Add runtime checks
     compact: false,
     comments: true
   });
 }
 ```
 
-## 集成和扩展
+## Integration and Extensions
 
-### 与测试工作器集成
+### Integration with Test Workers
 
 ```typescript
 import { PluginAPI } from '@testring/plugin-api';
 import babelPlugin from '@testring/plugin-babel';
 
-// 创建集成的测试环境
+// Create integrated test environment
 class TestEnvironmentWithBabel {
   private pluginAPI: PluginAPI;
   
@@ -596,7 +596,7 @@ class TestEnvironmentWithBabel {
   }
   
   private setupBabelCompilation() {
-    // 基础 Babel 配置
+    // Basic Babel configuration
     const babelConfig = {
       presets: [
         ['@babel/preset-env', {
@@ -616,33 +616,33 @@ class TestEnvironmentWithBabel {
       sourceRoot: process.cwd()
     };
     
-    // 注册 Babel 插件
+    // Register Babel plugin
     babelPlugin(this.pluginAPI, babelConfig);
     
-    // 监听编译事件
+    // Listen to compilation events
     this.setupCompilationHooks();
   }
   
   private setupCompilationHooks() {
     const testWorker = this.pluginAPI.getTestWorker();
     
-    // 编译前钩子
+    // Before compilation hook
     testWorker.beforeCompile((filename: string) => {
-      console.log(`开始编译: ${filename}`);
+      console.log(`Start compiling: ${filename}`);
     });
     
-    // 编译后钩子
+    // After compilation hook
     testWorker.afterCompile((filename: string, code: string) => {
-      console.log(`编译完成: ${filename}, 代码长度: ${code.length}`);
+      console.log(`Compilation finished: ${filename}, code length: ${code.length}`);
     });
     
-    // 编译错误钩子
+    // Compilation error hook
     testWorker.onCompileError((filename: string, error: Error) => {
-      console.error(`编译失败: ${filename}`, error);
+      console.error(`Compilation failed: ${filename}`, error);
     });
   }
   
-  // 动态编译代码
+  // Dynamically compile code
   async compileCode(code: string, filename: string): Promise<string> {
     const testWorker = this.pluginAPI.getTestWorker();
     
@@ -650,12 +650,12 @@ class TestEnvironmentWithBabel {
       const compiledCode = await testWorker.compile(code, filename);
       return compiledCode;
     } catch (error) {
-      console.error(`代码编译失败: ${filename}`, error);
+      console.error(`Code compilation failed: ${filename}`, error);
       throw error;
     }
   }
   
-  // 编译文件
+  // Compile file
   async compileFile(filepath: string): Promise<string> {
     const fs = require('fs').promises;
     const code = await fs.readFile(filepath, 'utf-8');
@@ -663,7 +663,7 @@ class TestEnvironmentWithBabel {
     return this.compileCode(code, filepath);
   }
   
-  // 批量编译
+  // Batch compile
   async compileFiles(filepaths: string[]): Promise<Map<string, string>> {
     const results = new Map<string, string>();
     
@@ -672,7 +672,7 @@ class TestEnvironmentWithBabel {
         const compiledCode = await this.compileFile(filepath);
         results.set(filepath, compiledCode);
       } catch (error) {
-        console.error(`批量编译失败: ${filepath}`, error);
+        console.error(`Batch compilation failed: ${filepath}`, error);
         results.set(filepath, '');
       }
     }));
@@ -681,16 +681,16 @@ class TestEnvironmentWithBabel {
   }
 }
 
-// 使用示例
-const pluginAPI = new PluginAPI(/* 配置 */);
+// Usage example
+const pluginAPI = new PluginAPI(/* configuration */);
 const testEnv = new TestEnvironmentWithBabel(pluginAPI);
 
-// 编译单个文件
+// Compile a single file
 testEnv.compileFile('./src/test/example.test.ts')
-  .then(code => console.log('编译结果:', code))
-  .catch(error => console.error('编译错误:', error));
+  .then(code => console.log('Compilation result:', code))
+  .catch(error => console.error('Compilation error:', error));
 
-// 批量编译
+// Batch compile
 const testFiles = [
   './src/test/unit.test.ts',
   './src/test/integration.test.ts',
@@ -699,17 +699,17 @@ const testFiles = [
 
 testEnv.compileFiles(testFiles)
   .then(results => {
-    console.log('批量编译完成:');
+    console.log('Batch compilation finished:');
     results.forEach((code, filepath) => {
-      console.log(`${filepath}: ${code.length} 字符`);
+      console.log(`${filepath}: ${code.length} characters`);
     });
   });
 ```
 
-### Webpack 集成
+### Webpack Integration
 
 ```typescript
-// 与 Webpack 集成的配置
+// Configuration for Webpack integration
 function createWebpackBabelConfig() {
   return {
     module: {
@@ -744,7 +744,7 @@ function createWebpackBabelConfig() {
   };
 }
 
-// 与 Jest 集成的配置
+// Configuration for Jest integration
 function createJestBabelConfig() {
   return {
     transform: {
@@ -766,86 +766,86 @@ function createJestBabelConfig() {
 }
 ```
 
-## 最佳实践
+## Best Practices
 
-### 1. 配置管理
-- 使用环境变量区分不同构建环境
-- 建立清晰的插件优先级和依赖关系
-- 实现配置的版本控制和变更追踪
-- 提供默认配置和自定义配置的良好平衡
+### 1. Configuration Management
+- Use environment variables to distinguish different build environments
+- Establish clear plugin priorities and dependencies
+- Implement configuration version control and change tracking
+- Provide good balance between default and custom configurations
 
-### 2. 性能优化
-- 启用 Babel 缓存以提高重复编译速度
-- 合理选择插件和预设避免不必要的转换
-- 使用并行编译处理大量文件
-- 监控编译时间和内存使用情况
+### 2. Performance Optimization
+- Enable Babel cache to improve repeated compilation speed
+- Reasonably select plugins and presets to avoid unnecessary transformations
+- Use parallel compilation to process large numbers of files
+- Monitor compilation time and memory usage
 
-### 3. 错误处理
-- 提供详细的编译错误信息和位置
-- 实现友好的错误恢复和重试机制
-- 记录编译过程中的警告和提示
-- 建立错误分类和常见问题解决方案
+### 3. Error Handling
+- Provide detailed compilation error information and locations
+- Implement friendly error recovery and retry mechanisms
+- Log warnings and hints during compilation process
+- Establish error classification and common problem solutions
 
-### 4. 调试支持
-- 保持准确的源码映射信息
-- 在开发环境中保留注释和调试信息
-- 提供编译过程的详细日志
-- 支持断点调试和源码查看
+### 4. Debug Support
+- Maintain accurate source map information
+- Preserve comments and debug information in development environments
+- Provide detailed logs of compilation process
+- Support breakpoint debugging and source code viewing
 
-### 5. 兼容性
-- 确保与不同版本 Babel 的兼容性
-- 处理不同 JavaScript 版本的语法差异
-- 支持主流的构建工具和测试框架
-- 提供平滑的升级路径和迁移指南
+### 5. Compatibility
+- Ensure compatibility with different versions of Babel
+- Handle syntax differences between different JavaScript versions
+- Support mainstream build tools and testing frameworks
+- Provide smooth upgrade paths and migration guides
 
-## 故障排除
+## Troubleshooting
 
-### 常见问题
+### Common Issues
 
-#### 编译失败
+#### Compilation Failure
 ```bash
 SyntaxError: Unexpected token
 ```
-解决方案：检查 Babel 配置、插件版本、语法支持。
+Solution: Check Babel configuration, plugin versions, syntax support.
 
-#### 模块导入错误
+#### Module Import Error
 ```bash
 Error: Cannot resolve module
 ```
-解决方案：检查模块转换配置、路径解析、文件扩展名。
+Solution: Check module transformation configuration, path resolution, file extensions.
 
-#### 源码映射问题
+#### Source Map Issues
 ```bash
 Source map error
 ```
-解决方案：检查源码映射配置、文件路径、编译选项。
+Solution: Check source map configuration, file paths, compilation options.
 
-#### 性能问题
+#### Performance Issues
 ```bash
 Babel compilation is slow
 ```
-解决方案：启用缓存、优化插件配置、并行处理。
+Solution: Enable caching, optimize plugin configuration, parallel processing.
 
-### 调试技巧
+### Debugging Tips
 
 ```typescript
-// 启用详细日志
+// Enable detailed logging
 process.env.BABEL_ENV = 'debug';
 
-// 检查 Babel 配置
+// Check Babel configuration
 babelPlugin(pluginAPI, {
   ...config,
-  // 输出详细信息
+  // Output detailed information
   verbose: true,
-  // 保留中间结果
+  // Preserve intermediate results
   auxiliaryCommentBefore: '/* Babel compiled */',
   auxiliaryCommentAfter: '/* End Babel */',
 });
 
-// 监控编译性能
+// Monitor compilation performance
 const startTime = Date.now();
 babelPlugin(pluginAPI, config);
-console.log(`Babel 插件注册耗时: ${Date.now() - startTime}ms`);
+console.log(`Babel plugin registration time: ${Date.now() - startTime}ms`);
 ```
 
 ## API Reference

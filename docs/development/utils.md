@@ -132,69 +132,69 @@ function checkDependencies(deps) {
 }
 ```
 
-**使用示例：**
+**Usage Example:**
 ```bash
-# 检查当前包的版本
+# Check current package versions
 node ../utils/check-packages-versions.js
 
-# 检查失败时会输出问题依赖
+# Will output problematic dependencies on failure
 @types/node@^14.0.0
 lodash@~4.17.0
 ```
 
-**集成到 CI/CD：**
+**Integration with CI/CD:**
 ```yaml
-# GitHub Actions 示例
+# GitHub Actions example
 - name: Check package versions
   run: node utils/check-packages-versions.js
 ```
 
-### cleanup.js - 构建产物清理脚本
+### cleanup.js - Build Artifact Cleanup Script
 
-清理项目的构建产物、依赖文件和临时文件，重置项目到干净状态。
+Cleans build artifacts, dependency files, and temporary files from the project, resetting it to a clean state.
 
-**功能特性：**
-- 清理 `node_modules` 目录
-- 清理 `dist` 构建产物目录
-- 清理 `package-lock.json` 锁定文件
-- 使用 rimraf 确保跨平台兼容性
-- 安全的文件系统操作和错误处理
+**Features:**
+- Clean `node_modules` directory
+- Clean `dist` build artifacts directory
+- Clean `package-lock.json` lock file
+- Use rimraf for cross-platform compatibility
+- Safe file system operations and error handling
 
-**清理逻辑：**
+**Cleanup Logic:**
 ```javascript
 const NODE_MODULES_PATH = path.resolve('./node_modules');
 const DIST_DIRECTORY = path.resolve('./dist');
 const PACKAGE_LOCK = path.resolve('./package-lock.json');
 
-// 安全清理文件和目录
+// Safely clean files and directories
 if (fs.existsSync(NODE_MODULES_PATH)) {
     rimraf.sync(NODE_MODULES_PATH);
 }
 ```
 
-**使用场景：**
+**Usage Scenarios:**
 ```bash
-# 清理当前包
+# Clean current package
 node ../utils/cleanup.js
 
-# 清理所有包（在根目录）
+# Clean all packages (in root directory)
 lerna exec -- node ../utils/cleanup.js
 
-# 重置整个项目
+# Reset entire project
 npm run cleanup && npm install
 ```
 
-### generate-readme.js - README 生成脚本
+### generate-readme.js - README Generation Script
 
-根据 package.json 信息自动生成标准化的 README.md 文件。
+Automatically generates standardized README.md files based on package.json information.
 
-**功能特性：**
-- 基于 package.json 的 name 和 description 自动生成
-- 标准化的 README 结构和格式
-- 支持 npm 和 yarn 安装命令
-- 仅在 README 不存在时生成，避免覆盖现有文档
+**Features:**
+- Auto-generate based on package.json name and description
+- Standardized README structure and format
+- Support for npm and yarn installation commands
+- Only generate when README doesn't exist, avoiding overwriting existing documentation
 
-**生成模板：**
+**Generation Template:**
 ```javascript
 const content = `
 # \`${pkg.name}\`
@@ -249,39 +249,39 @@ async function task(pkg) {
 
 **Usage Example:**
 ```bash
-# 发布所有包
+# Publish all packages
 NPM_TOKEN=your_token node utils/publish.js
 
-# 排除特定包
+# Exclude specific packages
 node utils/publish.js --exclude=@testring/example,@testring/test
 
-# 在 CI/CD 中使用
+# Use in CI/CD
 npm run publish:ci
 ```
 
-## 高级用法和最佳实践
+## Advanced Usage and Best Practices
 
-### 完整的项目初始化流程
+### Complete Project Initialization Process
 
 ```bash
-# 1. 创建新包目录
+# 1. Create new package directory
 mkdir packages/new-package
 cd packages/new-package
 
-# 2. 初始化 package.json
+# 2. Initialize package.json
 npm init -y
 
-# 3. 添加标准文件
+# 3. Add standard files
 node ../../utils/add-package-files.js
 
-# 4. 生成 README
+# 4. Generate README
 node ../../utils/generate-readme.js
 
-# 5. 检查版本规范
+# 5. Check version specifications
 node ../../utils/check-packages-versions.js
 ```
 
-### 自动化的 CI/CD 集成
+### Automated CI/CD Integration
 
 ```yaml
 # .github/workflows/ci.yml
@@ -335,41 +335,41 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```
 
-### 批量操作和脚本组合
+### Batch Operations and Script Combinations
 
 ```bash
-# 完整的重置和重建流程
+# Complete reset and rebuild process
 #!/bin/bash
 
-echo "开始项目重置..."
+echo "Starting project reset..."
 
-# 1. 清理所有包
-echo "清理构建产物..."
+# 1. Clean all packages
+echo "Cleaning build artifacts..."
 lerna exec -- node ../utils/cleanup.js
 
-# 2. 重新安装依赖
-echo "重新安装依赖..."
+# 2. Reinstall dependencies
+echo "Reinstalling dependencies..."
 npm install
 
-# 3. 检查版本规范
-echo "检查包版本..."
+# 3. Check package versions
+echo "Checking package versions..."
 lerna exec -- node ../utils/check-packages-versions.js
 
-# 4. 重新构建
-echo "重新构建..."
+# 4. Rebuild
+echo "Rebuilding..."
 npm run build
 
-# 5. 运行测试
-echo "运行测试..."
+# 5. Run tests
+echo "Running tests..."
 npm test
 
-echo "项目重置完成！"
+echo "Project reset completed!"
 ```
 
-### 自定义模板管理
+### Custom Template Management
 
 ```javascript
-// 扩展 add-package-files.js 支持更多模板
+// Extend add-package-files.js to support more templates
 const CUSTOM_TEMPLATES = {
     'jest.config.js': 'jest.config.template.js',
     'webpack.config.js': 'webpack.config.template.js',
@@ -392,74 +392,74 @@ function createCustomFile(templateName, outputName) {
 }
 ```
 
-### 高级发布策略
+### Advanced Publishing Strategy
 
 ```javascript
-// 自定义发布过滤器
+// Custom publish filter
 function shouldPublishPackage(pkg) {
-    // 跳过私有包
+    // Skip private packages
     if (pkg.private) return false;
     
-    // 跳过示例包
+    // Skip example packages
     if (pkg.name.includes('example')) return false;
     
-    // 跳过测试包
+    // Skip test packages
     if (pkg.name.includes('test')) return false;
     
-    // 检查是否有更新
+    // Check for changes
     return hasChanges(pkg);
 }
 
-// 条件发布
+// Conditional publishing
 async function conditionalPublish() {
     const packages = await getPackages(__dirname);
     const filteredPackages = packages.filter(shouldPublishPackage);
     
-    console.log(`准备发布 ${filteredPackages.length} 个包`);
+    console.log(`Preparing to publish ${filteredPackages.length} packages`);
     
     for (const pkg of filteredPackages) {
         try {
             await publishPackage(pkg);
-            console.log(`✓ 发布成功: ${pkg.name}`);
+            console.log(`✓ Published successfully: ${pkg.name}`);
         } catch (error) {
-            console.error(`✗ 发布失败: ${pkg.name}`, error.message);
+            console.error(`✗ Publish failed: ${pkg.name}`, error.message);
         }
     }
 }
 ```
 
-## 开发和维护指南
+## Development and Maintenance Guide
 
-### 添加新的工具脚本
+### Adding New Utility Scripts
 
 ```javascript
 #!/usr/bin/env node
 
-// 标准的脚本结构
+// Standard script structure
 const fs = require('fs');
 const path = require('path');
 
-// 1. 参数解析
+// 1. Argument parsing
 const args = process.argv.slice(2);
 const options = parseArguments(args);
 
-// 2. 主要功能实现
+// 2. Main functionality implementation
 async function main() {
     try {
-        // 实现核心逻辑
+        // Implement core logic
         await performTask(options);
         
-        // 成功输出
-        console.log('任务完成！');
+        // Success output
+        console.log('Task completed!');
         process.exit(0);
     } catch (error) {
-        // 错误处理
-        console.error('任务失败:', error.message);
+        // Error handling
+        console.error('Task failed:', error.message);
         process.exit(1);
     }
 }
 
-// 3. 参数解析函数
+// 3. Argument parsing function
 function parseArguments(args) {
     const options = {};
     
@@ -475,14 +475,14 @@ function parseArguments(args) {
     return options;
 }
 
-// 4. 执行主函数
+// 4. Execute main function
 main().catch(console.error);
 ```
 
-### 模板文件管理
+### Template File Management
 
 ```javascript
-// templates/manager.js - 模板管理器
+// templates/manager.js - Template manager
 class TemplateManager {
     constructor(templatesDir) {
         this.templatesDir = templatesDir;
@@ -511,7 +511,7 @@ class TemplateManager {
         
         let content = fs.readFileSync(templatePath, 'utf8');
         
-        // 替换变量
+        // Replace variables
         Object.keys(variables).forEach(key => {
             const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
             content = content.replace(regex, variables[key]);
@@ -522,10 +522,10 @@ class TemplateManager {
 }
 ```
 
-### 错误处理和日志记录
+### Error Handling and Logging
 
 ```javascript
-// utils/logger.js - 统一的日志记录
+// utils/logger.js - Unified logging
 class Logger {
     constructor(name) {
         this.name = name;
@@ -548,74 +548,74 @@ class Logger {
     }
 }
 
-// 使用示例
+// Usage example
 const logger = new Logger('PublishScript');
 
 try {
     await publishPackage(pkg);
-    logger.success(`发布成功: ${pkg.name}`);
+    logger.success(`Published successfully: ${pkg.name}`);
 } catch (error) {
-    logger.error(`发布失败: ${pkg.name}`, error.message);
+    logger.error(`Publish failed: ${pkg.name}`, error.message);
     throw error;
 }
 ```
 
-## 故障排除
+## Troubleshooting
 
-### 常见问题和解决方案
+### Common Issues and Solutions
 
-#### 1. 文件权限问题
+#### 1. File Permission Issues
 ```bash
 Error: EACCES: permission denied, open '/path/to/file'
 ```
-**解决方案：**
-- 检查文件和目录权限
-- 使用 `sudo` 或修改文件权限
-- 确保运行用户有足够的权限
+**Solution:**
+- Check file and directory permissions
+- Use `sudo` or modify file permissions
+- Ensure the running user has sufficient permissions
 
-#### 2. 依赖版本冲突
+#### 2. Dependency Version Conflicts
 ```bash
 Found non-exact versions:
 @types/node@^14.0.0
 lodash@~4.17.0
 ```
-**解决方案：**
-- 使用精确版本号：`"@types/node": "14.18.0"`
-- 运行 `npm install --package-lock-only` 更新锁定文件
-- 检查 `package-lock.json` 确保版本一致
+**Solution:**
+- Use exact version numbers: `"@types/node": "14.18.0"`
+- Run `npm install --package-lock-only` to update lock file
+- Check `package-lock.json` to ensure version consistency
 
-#### 3. 发布失败
+#### 3. Publishing Failures
 ```bash
 npm ERR! 403 Forbidden - PUT https://registry.npmjs.org/@testring/package
 ```
-**解决方案：**
-- 检查 NPM_TOKEN 是否正确设置
-- 验证包名是否已被占用
-- 确认发布权限和组织设置
+**Solution:**
+- Check if NPM_TOKEN is correctly set
+- Verify if package name is already taken
+- Confirm publishing permissions and organization settings
 
-#### 4. 模板文件缺失
+#### 4. Missing Template Files
 ```bash
 Error: ENOENT: no such file or directory, open 'templates/tsconfig.json'
 ```
-**解决方案：**
-- 确保 templates 目录存在
-- 检查模板文件是否完整
-- 验证路径解析是否正确
+**Solution:**
+- Ensure templates directory exists
+- Check if template files are complete
+- Verify path resolution is correct
 
-#### 5. 清理脚本执行失败
+#### 5. Cleanup Script Execution Failures
 ```bash
 Error: Cannot find module 'rimraf'
 ```
-**解决方案：**
-- 安装缺失的依赖：`npm install rimraf`
-- 检查 package.json 中的依赖声明
-- 确保在正确的目录中运行脚本
+**Solution:**
+- Install missing dependencies: `npm install rimraf`
+- Check dependency declarations in package.json
+- Ensure running scripts in correct directory
 
-### 调试技巧
+### Debugging Techniques
 
-#### 1. 启用详细输出
+#### 1. Enable Verbose Output
 ```javascript
-// 在脚本中添加调试信息
+// Add debug information to scripts
 const DEBUG = process.env.DEBUG || false;
 
 function debug(message, ...args) {
@@ -624,38 +624,38 @@ function debug(message, ...args) {
     }
 }
 
-// 使用
+// Usage
 debug('Processing package:', pkg.name);
 ```
 
-#### 2. 步骤追踪
+#### 2. Step Tracking
 ```javascript
-// 添加步骤追踪
+// Add step tracking
 let step = 0;
 function logStep(message) {
     console.log(`[${++step}] ${message}`);
 }
 
-logStep('开始清理构建产物');
-logStep('清理 node_modules');
-logStep('清理 dist 目录');
-logStep('清理完成');
+logStep('Start cleaning build artifacts');
+logStep('Clean node_modules');
+logStep('Clean dist directory');
+logStep('Cleanup completed');
 ```
 
-#### 3. 错误上下文
+#### 3. Error Context
 ```javascript
-// 增强错误信息
+// Enhanced error information
 function enhancedError(message, context = {}) {
     const error = new Error(message);
     error.context = context;
     return error;
 }
 
-// 使用
+// Usage
 try {
     await publishPackage(pkg);
 } catch (error) {
-    throw enhancedError(`发布失败: ${pkg.name}`, {
+    throw enhancedError(`Publish failed: ${pkg.name}`, {
         packageName: pkg.name,
         packagePath: pkg.location,
         originalError: error.message
@@ -663,26 +663,26 @@ try {
 }
 ```
 
-## 性能优化
+## Performance Optimization
 
-### 1. 并行处理
+### 1. Parallel Processing
 ```javascript
-// 并行执行清理任务
+// Parallel cleanup task execution
 async function parallelCleanup(packages) {
     const tasks = packages.map(pkg => cleanupPackage(pkg));
     const results = await Promise.allSettled(tasks);
     
     results.forEach((result, index) => {
         if (result.status === 'rejected') {
-            console.error(`清理失败: ${packages[index].name}`, result.reason);
+            console.error(`Cleanup failed: ${packages[index].name}`, result.reason);
         }
     });
 }
 ```
 
-### 2. 缓存优化
+### 2. Cache Optimization
 ```javascript
-// 文件状态缓存
+// File status cache
 const fileCache = new Map();
 
 function isFileModified(filePath) {
@@ -702,9 +702,9 @@ function isFileModified(filePath) {
 }
 ```
 
-### 3. 增量操作
+### 3. Incremental Operations
 ```javascript
-// 只处理变更的包
+// Only process changed packages
 function getChangedPackages(packages) {
     return packages.filter(pkg => {
         const packageJsonPath = path.join(pkg.location, 'package.json');
@@ -713,11 +713,11 @@ function getChangedPackages(packages) {
 }
 ```
 
-## 集成和扩展
+## Integration and Extensions
 
-### 1. 与其他工具集成
+### 1. Integration with Other Tools
 ```javascript
-// 与 ESLint 集成
+// Integration with ESLint
 function runESLint(packagePath) {
     const { ESLint } = require('eslint');
     const eslint = new ESLint({
@@ -728,7 +728,7 @@ function runESLint(packagePath) {
     return eslint.lintFiles(['src/**/*.ts']);
 }
 
-// 与 Prettier 集成
+// Integration with Prettier
 function runPrettier(packagePath) {
     const prettier = require('prettier');
     const glob = require('glob');
@@ -747,9 +747,9 @@ function runPrettier(packagePath) {
 }
 ```
 
-### 2. 自定义钩子系统
+### 2. Custom Hook System
 ```javascript
-// 钩子系统
+// Hook system
 class HookSystem {
     constructor() {
         this.hooks = {};
@@ -771,65 +771,65 @@ class HookSystem {
     }
 }
 
-// 使用钩子
+// Use hooks
 const hooks = new HookSystem();
 
 hooks.addHook('before-publish', async (pkg) => {
-    console.log(`准备发布: ${pkg.name}`);
+    console.log(`Preparing to publish: ${pkg.name}`);
     await runTests(pkg);
 });
 
 hooks.addHook('after-publish', async (pkg) => {
-    console.log(`发布完成: ${pkg.name}`);
+    console.log(`Publish completed: ${pkg.name}`);
     await notifySlack(pkg);
 });
 ```
 
-## 最佳实践总结
+## Best Practices Summary
 
-### 1. 脚本开发原则
-- **单一职责**：每个脚本只负责一个特定的任务
-- **幂等性**：多次执行相同的脚本应该产生相同的结果
-- **错误处理**：提供清晰的错误信息和恢复机制
-- **日志记录**：记录详细的操作日志和状态信息
+### 1. Script Development Principles
+- **Single Responsibility**: Each script is responsible for only one specific task
+- **Idempotency**: Multiple executions of the same script should produce the same result
+- **Error Handling**: Provide clear error messages and recovery mechanisms
+- **Logging**: Record detailed operation logs and status information
 
-### 2. 版本管理
-- **精确版本**：使用精确的版本号而非范围版本
-- **锁定文件**：维护 package-lock.json 确保一致性
-- **依赖审查**：定期审查和更新依赖包
+### 2. Version Management
+- **Exact Versions**: Use exact version numbers instead of range versions
+- **Lock Files**: Maintain package-lock.json to ensure consistency
+- **Dependency Review**: Regularly review and update dependency packages
 
-### 3. 自动化流程
-- **CI/CD 集成**：将脚本集成到持续集成流程中
-- **自动化测试**：确保脚本的正确性和稳定性
-- **监控和告警**：监控脚本执行状态和性能
+### 3. Automation Workflows
+- **CI/CD Integration**: Integrate scripts into continuous integration workflows
+- **Automated Testing**: Ensure script correctness and stability
+- **Monitoring and Alerts**: Monitor script execution status and performance
 
-### 4. 安全考虑
-- **权限控制**：最小化脚本运行权限
-- **敏感信息**：使用环境变量管理敏感信息
-- **输入验证**：验证用户输入和参数
+### 4. Security Considerations
+- **Permission Control**: Minimize script execution permissions
+- **Sensitive Information**: Use environment variables to manage sensitive information
+- **Input Validation**: Validate user input and parameters
 
-### 5. 维护和文档
-- **代码注释**：提供清晰的代码注释和文档
-- **版本记录**：记录脚本的变更历史
-- **使用示例**：提供详细的使用示例和最佳实践
+### 5. Maintenance and Documentation
+- **Code Comments**: Provide clear code comments and documentation
+- **Version Records**: Record script change history
+- **Usage Examples**: Provide detailed usage examples and best practices
 
-## 相关资源
+## Related Resources
 
-### 依赖工具
-- **[Lerna](https://lerna.js.org/)** - 多包管理工具
-- **[npm-publish](https://www.npmjs.com/package/@jsdevtools/npm-publish)** - npm 发布工具
-- **[rimraf](https://www.npmjs.com/package/rimraf)** - 跨平台文件删除工具
+### Dependency Tools
+- **[Lerna](https://lerna.js.org/)** - Multi-package management tool
+- **[npm-publish](https://www.npmjs.com/package/@jsdevtools/npm-publish)** - npm publishing tool
+- **[rimraf](https://www.npmjs.com/package/rimraf)** - Cross-platform file deletion tool
 
-### 扩展阅读
-- **[Monorepo 最佳实践](https://monorepo.tools/)**
-- **[npm 发布指南](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry)**
-- **[CI/CD 集成模式](https://docs.github.com/en/actions)**
+### Further Reading
+- **[Monorepo Best Practices](https://monorepo.tools/)**
+- **[npm Publishing Guide](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry)**
+- **[CI/CD Integration Patterns](https://docs.github.com/en/actions)**
 
-### 社区资源
-- **[testring 项目主页](https://github.com/ringcentral/testring)**
-- **[问题反馈](https://github.com/ringcentral/testring/issues)**
-- **[贡献指南](https://github.com/ringcentral/testring/blob/master/CONTRIBUTING.md)**
+### Community Resources
+- **[testring Project Homepage](https://github.com/ringcentral/testring)**
+- **[Issue Feedback](https://github.com/ringcentral/testring/issues)**
+- **[Contribution Guide](https://github.com/ringcentral/testring/blob/master/CONTRIBUTING.md)**
 
-## 许可证
+## License
 
 MIT License 

@@ -1,52 +1,52 @@
-# Ubuntu 测试失败报告问题
+# Ubuntu Test Failure Reporting Issue
 
-## 问题描述
+## Problem Description
 
-在 Ubuntu 环境下运行 E2E 测试时，发现测试实际失败了（如断言错误），但在最终的整体报告中却显示为成功。这个问题只在 Ubuntu 下出现，其他操作系统（如 macOS、Windows）工作正常。
+When running E2E tests in Ubuntu environment, it was discovered that tests actually failed (such as assertion errors), but the final overall report showed them as successful. This issue only occurs in Ubuntu, while other operating systems (such as macOS, Windows) work normally.
 
-## 问题症状
+## Problem Symptoms
 
-1. 测试日志显示明确的失败信息：
+1. Test logs show clear failure information:
    ```
    1:40:17 PM | info | main | [step end] Test failed AssertionError: [assert] include(exp = "Success", inc = "Example")
    1:40:17 PM | error | main | [worker-controller] AssertionError: [assert] include(exp = "Success", inc = "Example")
    ```
 
-2. 但最终报告显示测试通过，没有反映失败状态
+2. But the final report shows tests as passed, not reflecting the failure status
 
-3. CI 流水线可能显示绿色（成功），尽管实际有测试失败
+3. CI pipeline may show green (success), despite actual test failures
 
-## 根本原因
+## Root Cause
 
-### 1. 进程错误传播问题
+### 1. Process Error Propagation Issue
 
-在 `packages/e2e-test-app/src/test-runner.ts` 中，子进程的错误处理不够健壮：
+In `packages/e2e-test-app/src/test-runner.ts`, the child process error handling is not robust enough:
 
 ```typescript
-// 原始代码问题
+// Original problematic code
 const testringProcess = childProcess.exec(
     `node ${testringFile} ${args.join(' ')}`,
     {},
     (error, _stdout, _stderr) => {
         mockWebServer.stop();
         if (error) {
-            throw error; // 这里抛出错误，但可能被忽略
+            throw error; // Error thrown here may be ignored
         }
     },
 );
 ```
 
-### 2. 平台特定的进程管理差异
+### 2. Platform-Specific Process Management Differences
 
-Ubuntu/Linux 下的进程管理和错误传播机制与其他操作系统存在差异，特别是在 CI 环境中。
+Process management and error propagation mechanisms in Ubuntu/Linux differ from other operating systems, especially in CI environments.
 
-### 3. 异步错误处理时序问题
+### 3. Asynchronous Error Handling Timing Issues
 
-错误处理回调和进程退出事件之间存在时序竞争，导致错误状态丢失。
+There are timing races between error handling callbacks and process exit events, causing error states to be lost.
 
-## 解决方案
+## Solution
 
-### 1. 改进 test-runner.ts 错误处理
+### 1. Improve test-runner.ts Error Handling
 
 ```typescript
 async function runTests() {
@@ -71,7 +71,7 @@ async function runTests() {
             },
         );
 
-        // 添加进程退出事件处理
+        // Add process exit event handling
         testringProcess.on('exit', (code, signal) => {
             console.log(`[test-runner] Process exited with code: ${code}, signal: ${signal}`);
             if (code !== 0 && code !== null) {
@@ -98,13 +98,13 @@ runTests().catch((error) => {
 });
 ```
 
-### 2. 改进 CLI 错误处理
+### 2. Improve CLI Error Handling
 
-在 `core/cli/src/commands/runCommand.ts` 中：
+In `core/cli/src/commands/runCommand.ts`:
 
 ```typescript
 if (testRunResult) {
-    this.logger.error('Founded errors:');
+    this.logger.error('Found errors:');
 
     testRunResult.forEach((error, index) => {
         this.logger.error(`Error ${index + 1}:`, error.message);
@@ -114,7 +114,7 @@ if (testRunResult) {
     const errorMessage = `Failed ${testRunResult.length}/${tests.length} tests.`;
     this.logger.error(errorMessage);
     
-    // 确保正确设置退出码
+    // Ensure correct exit code is set
     const error = new Error(errorMessage);
     (error as any).exitCode = 1;
     (error as any).testFailures = testRunResult.length;
@@ -124,12 +124,12 @@ if (testRunResult) {
 }
 ```
 
-### 3. 平台特定处理
+### 3. Platform-Specific Handling
 
-添加针对 Linux/Ubuntu 的特殊处理：
+Add special handling for Linux/Ubuntu:
 
 ```typescript
-// 在 Linux/Ubuntu CI 环境中更严格的错误检测
+// More strict error detection in Linux/Ubuntu CI environment
 if (isLinux && isCI) {
     if ((code !== 0 && code !== null) || signal) {
         const error = new Error(`Test process exited with non-zero code: ${code}, signal: ${signal}`);
@@ -142,29 +142,29 @@ if (isLinux && isCI) {
 }
 ```
 
-## 验证修复
+## Verification
 
-使用提供的测试脚本验证修复：
+Use the provided test script to verify the fix:
 
 ```bash
 node test-error-handling.js
 ```
 
-该脚本会：
-1. 运行已知会失败的测试
-2. 检查是否正确报告失败
-3. 验证改进的错误日志是否存在
+This script will:
+1. Run tests that are known to fail
+2. Check if failures are correctly reported
+3. Verify that improved error logs exist
 
-## 预防措施
+## Prevention Measures
 
-1. **监控 CI 日志**：定期检查 CI 日志，确保测试失败被正确报告
-2. **使用严格模式**：在 CI 环境中使用 `--bail` 参数，测试失败时立即停止
-3. **添加健康检查**：在 CI 流水线中添加额外的验证步骤
-4. **平台测试**：确保在所有目标平台上测试错误处理机制
+1. **Monitor CI Logs**: Regularly check CI logs to ensure test failures are correctly reported
+2. **Use Strict Mode**: Use `--bail` parameter in CI environment to stop immediately when tests fail
+3. **Add Health Checks**: Add additional validation steps in CI pipeline
+4. **Platform Testing**: Ensure error handling mechanisms are tested on all target platforms
 
-## 相关文件
+## Related Files
 
-- `packages/e2e-test-app/src/test-runner.ts` - 主要修复
-- `core/cli/src/commands/runCommand.ts` - CLI 错误处理改进
-- `core/cli/src/index.ts` - 主入口错误处理
-- `core/test-run-controller/src/test-run-controller.ts` - 测试控制器改进
+- `packages/e2e-test-app/src/test-runner.ts` - Main fix
+- `core/cli/src/commands/runCommand.ts` - CLI error handling improvements
+- `core/cli/src/index.ts` - Main entry error handling
+- `core/test-run-controller/src/test-run-controller.ts` - Test controller improvements

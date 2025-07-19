@@ -230,311 +230,311 @@ if (softErrors.length > 0) {
 }
 ```
 
-## 高级元素操作
+## Advanced Element Operations
 
-### 复杂交互操作
+### Complex Interaction Operations
 
 ```typescript
-// 双击元素
+// Double-click element
 await webApp.doubleClick(webApp.root.div.className('editable'));
 
-// 拖拽操作
+// Drag and drop operation
 const sourceElement = webApp.root.div.id('source');
 const targetElement = webApp.root.div.id('target');
 await webApp.dragAndDrop(sourceElement, targetElement);
 
-// 坐标点击
+// Coordinate click
 await webApp.clickCoordinates(webApp.root.canvas, {
   x: 'center',
   y: 'center'
 });
 
-// 移动到元素
-await webApp.moveToObject(webApp.root.button.text('提交'), 10, 10);
+// Move to element
+await webApp.moveToObject(webApp.root.button.text('Submit'), 10, 10);
 
-// 滚动到元素
+// Scroll to element
 await webApp.scrollIntoView(webApp.root.footer);
 ```
 
-### 表单操作
+### Form Operations
 
 ```typescript
-// 下拉框操作
+// Dropdown operations
 const selectElement = webApp.root.select.name('country');
 
-// 按值选择
+// Select by value
 await webApp.selectByValue(selectElement, 'CN');
 
-// 按可见文本选择
-await webApp.selectByVisibleText(selectElement, '中国');
+// Select by visible text
+await webApp.selectByVisibleText(selectElement, 'China');
 
-// 按索引选择
+// Select by index
 await webApp.selectByIndex(selectElement, 0);
 
-// 获取选中的文本
+// Get selected text
 const selectedText = await webApp.getSelectedText(selectElement);
 
-// 获取所有选项
+// Get all options
 const allOptions = await webApp.getSelectTexts(selectElement);
-console.log('所有选项:', allOptions);
+console.log('All options:', allOptions);
 
-// 复选框操作
+// Checkbox operations
 const checkbox = webApp.root.input.type('checkbox').name('agreement');
 await webApp.setChecked(checkbox, true);
 
-// 检查是否选中
+// Check if selected
 const isChecked = await webApp.isChecked(checkbox);
-console.log('复选框状态:', isChecked);
+console.log('Checkbox state:', isChecked);
 ```
 
-### 文件上传
+### File Upload
 
 ```typescript
-// 文件上传
+// File upload
 const fileInput = webApp.root.input.type('file');
 await webApp.uploadFile('/path/to/local/file.pdf');
 
-// 等待上传完成
+// Wait for upload completion
 await webApp.waitForVisible(webApp.root.div.className('upload-success'));
 ```
 
-## 等待和同步机制
+## Waiting and Synchronization Mechanisms
 
-### 基础等待方法
+### Basic Waiting Methods
 
 ```typescript
-// 等待元素存在
+// Wait for element to exist
 await webApp.waitForExist(
   webApp.root.div.className('loading'),
-  10000  // 超时时间
+  10000  // Timeout
 );
 
-// 等待元素可见
+// Wait for element to be visible
 await webApp.waitForVisible(
   webApp.root.modal.className('dialog'),
   5000
 );
 
-// 等待元素不可见
+// Wait for element to be invisible
 await webApp.waitForNotVisible(
   webApp.root.div.className('spinner'),
   15000
 );
 
-// 等待元素不存在
+// Wait for element to not exist
 await webApp.waitForNotExists(
   webApp.root.div.className('error-message'),
   3000
 );
 ```
 
-### 高级等待条件
+### Advanced Waiting Conditions
 
 ```typescript
-// 等待元素可点击
+// Wait for element to be clickable
 await webApp.waitForClickable(
-  webApp.root.button.text('提交'),
+  webApp.root.button.text('Submit'),
   8000
 );
 
-// 等待元素启用
+// Wait for element to be enabled
 await webApp.waitForEnabled(
   webApp.root.input.name('email'),
   5000
 );
 
-// 等待元素稳定（位置不变）
+// Wait for element to be stable (position unchanged)
 await webApp.waitForStable(
   webApp.root.div.className('animated'),
   10000
 );
 
-// 自定义条件等待
+// Custom condition waiting
 await webApp.waitUntil(
   async () => {
     const count = await webApp.getElementsCount(webApp.root.li.className('item'));
     return count >= 5;
   },
   10000,
-  '等待列表项数量达到5个失败'
+  'Failed to wait for list item count to reach 5'
 );
 ```
 
-### 状态检查方法
+### State Checking Methods
 
 ```typescript
-// 检查元素是否存在
-const exists = await webApp.isElementsExist(webApp.root.button.text('删除'));
+// Check if element exists
+const exists = await webApp.isElementsExist(webApp.root.button.text('Delete'));
 
-// 检查元素是否可见
+// Check if element is visible
 const visible = await webApp.isVisible(webApp.root.modal);
 
-// 检查元素是否启用
-const enabled = await webApp.isEnabled(webApp.root.button.text('提交'));
+// Check if element is enabled
+const enabled = await webApp.isEnabled(webApp.root.button.text('Submit'));
 
-// 检查元素是否只读
+// Check if element is read-only
 const readOnly = await webApp.isReadOnly(webApp.root.input.name('code'));
 
-// 检查元素是否可点击
+// Check if element is clickable
 const clickable = await webApp.isClickable(webApp.root.a.href('#'));
 
-// 检查元素是否聚焦
+// Check if element is focused
 const focused = await webApp.isFocused(webApp.root.input.name('search'));
 ```
 
-## 断言系统
+## Assertion System
 
-### 基础断言
+### Basic Assertions
 
 ```typescript
-// 同步断言（失败时立即停止测试）
+// Synchronous assertions (stop test immediately on failure)
 await webApp.assert.isTrue(
-  await webApp.isVisible(webApp.root.h1.text('欢迎')),
-  '首页标题应该可见'
+  await webApp.isVisible(webApp.root.h1.text('Welcome')),
+  'Home page title should be visible'
 );
 
 await webApp.assert.equal(
   await webApp.getText(webApp.root.span.className('username')),
   'testuser@example.com',
-  '用户名显示正确'
+  'Username display is correct'
 );
 
-// 软断言（失败时不停止测试，继续执行）
+// Soft assertions (continue test execution on failure)
 await webApp.softAssert.isTrue(
-  await webApp.isEnabled(webApp.root.button.text('保存')),
-  '保存按钮应该启用'
+  await webApp.isEnabled(webApp.root.button.text('Save')),
+  'Save button should be enabled'
 );
 
 await webApp.softAssert.contains(
   await webApp.getText(webApp.root.div.className('message')),
-  '操作成功',
-  '成功消息应该包含正确文本'
+  'Operation successful',
+  'Success message should contain correct text'
 );
 
-// 获取软断言错误
+// Get soft assertion errors
 const softErrors = webApp.getSoftAssertionErrors();
 if (softErrors.length > 0) {
-  console.log('软断言失败:', softErrors);
+  console.log('Soft assertion failures:', softErrors);
 }
 ```
 
-### 自定义断言消息
+### Custom Assertion Messages
 
 ```typescript
-// 带成功和失败消息的断言
+// Assertions with success and failure messages
 await webApp.assert.isTrue(
   await webApp.isVisible(webApp.root.div.className('success')),
-  '操作成功提示显示',
-  '验证成功提示显示正常'
+  'Success prompt display',
+  'Success prompt display verification normal'
 );
 
-// 复杂断言逻辑
+// Complex assertion logic
 await webApp.assert.isFalse(
   await webApp.isVisible(webApp.root.div.className('error')),
-  '不应该显示错误信息'
+  'Should not display error message'
 );
 
-// 数值断言
+// Numeric assertions
 const itemCount = await webApp.getElementsCount(webApp.root.li.className('product'));
-await webApp.assert.greaterThan(itemCount, 0, '产品列表不为空');
+await webApp.assert.greaterThan(itemCount, 0, 'Product list is not empty');
 ```
 
-## 多窗口和标签页管理
+## Multi-Window and Tab Management
 
-### 标签页操作
+### Tab Operations
 
 ```typescript
-// 获取所有标签页ID
+// Get all tab IDs
 const tabIds = await webApp.getTabIds();
-console.log('标签页列表:', tabIds);
+console.log('Tab list:', tabIds);
 
-// 获取当前标签页ID
+// Get current tab ID
 const currentTab = await webApp.getCurrentTabId();
 
-// 获取主标签页ID
+// Get main tab ID
 const mainTab = await webApp.getMainTabId();
 
-// 切换到指定标签页
+// Switch to specified tab
 await webApp.switchTab(tabIds[1]);
 
-// 打开新窗口
+// Open new window
 await webApp.newWindow(
   'https://example.com/help',
   'helpWindow',
   { width: 800, height: 600 }
 );
 
-// 关闭当前标签页
+// Close current tab
 await webApp.closeCurrentTab();
 
-// 关闭所有其他标签页
+// Close all other tabs
 await webApp.closeAllOtherTabs();
 
-// 切换到主标签页
+// Switch to main tab
 await webApp.switchToMainSiblingTab();
 ```
 
-### 窗口管理
+### Window Management
 
 ```typescript
-// 最大化窗口
+// Maximize window
 await webApp.maximizeWindow();
 
-// 获取窗口大小
+// Get window size
 const windowSize = await webApp.getWindowSize();
-console.log('窗口尺寸:', windowSize);
+console.log('Window size:', windowSize);
 
-// 获取窗口句柄
+// Get window handles
 const handles = await webApp.windowHandles();
 
-// 切换窗口
+// Switch window
 await webApp.window(handles[0]);
 ```
 
-## 框架和弹窗处理
+## Frame and Popup Handling
 
-### 框架切换
+### Frame Switching
 
 ```typescript
-// 切换到指定框架
+// Switch to specified frame
 await webApp.switchToFrame('contentFrame');
 
-// 切换到父框架
+// Switch to parent frame
 await webApp.switchToParentFrame();
 
-// 在框架中操作元素
+// Operate elements in frame
 await webApp.setValue(
   webApp.root.input.name('message'),
-  '在框架中输入文本'
+  'Enter text in frame'
 );
 ```
 
-### 弹窗处理
+### Popup Handling
 
 ```typescript
-// 等待弹窗出现
+// Wait for popup to appear
 await webApp.waitForAlert(5000);
 
-// 检查是否有弹窗
+// Check if popup exists
 const hasAlert = await webApp.isAlertOpen();
 
-// 获取弹窗文本
+// Get popup text
 const alertText = await webApp.alertText();
-console.log('弹窗内容:', alertText);
+console.log('Popup content:', alertText);
 
-// 接受弹窗
+// Accept popup
 await webApp.alertAccept();
 
-// 取消弹窗
+// Dismiss popup
 await webApp.alertDismiss();
 ```
 
-## Cookie 和会话管理
+## Cookie and Session Management
 
-### Cookie 操作
+### Cookie Operations
 
 ```typescript
-// 设置 Cookie
+// Set Cookie
 await webApp.setCookie({
   name: 'sessionId',
   value: 'abc123def456',
@@ -544,138 +544,138 @@ await webApp.setCookie({
   secure: true
 });
 
-// 获取 Cookie
+// Get Cookie
 const sessionCookie = await webApp.getCookie('sessionId');
-console.log('会话Cookie:', sessionCookie);
+console.log('Session Cookie:', sessionCookie);
 
-// 删除 Cookie
+// Delete Cookie
 await webApp.deleteCookie('sessionId');
 
-// 设置时区
+// Set timezone
 await webApp.setTimeZone('Asia/Shanghai');
 ```
 
-## 元素信息获取
+## Element Information Retrieval
 
-### 基础属性获取
+### Basic Property Retrieval
 
 ```typescript
 const element = webApp.root.div.className('product-info');
 
-// 获取元素文本
+// Get element text
 const text = await webApp.getText(element);
 
-// 获取元素属性
+// Get element attributes
 const id = await webApp.getAttribute(element, 'id');
 const className = await webApp.getAttribute(element, 'class');
 
-// 获取元素值
+// Get element value
 const value = await webApp.getValue(webApp.root.input.name('price'));
 
-// 获取元素HTML
+// Get element HTML
 const html = await webApp.getHTML(element);
 
-// 获取元素尺寸
+// Get element size
 const size = await webApp.getSize(element);
-console.log('元素尺寸:', size);
+console.log('Element size:', size);
 
-// 获取元素位置
+// Get element location
 const location = await webApp.getLocation(element);
-console.log('元素位置:', location);
+console.log('Element location:', location);
 ```
 
-### CSS 样式获取
+### CSS Style Retrieval
 
 ```typescript
-// 获取CSS属性
+// Get CSS properties
 const color = await webApp.getCssProperty(element, 'color');
 const fontSize = await webApp.getCssProperty(element, 'font-size');
 const display = await webApp.getCssProperty(element, 'display');
 
-console.log('元素样式:', { color, fontSize, display });
+console.log('Element styles:', { color, fontSize, display });
 
-// 检查CSS类是否存在
+// Check if CSS class exists
 const hasActiveClass = await webApp.isCSSClassExists(
-  webApp.root.button.text('提交'),
+  webApp.root.button.text('Submit'),
   'active',
   'btn-primary'
 );
 ```
 
-### 元素集合操作
+### Element Collection Operations
 
 ```typescript
-// 获取元素数量
+// Get element count
 const count = await webApp.getElementsCount(webApp.root.li.className('item'));
 
-// 获取多个元素的文本
+// Get text from multiple elements
 const texts = await webApp.getTexts(webApp.root.span.className('label'));
-console.log('所有标签文本:', texts);
+console.log('All label texts:', texts);
 
-// 获取元素列表
+// Get element list
 const elements = await webApp.elements(webApp.root.div.className('card'));
-console.log('找到的元素数量:', elements.length);
+console.log('Found element count:', elements.length);
 ```
 
-## 键盘和鼠标操作
+## Keyboard and Mouse Operations
 
-### 键盘操作
+### Keyboard Operations
 
 ```typescript
-// 发送键盘输入
-await webApp.keys(['Control', 'a']);  // 全选
-await webApp.keys(['Control', 'c']);  // 复制
-await webApp.keys(['Control', 'v']);  // 粘贴
+// Send keyboard input
+await webApp.keys(['Control', 'a']);  // Select all
+await webApp.keys(['Control', 'c']);  // Copy
+await webApp.keys(['Control', 'v']);  // Paste
 
-// 发送特殊键
+// Send special keys
 await webApp.keys('Tab');
 await webApp.keys('Enter');
 await webApp.keys('Escape');
 
-// 组合键操作
+// Combination key operations
 await webApp.keys(['Shift', 'Tab']);
-await webApp.keys(['Control', 'Shift', 'I']);  // 开发者工具
+await webApp.keys(['Control', 'Shift', 'I']);  // Developer tools
 ```
 
-### 高级输入操作
+### Advanced Input Operations
 
 ```typescript
-// 添加文本到现有内容
-await webApp.addValue(webApp.root.textarea.name('comment'), '\n追加的文本');
+// Add text to existing content
+await webApp.addValue(webApp.root.textarea.name('comment'), '\nAppended text');
 
-// JavaScript模拟输入
+// JavaScript simulated input
 await webApp.simulateJSFieldChange(
   webApp.root.input.name('dynamic'),
-  '通过JS设置的值'
+  'Value set via JS'
 );
 
-// 清除字段
+// Clear field
 await webApp.simulateJSFieldClear(webApp.root.input.name('temp'));
 ```
 
-## 截图和调试
+## Screenshots and Debugging
 
-### 截图功能
+### Screenshot Functionality
 
 ```typescript
-// 手动截图
+// Manual screenshot
 const screenshotPath = await webApp.makeScreenshot();
-console.log('截图保存路径:', screenshotPath);
+console.log('Screenshot save path:', screenshotPath);
 
-// 强制截图（忽略配置）
+// Force screenshot (ignore configuration)
 await webApp.makeScreenshot(true);
 
-// 禁用截图
+// Disable screenshots
 await webApp.disableScreenshots();
 
-// 启用截图
+// Enable screenshots
 await webApp.enableScreenshots();
 ```
 
-### 调试工具
+### Debug Tools
 
 ```typescript
-// 启用调试模式的配置
+// Configuration with debug mode enabled
 const webAppWithDebug = new WebApplication('test-debug', transport, {
   screenshotsEnabled: true,
   screenshotPath: './debug-screenshots/',
@@ -687,16 +687,16 @@ const webAppWithDebug = new WebApplication('test-debug', transport, {
   }
 });
 
-// 元素高亮（在调试模式下自动工作）
-await webAppWithDebug.waitForExist(webApp.root.button.text('调试'));
+// Element highlighting (automatically works in debug mode)
+await webAppWithDebug.waitForExist(webApp.root.button.text('Debug'));
 ```
 
-## 高级功能
+## Advanced Features
 
-### PDF 生成
+### PDF Generation
 
 ```typescript
-// 生成PDF文件
+// Generate PDF file
 await webApp.savePDF({
   filepath: './reports/page.pdf',
   format: 'A4',
@@ -711,12 +711,12 @@ await webApp.savePDF({
 });
 ```
 
-### 扩展实例
+### Extended Instance
 
 ```typescript
-// 扩展WebApplication实例
+// Extend WebApplication instance
 const extendedApp = webApp.extendInstance({
-  // 自定义方法
+  // Custom methods
   async loginUser(username: string, password: string) {
     await this.setValue(this.root.input.name('username'), username);
     await this.setValue(this.root.input.name('password'), password);
@@ -724,36 +724,36 @@ const extendedApp = webApp.extendInstance({
     await this.waitForVisible(this.root.div.className('dashboard'));
   },
   
-  // 自定义属性
+  // Custom properties
   customTimeout: 15000
 });
 
-// 使用扩展方法
+// Use extended method
 await extendedApp.loginUser('admin', 'password123');
 ```
 
-### 条件检查方法
+### Conditional Check Methods
 
 ```typescript
-// 检查元素是否变为可见
+// Check if element becomes visible
 const becameVisible = await webApp.isBecomeVisible(
   webApp.root.div.className('notification'),
   3000
 );
 
-// 检查元素是否变为隐藏
+// Check if element becomes hidden
 const becameHidden = await webApp.isBecomeHidden(
   webApp.root.div.className('loading'),
   10000
 );
 
-console.log('通知显示状态:', becameVisible);
-console.log('加载动画隐藏状态:', becameHidden);
+console.log('Notification display state:', becameVisible);
+console.log('Loading animation hidden state:', becameHidden);
 ```
 
-## 错误处理和最佳实践
+## Error Handling and Best Practices
 
-### 错误处理模式
+### Error Handling Patterns
 
 ```typescript
 class WebAppTestCase {
@@ -769,8 +769,8 @@ class WebAppTestCase {
       await this.webApp.click(element);
       return true;
     } catch (error) {
-      console.error('点击失败:', error.message);
-      await this.webApp.makeScreenshot(true);  // 错误时强制截图
+      console.error('Click failed:', error.message);
+      await this.webApp.makeScreenshot(true);  // Force screenshot on error
       return false;
     }
   }
@@ -781,15 +781,15 @@ class WebAppTestCase {
       await this.webApp.clearValue(element);
       await this.webApp.setValue(element, value);
       
-      // 验证值是否设置成功
+      // Verify value was set successfully
       const actualValue = await this.webApp.getValue(element);
       if (actualValue !== value) {
-        throw new Error(`值设置失败: 期望 "${value}", 实际 "${actualValue}"`);
+        throw new Error(`Value setting failed: expected "${value}", actual "${actualValue}"`);
       }
       
       return true;
     } catch (error) {
-      console.error('设置值失败:', error.message);
+      console.error('Set value failed:', error.message);
       await this.webApp.makeScreenshot(true);
       return false;
     }
@@ -797,27 +797,27 @@ class WebAppTestCase {
 }
 ```
 
-### 超时控制
+### Timeout Control
 
 ```typescript
-// 自定义超时时间的操作
+// Custom timeout operations
 await webApp.waitForExist(webApp.root.div.className('slow-loading'), 30000);
 
-// 快速检查（短超时）
+// Quick check (short timeout)
 try {
   await webApp.waitForVisible(webApp.root.div.className('popup'), 1000);
-  console.log('弹窗快速显示');
+  console.log('Popup displayed quickly');
 } catch (error) {
-  console.log('弹窗未快速显示，继续其他操作');
+  console.log('Popup not displayed quickly, continue with other operations');
 }
 
-// 分阶段等待
-await webApp.waitForExist(webApp.root.button.text('加载更多'), 5000);
-await webApp.click(webApp.root.button.text('加载更多'));
+// Phased waiting
+await webApp.waitForExist(webApp.root.button.text('Load More'), 5000);
+await webApp.click(webApp.root.button.text('Load More'));
 await webApp.waitForVisible(webApp.root.div.className('new-content'), 15000);
 ```
 
-### 重试机制
+### Retry Mechanism
 
 ```typescript
 class RetryHelper {
@@ -835,7 +835,7 @@ class RetryHelper {
         lastError = error as Error;
         
         if (i < maxRetries) {
-          console.log(`操作失败，${delay}ms后重试 (${i + 1}/${maxRetries})`);
+          console.log(`Operation failed, retrying in ${delay}ms (${i + 1}/${maxRetries})`);
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
@@ -845,23 +845,23 @@ class RetryHelper {
   }
 }
 
-// 使用重试机制
+// Use retry mechanism
 await RetryHelper.withRetry(async () => {
-  await webApp.click(webApp.root.button.text('不稳定的按钮'));
+  await webApp.click(webApp.root.button.text('Unstable Button'));
   await webApp.waitForVisible(webApp.root.div.className('success'), 3000);
 }, 3, 2000);
 ```
 
-## 性能优化
+## Performance Optimization
 
-### 批量操作
+### Batch Operations
 
 ```typescript
-// 批量检查元素状态
+// Batch check element states
 const elements = [
-  webApp.root.button.text('保存'),
-  webApp.root.button.text('取消'),
-  webApp.root.button.text('删除')
+  webApp.root.button.text('Save'),
+  webApp.root.button.text('Cancel'),
+  webApp.root.button.text('Delete')
 ];
 
 const statuses = await Promise.all(
@@ -872,77 +872,77 @@ const statuses = await Promise.all(
   }))
 );
 
-console.log('按钮状态:', statuses);
+console.log('Button states:', statuses);
 ```
 
-### 选择性截图
+### Selective Screenshots
 
 ```typescript
-// 只在重要步骤截图
+// Only take screenshots at important steps
 await webApp.disableScreenshots();
 
-// 执行常规操作
+// Execute regular operations
 await webApp.setValue(webApp.root.input.name('search'), 'test');
-await webApp.click(webApp.root.button.text('搜索'));
+await webApp.click(webApp.root.button.text('Search'));
 
-// 在关键验证点启用截图
+// Enable screenshots at key verification points
 await webApp.enableScreenshots();
 await webApp.waitForVisible(webApp.root.div.className('results'));
 await webApp.makeScreenshot();
 ```
 
-### 智能等待
+### Smart Waiting
 
 ```typescript
-// 组合等待条件
+// Combined wait conditions
 async function waitForPageReady(webApp: WebApplication) {
-  // 等待页面基础元素
+  // Wait for basic page elements
   await webApp.waitForExist(webApp.root, 10000);
   
-  // 等待加载指示器消失
+  // Wait for loading indicator to disappear
   try {
     await webApp.waitForNotVisible(webApp.root.div.className('loading'), 15000);
   } catch {
-    // 如果没有加载指示器，忽略错误
+    // If no loading indicator, ignore error
   }
   
-  // 等待主要内容可见
+  // Wait for main content to be visible
   await webApp.waitForVisible(webApp.root.main, 10000);
   
-  // 确保页面稳定
+  // Ensure page is stable
   await webApp.pause(500);
 }
 
 await waitForPageReady(webApp);
 ```
 
-## 测试模式和环境
+## Test Modes and Environments
 
-### 会话管理
+### Session Management
 
 ```typescript
-// 检查会话状态
+// Check session state
 if (webApp.isStopped()) {
-  console.log('会话已停止');
+  console.log('Session stopped');
 } else {
-  // 执行测试操作
+  // Execute test operations
   await webApp.openPage('https://example.com');
 }
 
-// 结束会话
+// End session
 await webApp.end();
 ```
 
-### 配置驱动测试
+### Configuration-Driven Testing
 
 ```typescript
-// 根据环境配置创建实例
+// Create instance based on environment configuration
 function createWebApp(environment: string) {
   const configs = {
     development: {
       screenshotsEnabled: true,
       screenshotPath: './dev-screenshots/',
-      devtool: { /* 开发工具配置 */ }
+      devtool: { /* Development tools configuration */ }
     },
     staging: {
       screenshotsEnabled: true,

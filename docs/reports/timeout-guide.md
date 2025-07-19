@@ -34,92 +34,92 @@ const customTimeout = TIMEOUTS.custom('fast', 'hover', 2000); // Based on 2 seco
 await page.hover(selector, { timeout: customTimeout });
 ```
 
-## ⏱️ Timeout 分类
+## ⏱️ Timeout Categories
 
-### 快速操作 (< 5秒)
-- `CLICK` - 点击操作
-- `HOVER` - 悬停操作 
-- `FILL` - 填充操作
-- `KEY` - 键盘操作
+### Fast Operations (< 5 seconds)
+- `CLICK` - Click operations
+- `HOVER` - Hover operations 
+- `FILL` - Fill operations
+- `KEY` - Keyboard operations
 
-### 中等操作 (5-15秒)
-- `WAIT_FOR_ELEMENT` - 等待元素存在
-- `WAIT_FOR_VISIBLE` - 等待元素可见
-- `WAIT_FOR_CLICKABLE` - 等待元素可点击
-- `CONDITION` - 等待条件满足
+### Medium Operations (5-15 seconds)
+- `WAIT_FOR_ELEMENT` - Wait for element to exist
+- `WAIT_FOR_VISIBLE` - Wait for element to be visible
+- `WAIT_FOR_CLICKABLE` - Wait for element to be clickable
+- `CONDITION` - Wait for condition to be met
 
-### 慢速操作 (15-60秒)
-- `PAGE_LOAD` - 页面加载
-- `NAVIGATION` - 导航操作
-- `NETWORK_REQUEST` - 网络请求
+### Slow Operations (15-60 seconds)
+- `PAGE_LOAD` - Page loading
+- `NAVIGATION` - Navigation operations
+- `NETWORK_REQUEST` - Network requests
 
-### 系统级别 (> 1分钟)
-- `TEST_EXECUTION` - 单个测试执行
-- `CLIENT_SESSION` - 客户端会话
-- `PAGE_LOAD_MAX` - 页面加载最大时间
+### System Level (> 1 minute)
+- `TEST_EXECUTION` - Single test execution
+- `CLIENT_SESSION` - Client session
+- `PAGE_LOAD_MAX` - Maximum page load time
 
-### 清理操作 (< 10秒)
-- `TRACE_STOP` - 跟踪停止
-- `COVERAGE_STOP` - 覆盖率停止
-- `CONTEXT_CLOSE` - 上下文关闭
+### Cleanup Operations (< 10 seconds)
+- `TRACE_STOP` - Trace stopping
+- `COVERAGE_STOP` - Coverage stopping
+- `CONTEXT_CLOSE` - Context closing
 
-## 🌍 环境配置
+## 🌍 Environment Configuration
 
-### 环境变量
+### Environment Variables
 
-- `NODE_ENV=development` 或 `LOCAL=true` - 本地开发环境
-- `CI=true` - CI/CD环境
-- `DEBUG=true` 或 `PLAYWRIGHT_DEBUG=1` - 调试模式
+- `NODE_ENV=development` or `LOCAL=true` - Local development environment
+- `CI=true` - CI/CD environment
+- `DEBUG=true` or `PLAYWRIGHT_DEBUG=1` - Debug mode
 
-### 环境倍数
+### Environment Multipliers
 
 ```javascript
-// 本地环境：延长timeout，便于调试
+// Local environment: Extend timeouts for debugging
 local: {
-    fast: 2,      // 快速操作延长2倍
-    medium: 2,    // 中等操作延长2倍
-    slow: 1.5,    // 慢速操作延长1.5倍
+    fast: 2,      // Fast operations extended by 2x
+    medium: 2,    // Medium operations extended by 2x
+    slow: 1.5,    // Slow operations extended by 1.5x
 }
 
-// CI环境：缩短timeout，提高效率
+// CI environment: Shorten timeouts for efficiency
 ci: {
-    fast: 0.8,    // 快速操作缩短到80%
-    medium: 0.8,  // 中等操作缩短到80%
-    slow: 0.7,    // 慢速操作缩短到70%
+    fast: 0.8,    // Fast operations shortened to 80%
+    medium: 0.8,  // Medium operations shortened to 80%
+    slow: 0.7,    // Slow operations shortened to 70%
 }
 
-// 调试环境：大幅延长timeout
+// Debug environment: Significantly extend timeouts
 debug: {
-    fast: 10,     // 调试模式大幅延长
-    medium: 10,   // 调试模式大幅延长
-    slow: 5,      // 调试模式延长5倍
+    fast: 10,     // Debug mode significantly extended
+    medium: 10,   // Debug mode significantly extended
+    slow: 5,      // Debug mode extended by 5x
 }
 ```
 
-## 🔧 配置文件更新
+## 🔧 Configuration File Updates
 
-### Playwright 插件
+### Playwright Plugin
 
 ```typescript
 // packages/plugin-playwright-driver/src/plugin/index.ts
 const TIMEOUTS = require('../../../e2e-test-app/timeout-config.js');
 
-// 使用配置的timeout
+// Use configured timeout
 await page.hover(selector, { timeout: TIMEOUTS.HOVER });
 await page.fill(selector, value, { timeout: TIMEOUTS.FILL });
 ```
 
-### Selenium 插件
+### Selenium Plugin
 
 ```typescript
 // packages/plugin-selenium-driver/src/plugin/index.ts
 const TIMEOUTS = require('../../../e2e-test-app/timeout-config.js');
 
-// 使用配置的timeout
+// Use configured timeout
 timeout: timeout || TIMEOUTS.CONDITION
 ```
 
-### WebApplication 类
+### WebApplication Class
 
 ```typescript
 // packages/web-application/src/web-application.ts
@@ -129,7 +129,7 @@ protected WAIT_TIMEOUT = TIMEOUTS.WAIT_TIMEOUT;
 protected WAIT_PAGE_LOAD_TIMEOUT = TIMEOUTS.PAGE_LOAD_MAX;
 ```
 
-### 测试配置
+### Test Configuration
 
 ```javascript
 // packages/e2e-test-app/test/playwright/config.js
@@ -146,104 +146,104 @@ return {
 };
 ```
 
-## ✅ 配置验证
+## ✅ Configuration Validation
 
-### 验证工具
+### Validation Tool
 
 ```bash
-# 运行timeout配置验证
+# Run timeout configuration validation
 node packages/e2e-test-app/timeout-config-validator.js
 ```
 
-### 验证内容
+### Validation Content
 
-- timeout值的合理性检查
-- 不同类型timeout的逻辑关系验证
-- 环境配置的一致性检查
+- Reasonableness check of timeout values
+- Logical relationship validation between different types of timeouts
+- Consistency check of environment configurations
 
-### 验证输出示例
+### Validation Output Example
 
 ```
-📊 Timeout配置摘要:
-==================
+📊 Timeout Configuration Summary:
+================================
 
-🚀 快速操作:
-   点击:       2000ms
-   悬停:       1000ms
-   填充:       2000ms
-   按键:       1000ms
+🚀 Fast Operations:
+Click:       2000ms
+Hover:       1000ms
+Fill:        2000ms
+Key:         1000ms
 
-⏳ 中等操作:
-   等待元素:   10000ms
-   等待可见:   10000ms
-   等待可点击: 8000ms
-   等待条件:   5000ms
+⏳ Medium Operations:
+Wait for element:   10000ms
+Wait for visible:   10000ms
+Wait for clickable: 8000ms
+Wait for condition: 5000ms
 
-🔍 验证timeout配置...
-✅ 验证完成: 15/15 项通过
-🌍 当前环境: 本地
+🔍 Validating timeout configuration...
+✅ Validation complete: 15/15 items passed
+🌍 Current environment: Local
 ```
 
-## 🐛 问题解决
+## 🐛 Problem Resolution
 
-### 常见问题
+### Common Issues
 
-1. **moveToObject 等待30秒**
-   - ✅ 已解决：使用 `TIMEOUTS.HOVER` (1秒)
+1. **moveToObject waiting 30 seconds**
+   - ✅ Resolved: Use `TIMEOUTS.HOVER` (1 second)
 
-2. **测试在CI中超时**
-   - ✅ 已解决：CI环境自动缩短timeout
+2. **Tests timing out in CI**
+   - ✅ Resolved: CI environment automatically shortens timeouts
 
-3. **本地调试timeout过短**
-   - ✅ 已解决：本地环境自动延长timeout
+3. **Local debugging timeouts too short**
+   - ✅ Resolved: Local environment automatically extends timeouts
 
-4. **不同插件timeout不一致**
-   - ✅ 已解决：统一配置文件管理
+4. **Inconsistent timeouts across plugins**
+   - ✅ Resolved: Unified configuration file management
 
-### 迁移现有代码
+### Migrating Existing Code
 
 ```javascript
-// 旧代码
+// Old code
 await page.hover(selector, { timeout: 5000 });
 await page.click(selector, { timeout: 2000 });
 
-// 新代码
+// New code
 await page.hover(selector, { timeout: TIMEOUTS.HOVER });
 await page.click(selector, { timeout: TIMEOUTS.CLICK });
 ```
 
-## 📈 性能改进
+## 📈 Performance Improvements
 
-### 前后对比
+### Before and After Comparison
 
-| 操作 | 优化前 | 优化后 | 改进 |
-|------|--------|--------|------|
-| moveToObject | 30秒 | 1秒 | 96.7% ⬇️ |
-| click操作 | 硬编码2秒 | 环境相关 | 更灵活 |
-| 测试执行 | 固定30秒 | 环境相关 | 更高效 |
+| Operation | Before | After | Improvement |
+|-----------|--------|-------|-------------|
+| moveToObject | 30s | 1s | 96.7% ⬇️ |
+| Click operations | Hardcoded 2s | Environment-based | More flexible |
+| Test execution | Fixed 30s | Environment-based | More efficient |
 
-### 环境优化
+### Environment Optimization
 
-- **本地开发**: timeout延长，便于调试
-- **CI环境**: timeout缩短，提高构建速度  
-- **调试模式**: timeout大幅延长或无限制
+- **Local development**: Extended timeouts for debugging
+- **CI environment**: Shortened timeouts for faster builds
+- **Debug mode**: Significantly extended timeouts or unlimited
 
-## 🔮 未来扩展
+## 🔮 Future Extensions
 
-### 计划改进
+### Planned Improvements
 
-1. **动态timeout调整** - 根据网络延迟自动调整
-2. **统计分析** - 收集实际操作时间数据
-3. **智能预测** - 基于历史数据预测最优timeout
-4. **更细粒度配置** - 支持不同页面的专用timeout
+1. **Dynamic timeout adjustment** - Automatically adjust based on network latency
+2. **Statistical analysis** - Collect actual operation time data
+3. **Intelligent prediction** - Predict optimal timeouts based on historical data
+4. **Finer-grained configuration** - Support dedicated timeouts for different pages
 
-### 贡献指南
+### Contribution Guidelines
 
-1. 修改 `timeout-config.js` 中的基础配置
-2. 运行验证器确保配置合理
-3. 更新相关文档
-4. 测试不同环境的行为
+1. Modify base configuration in `timeout-config.js`
+2. Run validator to ensure reasonable configuration
+3. Update related documentation
+4. Test behavior in different environments
 
 ---
 
-📝 **注意**: 此配置系统向后兼容，现有代码无需立即修改，但建议逐步迁移以获得更好的性能和一致性。 
+📝 **Note**: This configuration system is backward compatible, existing code doesn't need immediate modification, but gradual migration is recommended for better performance and consistency. 
