@@ -113,13 +113,13 @@ jobs:
 
     # SonarQube Scan
     - name: SonarQube Scan
-      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event.pull_request.merged == true)}}
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event.pull_request.merged == true) && secrets.SONAR_TOKEN != ''}}
       uses: SonarSource/sonarqube-scan-action@v5
       with:
         projectBaseDir: .
         args: >
           -Dsonar.organization=${{ github.repository_owner }}
-          -Dsonar.projectKey=${{ github.repository }}
+          -Dsonar.projectKey=${{ github.repository_owner }}_${{ github.event.repository.name }}
           -Dsonar.sources=core,packages
           -Dsonar.tests=core,packages
           -Dsonar.test.inclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js
