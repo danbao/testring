@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, main ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, main ]
     types: [opened, synchronize, reopened]
 
 jobs:
@@ -113,7 +113,7 @@ jobs:
 
     # Check if SonarQube Token is available
     - name: Check SonarQube Token
-      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event.pull_request.merged == true)}}
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event_name == 'push')}}
       run: |
         if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
           echo "⚠️ SONAR_TOKEN not configured, skipping SonarQube scan"
@@ -126,13 +126,11 @@ jobs:
 
     # SonarQube Scan
     - name: SonarQube Scan
-      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event.pull_request.merged == true) && steps.sonar_check.outputs.skip_sonar == 'false'}}
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event_name == 'push') && steps.sonar_check.outputs.skip_sonar == 'false'}}
       uses: SonarSource/sonarqube-scan-action@v5
       with:
         projectBaseDir: .
         args: >
-          -Dsonar.organization=${{ github.repository_owner }}
-          -Dsonar.projectKey=${{ github.repository_owner }}_${{ github.event.repository.name }}
           -Dsonar.sources=core,packages
           -Dsonar.tests=core,packages
           -Dsonar.test.inclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js
@@ -141,14 +139,6 @@ jobs:
           -Dsonar.javascript.lcov.reportPaths=merged-coverage/lcov.info,.coverage/lcov.info,c8-cov/lcov.info
           -Dsonar.typescript.lcov.reportPaths=merged-coverage/lcov.info,.coverage/lcov.info,c8-cov/lcov.info
           -Dsonar.coverage.exclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js,**/test/**,**/tests/**,**/__tests__/**
-          -Dsonar.pullrequest.key=${{ github.event.number }}
-          -Dsonar.pullrequest.branch=${{ github.head_ref }}
-          -Dsonar.pullrequest.base=${{ github.base_ref }}
-          -Dsonar.pullrequest.github.repository=${{ github.repository }}
-          -Dsonar.links.homepage=https://github.com/${{ github.repository }}
-          -Dsonar.links.ci=https://github.com/${{ github.repository }}/actions
-          -Dsonar.links.scm=https://github.com/${{ github.repository }}
-          -Dsonar.links.issue=https://github.com/${{ github.repository }}/issues
           -Dsonar.verbose=true
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
