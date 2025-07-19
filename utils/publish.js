@@ -63,14 +63,158 @@ function createDevPackageJson(pkg) {
     if (devPackageJson.dependencies) {
         for (const [depName, depVersion] of Object.entries(devPackageJson.dependencies)) {
             if (depName === 'testring') {
-                devPackageJson.dependencies[depName] = `${depVersion}-${githubUsername}-${commitId}`;
+                devPackageJson.dependencies[depName] = `testring-dev@${depVersion}-${githubUsername}-${commitId}`;
             } else if (depName.startsWith('@testring/')) {
-                devPackageJson.dependencies[depName] = `${depVersion}-${githubUsername}-${commitId}`;
+                const devDepName = depName.replace('@testring/', '@testring-dev/');
+                devPackageJson.dependencies[devDepName] = `${depVersion}-${githubUsername}-${commitId}`;
+                delete devPackageJson.dependencies[depName]; // Remove original dependency
+            }
+        }
+    }
+
+    // Transform devDependencies to use dev versions
+    if (devPackageJson.devDependencies) {
+        for (const [depName, depVersion] of Object.entries(devPackageJson.devDependencies)) {
+            if (depName === 'testring') {
+                devPackageJson.devDependencies[depName] = `testring-dev@${depVersion}-${githubUsername}-${commitId}`;
+            } else if (depName.startsWith('@testring/')) {
+                const devDepName = depName.replace('@testring/', '@testring-dev/');
+                devPackageJson.devDependencies[devDepName] = `${depVersion}-${githubUsername}-${commitId}`;
+                delete devPackageJson.devDependencies[depName]; // Remove original dependency
+            }
+        }
+    }
+
+    // Transform peerDependencies to use dev versions
+    if (devPackageJson.peerDependencies) {
+        for (const [depName, depVersion] of Object.entries(devPackageJson.peerDependencies)) {
+            if (depName === 'testring') {
+                devPackageJson.peerDependencies[depName] = `testring-dev@${depVersion}-${githubUsername}-${commitId}`;
+            } else if (depName.startsWith('@testring/')) {
+                const devDepName = depName.replace('@testring/', '@testring-dev/');
+                devPackageJson.peerDependencies[devDepName] = `${depVersion}-${githubUsername}-${commitId}`;
+                delete devPackageJson.peerDependencies[depName]; // Remove original dependency
             }
         }
     }
 
     return devPackageJson;
+}
+
+// Function to replace @testring references in code files
+function replaceTestringReferences(pkg) {
+    const srcDir = path.join(pkg.location, 'src');
+    const testDir = path.join(pkg.location, 'test');
+    const staticDir = path.join(pkg.location, 'static');
+    const extensionDir = path.join(pkg.location, 'extension');
+    
+    // Function to process a directory
+    function processDirectory(dir) {
+        if (!fs.existsSync(dir)) return;
+        
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+            const filePath = path.join(dir, file);
+            const stat = fs.statSync(filePath);
+            
+            if (stat.isDirectory()) {
+                processDirectory(filePath);
+            } else if (file.endsWith('.ts') || file.endsWith('.js') || file.endsWith('.tsx') || file.endsWith('.jsx') || file.endsWith('.json')) {
+                // Read file content
+                let content = fs.readFileSync(filePath, 'utf8');
+                
+                // Replace @testring references
+                const originalContent = content;
+                content = content.replace(/from ['"]@testring\//g, "from '@testring-dev/");
+                content = content.replace(/import ['"]@testring\//g, "import '@testring-dev/");
+                content = content.replace(/require\(['"]@testring\//g, "require('@testring-dev/");
+                
+                // Replace testring references (non-scoped)
+                content = content.replace(/from ['"]testring['"]/g, "from 'testring-dev'");
+                content = content.replace(/import ['"]testring['"]/g, "import 'testring-dev'");
+                content = content.replace(/require\(['"]testring['"]\)/g, "require('testring-dev')");
+                
+                // Replace testring in HTML element names and other identifiers
+                content = content.replace(/testring-highlight/g, "testring-dev-highlight");
+                content = content.replace(/testring-dev\.json/g, "testring-dev.json");
+                content = content.replace(/testring-dev\.crx/g, "testring-dev.crx");
+                
+                // Replace TestRing in strings (case sensitive)
+                content = content.replace(/"TestRing"/g, '"TestRing-Dev"');
+                content = content.replace(/'TestRing'/g, "'TestRing-Dev'");
+                
+                // Write back if content changed
+                if (content !== originalContent) {
+                    fs.writeFileSync(filePath, content);
+                    process.stdout.write(`  [DEV] Updated references in: ${filePath}\n`);
+                }
+            }
+        }
+    }
+    
+    // Process src, test, static, and extension directories
+    processDirectory(srcDir);
+    processDirectory(testDir);
+    processDirectory(staticDir);
+    processDirectory(extensionDir);
+}
+
+// Function to restore @testring references in code files
+function restoreTestringReferences(pkg) {
+    const srcDir = path.join(pkg.location, 'src');
+    const testDir = path.join(pkg.location, 'test');
+    const staticDir = path.join(pkg.location, 'static');
+    const extensionDir = path.join(pkg.location, 'extension');
+    
+    // Function to process a directory
+    function processDirectory(dir) {
+        if (!fs.existsSync(dir)) return;
+        
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+            const filePath = path.join(dir, file);
+            const stat = fs.statSync(filePath);
+            
+            if (stat.isDirectory()) {
+                processDirectory(filePath);
+            } else if (file.endsWith('.ts') || file.endsWith('.js') || file.endsWith('.tsx') || file.endsWith('.jsx') || file.endsWith('.json')) {
+                // Read file content
+                let content = fs.readFileSync(filePath, 'utf8');
+                
+                // Restore @testring references
+                const originalContent = content;
+                content = content.replace(/from ['"]@testring-dev\//g, "from '@testring/");
+                content = content.replace(/import ['"]@testring-dev\//g, "import '@testring/");
+                content = content.replace(/require\(['"]@testring-dev\//g, "require('@testring/");
+                
+                // Restore testring references (non-scoped)
+                content = content.replace(/from ['"]testring-dev['"]/g, "from 'testring'");
+                content = content.replace(/import ['"]testring-dev['"]/g, "import 'testring'");
+                content = content.replace(/require\(['"]testring-dev['"]\)/g, "require('testring')");
+                
+                // Restore testring in HTML element names and other identifiers
+                content = content.replace(/testring-dev-highlight/g, "testring-highlight");
+                content = content.replace(/testring-dev\.json/g, "testring-dev.json");
+                content = content.replace(/testring-dev\.crx/g, "testring-dev.crx");
+                
+                // Restore TestRing in strings (case sensitive)
+                content = content.replace(/"TestRing-Dev"/g, '"TestRing"');
+                content = content.replace(/'TestRing-Dev'/g, "'TestRing'");
+                
+                // Write back if content changed
+                if (content !== originalContent) {
+                    fs.writeFileSync(filePath, content);
+                    process.stdout.write(`  [RESTORE] Restored references in: ${filePath}\n`);
+                }
+            }
+        }
+    }
+    
+    // Process src, test, static, and extension directories
+    processDirectory(srcDir);
+    processDirectory(testDir);
+    processDirectory(staticDir);
+    processDirectory(extensionDir);
 }
 
 async function task(pkg) {
@@ -88,7 +232,7 @@ async function task(pkg) {
     );
     let published = false;
     try {
-        // For dev publishing, we need to temporarily replace the package.json
+        // For dev publishing, we need to temporarily replace the package.json and update code references
         if (isDevPublish) {
             const originalPackageJsonPath = path.join(pkg.location, 'package.json');
             
@@ -97,6 +241,9 @@ async function task(pkg) {
             
             // Replace with dev version
             fs.writeFileSync(originalPackageJsonPath, JSON.stringify(devPackageJson, null, 2));
+            
+            // Replace @testring references in code files
+            replaceTestringReferences(pkg);
         }
         
         if (isDryRun) {
@@ -118,10 +265,13 @@ async function task(pkg) {
     } catch (error) {
         process.stderr.write(error.toString());
     } finally {
-        // Restore original package.json if it was modified
+        // Restore original package.json and code references if they were modified
         if (isDevPublish && originalPackageJson) {
             const originalPackageJsonPath = path.join(pkg.location, 'package.json');
             fs.writeFileSync(originalPackageJsonPath, originalPackageJson);
+            
+            // Restore @testring references in code files
+            restoreTestringReferences(pkg);
         }
     }
 
