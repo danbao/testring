@@ -22,6 +22,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # 禁用浅克隆，获取完整历史记录
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
@@ -137,10 +139,11 @@ jobs:
           -Dsonar.tests=core,packages
           -Dsonar.test.inclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js
           -Dsonar.test.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/.nyc_output/**,**/.coverage/**
-          -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/.nyc_output/**,**/.coverage/**,**/*.d.ts,**/test-results/**,**/playwright-report/**
+          -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/.nyc_output/**,**/.coverage/**,**/*.d.ts,**/test-results/**,**/playwright-report/**,**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js,**/test/**,**/tests/**,**/__tests__/**
           -Dsonar.javascript.lcov.reportPaths=merged-coverage/lcov.info,.coverage/lcov.info,c8-cov/lcov.info
           -Dsonar.typescript.lcov.reportPaths=merged-coverage/lcov.info,.coverage/lcov.info,c8-cov/lcov.info
           -Dsonar.coverage.exclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js,**/test/**,**/tests/**,**/__tests__/**
+          -Dsonar.security.exclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js,**/test/**,**/tests/**,**/__tests__/**
           -Dsonar.verbose=true
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
