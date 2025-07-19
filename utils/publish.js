@@ -14,6 +14,7 @@ let excludeList = [];
 let isDevPublish = false;
 let githubUsername = '';
 let commitId = '';
+let isDryRun = false;
 
 for (let i = 0; i < argv.length; i++) {
     if (argv[i].startsWith('--exclude=')) {
@@ -24,10 +25,12 @@ for (let i = 0; i < argv.length; i++) {
         githubUsername = argv[i].replace('--github-username=', '');
     } else if (argv[i].startsWith('--commit-id=')) {
         commitId = argv[i].replace('--commit-id=', '');
+    } else if (argv[i].startsWith('--dry-run')) {
+        isDryRun = true;
     }
 }
 
-if (!token) {
+if (!token && !isDryRun) {
     throw new Error('NPM_TOKEN required');
 }
 
@@ -71,19 +74,12 @@ function createDevPackageJson(pkg) {
 }
 
 async function task(pkg) {
-    let packageJsonToPublish;
     let displayName = pkg.name;
+    let devPackageJson = null;
 
     if (isDevPublish) {
-        packageJsonToPublish = createDevPackageJson(pkg);
-        displayName = packageJsonToPublish.name;
-
-        // Write temporary dev package.json
-        const tempPackageJsonPath = path.join(pkg.location, 'package.dev.json');
-        fs.writeFileSync(tempPackageJsonPath, JSON.stringify(packageJsonToPublish, null, 2));
-        packageJsonToPublish = tempPackageJsonPath;
-    } else {
-        packageJsonToPublish = path.join(pkg.location, 'package.json');
+        devPackageJson = createDevPackageJson(pkg);
+        displayName = devPackageJson.name;
     }
 
     process.stdout.write(
@@ -91,21 +87,41 @@ async function task(pkg) {
     );
     let published = false;
     try {
-        await npmPublish({
-            package: packageJsonToPublish,
-            token,
-            access: 'public'
-        });
-        published = true;
+        // For dev publishing, we need to temporarily replace the package.json
+        let originalPackageJson = null;
+        if (isDevPublish) {
+            const originalPackageJsonPath = path.join(pkg.location, 'package.json');
+            
+            // Backup original package.json
+            originalPackageJson = fs.readFileSync(originalPackageJsonPath, 'utf8');
+            
+            // Replace with dev version
+            fs.writeFileSync(originalPackageJsonPath, JSON.stringify(devPackageJson, null, 2));
+        }
+        
+        if (isDryRun) {
+            process.stdout.write(`  [DRY RUN] Would publish package: ${displayName}\n`);
+            process.stdout.write(`  [DRY RUN] Package location: ${pkg.location}\n`);
+            if (isDevPublish) {
+                process.stdout.write(`  [DRY RUN] Dev package name: ${displayName}\n`);
+                process.stdout.write(`  [DRY RUN] Dev package version: ${devPackageJson.version}\n`);
+            }
+            published = true; // Mark as "published" for dry run
+        } else {
+            await npmPublish({
+                package: pkg.location,
+                token,
+                access: 'public'
+            });
+            published = true;
+        }
     } catch (error) {
         process.stderr.write(error.toString());
     } finally {
-        // Clean up temporary file if it was created
-        if (isDevPublish) {
-            const tempPackageJsonPath = path.join(pkg.location, 'package.dev.json');
-            if (fs.existsSync(tempPackageJsonPath)) {
-                fs.unlinkSync(tempPackageJsonPath);
-            }
+        // Restore original package.json if it was modified
+        if (isDevPublish && originalPackageJson) {
+            const originalPackageJsonPath = path.join(pkg.location, 'package.json');
+            fs.writeFileSync(originalPackageJsonPath, originalPackageJson);
         }
     }
 
@@ -125,9 +141,12 @@ async function main() {
         if (!commitId) {
             throw new Error('--commit-id is required for dev publishing');
         }
-        process.stdout.write(`Dev publishing mode enabled:\n`);
-        process.stdout.write(`  GitHub username: ${githubUsername}\n`);
-        process.stdout.write(`  Commit ID: ${commitId}\n`);
+            process.stdout.write(`Dev publishing mode enabled:\n`);
+    process.stdout.write(`  GitHub username: ${githubUsername}\n`);
+    process.stdout.write(`  Commit ID: ${commitId}\n`);
+    if (isDryRun) {
+        process.stdout.write(`  Dry run mode: enabled\n`);
+    }
     }
 
     const packages = await getPackages(__dirname);
