@@ -76,6 +76,7 @@ function createDevPackageJson(pkg) {
 async function task(pkg) {
     let displayName = pkg.name;
     let devPackageJson = null;
+    let originalPackageJson = null;
 
     if (isDevPublish) {
         devPackageJson = createDevPackageJson(pkg);
@@ -88,7 +89,6 @@ async function task(pkg) {
     let published = false;
     try {
         // For dev publishing, we need to temporarily replace the package.json
-        let originalPackageJson = null;
         if (isDevPublish) {
             const originalPackageJsonPath = path.join(pkg.location, 'package.json');
             
