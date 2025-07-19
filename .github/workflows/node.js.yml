@@ -111,10 +111,25 @@ jobs:
         path-to-lcov: './merged-coverage/lcov.info'
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
-    # SonarCloud Scan
-    - name: SonarCloud Scan
+    # SonarQube Scan
+    - name: SonarQube Scan
       if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event.pull_request.merged == true)}}
-      uses: sonarsource/sonarcloud-github-action@master
+      uses: SonarSource/sonarqube-scan-action@v5
+      with:
+        projectBaseDir: .
+        args: >
+          -Dsonar.sources=core,packages
+          -Dsonar.tests=core,packages
+          -Dsonar.test.inclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js
+          -Dsonar.test.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/.nyc_output/**,**/.coverage/**
+          -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/.nyc_output/**,**/.coverage/**,**/*.d.ts,**/test-results/**,**/playwright-report/**
+          -Dsonar.javascript.lcov.reportPaths=merged-coverage/lcov.info,.coverage/lcov.info,c8-cov/lcov.info
+          -Dsonar.typescript.lcov.reportPaths=merged-coverage/lcov.info,.coverage/lcov.info,c8-cov/lcov.info
+          -Dsonar.coverage.exclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js,**/test/**,**/tests/**,**/__tests__/**
+          -Dsonar.pullrequest.key=${{ github.event.number }}
+          -Dsonar.pullrequest.branch=${{ github.head_ref }}
+          -Dsonar.pullrequest.base=${{ github.base_ref }}
+          -Dsonar.pullrequest.github.repository=${{ github.repository }}
+          -Dsonar.verbose=true
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
