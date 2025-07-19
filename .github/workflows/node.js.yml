@@ -111,9 +111,22 @@ jobs:
         path-to-lcov: './merged-coverage/lcov.info'
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
+    # Check if SonarQube Token is available
+    - name: Check SonarQube Token
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event.pull_request.merged == true)}}
+      run: |
+        if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+          echo "⚠️ SONAR_TOKEN not configured, skipping SonarQube scan"
+          echo "skip_sonar=true" >> $GITHUB_OUTPUT
+        else
+          echo "✅ SONAR_TOKEN found, proceeding with SonarQube scan"
+          echo "skip_sonar=false" >> $GITHUB_OUTPUT
+        fi
+      id: sonar_check
+
     # SonarQube Scan
     - name: SonarQube Scan
-      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event.pull_request.merged == true) && secrets.SONAR_TOKEN != ''}}
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event.pull_request.merged == true) && steps.sonar_check.outputs.skip_sonar == 'false'}}
       uses: SonarSource/sonarqube-scan-action@v5
       with:
         projectBaseDir: .
