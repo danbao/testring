@@ -118,6 +118,8 @@ jobs:
       with:
         projectBaseDir: .
         args: >
+          -Dsonar.organization=${{ github.repository_owner }}
+          -Dsonar.projectKey=${{ github.repository }}
           -Dsonar.sources=core,packages
           -Dsonar.tests=core,packages
           -Dsonar.test.inclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js
@@ -130,6 +132,10 @@ jobs:
           -Dsonar.pullrequest.branch=${{ github.head_ref }}
           -Dsonar.pullrequest.base=${{ github.base_ref }}
           -Dsonar.pullrequest.github.repository=${{ github.repository }}
+          -Dsonar.links.homepage=https://github.com/${{ github.repository }}
+          -Dsonar.links.ci=https://github.com/${{ github.repository }}/actions
+          -Dsonar.links.scm=https://github.com/${{ github.repository }}
+          -Dsonar.links.issue=https://github.com/${{ github.repository }}/issues
           -Dsonar.verbose=true
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
