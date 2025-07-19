@@ -111,8 +111,9 @@ jobs:
         path-to-lcov: './merged-coverage/lcov.info'
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
+    # SonarCloud Scan
     - name: SonarCloud Scan
-      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && github.event.pull_request.merged == true}}
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event.pull_request.merged == true)}}
       uses: sonarsource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
