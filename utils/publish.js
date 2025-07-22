@@ -87,7 +87,7 @@ function replacePackageReferences(pkgLocation) {
             
             // Replace testring with testring-dev (as word boundary)
             if (content.includes('testring')) {
-                content = content.replace(/\btestring\b/g, 'testring-dev');
+                content = content.replace(/\btestring\b(?!-dev)/g, 'testring-dev');
                 modified = true;
             }
             
@@ -195,7 +195,7 @@ function createDevPackageJson(pkg) {
             for (const [depName, depVersion] of Object.entries(devPackageJson[depType])) {
                 if (depName === 'testring') {
                     newDependencies['testring-dev'] = `${depVersion}-${githubUsername}-${commitId}`;
-                } else if (depName.startsWith('@testring/')) {
+                } else if (depName.startsWith('@testring/') && !depName.startsWith('@testring-dev/')) {
                     const devDepName = depName.replace('@testring/', '@testring-dev/');
                     newDependencies[devDepName] = `${depVersion}-${githubUsername}-${commitId}`;
                 } else {
