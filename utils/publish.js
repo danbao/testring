@@ -35,7 +35,7 @@ if (!token && !isDryRun) {
 }
 
 // Function to recursively find all files in a directory
-function findFiles(dir, extensions = ['.js', '.ts', '.json', '.d.ts', '.md']) {
+function findFiles(dir, extensions = ['.js', '.ts', '.json', '.d.ts', '.md', '.jsx', '.tsx', '.yml', '.yaml']) {
     const files = [];
     const items = fs.readdirSync(dir);
     
@@ -79,9 +79,15 @@ function replacePackageReferences(pkgLocation) {
                 modified = true;
             }
             
+            // Replace `testring` with `testring-dev` (in backticks)
+            if (content.includes('`testring`')) {
+                content = content.replace(/`testring`/g, '`testring-dev`');
+                modified = true;
+            }
+            
             // Replace testring with testring-dev (as word boundary)
-            if (content.includes('testring ')) {
-                content = content.replace(/\btestring\s/g, 'testring-dev ');
+            if (content.includes('testring')) {
+                content = content.replace(/\btestring\b/g, 'testring-dev');
                 modified = true;
             }
             
@@ -127,9 +133,15 @@ function restorePackageReferences(pkgLocation) {
                 modified = true;
             }
             
+            // Restore `testring-dev` with `testring` (in backticks)
+            if (content.includes('`testring-dev`')) {
+                content = content.replace(/`testring-dev`/g, '`testring`');
+                modified = true;
+            }
+            
             // Restore testring-dev with testring (as word boundary)
-            if (content.includes('testring-dev ')) {
-                content = content.replace(/\btestring-dev\s/g, 'testring ');
+            if (content.includes('testring-dev')) {
+                content = content.replace(/\btestring-dev\b/g, 'testring');
                 modified = true;
             }
             
@@ -175,13 +187,22 @@ function createDevPackageJson(pkg) {
     };
 
     // Transform dependencies to use dev versions
-    if (devPackageJson.dependencies) {
-        for (const [depName, depVersion] of Object.entries(devPackageJson.dependencies)) {
-            if (depName === 'testring') {
-                devPackageJson.dependencies[depName] = `${depVersion}-${githubUsername}-${commitId}`;
-            } else if (depName.startsWith('@testring/')) {
-                devPackageJson.dependencies[depName] = `${depVersion}-${githubUsername}-${commitId}`;
+    const dependencyTypes = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
+    
+    for (const depType of dependencyTypes) {
+        if (devPackageJson[depType]) {
+            const newDependencies = {};
+            for (const [depName, depVersion] of Object.entries(devPackageJson[depType])) {
+                if (depName === 'testring') {
+                    newDependencies['testring-dev'] = `${depVersion}-${githubUsername}-${commitId}`;
+                } else if (depName.startsWith('@testring/')) {
+                    const devDepName = depName.replace('@testring/', '@testring-dev/');
+                    newDependencies[devDepName] = `${depVersion}-${githubUsername}-${commitId}`;
+                } else {
+                    newDependencies[depName] = depVersion;
+                }
             }
+            devPackageJson[depType] = newDependencies;
         }
     }
 
