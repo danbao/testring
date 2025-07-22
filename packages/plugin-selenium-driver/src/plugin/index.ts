@@ -24,7 +24,7 @@ import webdriver from 'webdriver';
 import {WebdriverIOConfig} from '@wdio/types/build/Capabilities';
 
 // 导入统一的timeout配置
-const TIMEOUTS = require('../../../e2e-test-app/timeout-config.js');
+const TIMEOUTS = require('@testring/timeout-config');
 
 type BrowserObjectCustom = WebdriverIO.Browser & {
     sessionId: string;

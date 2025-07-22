@@ -11,7 +11,7 @@ import * as path from 'path';
 import * as os from 'os';
 
 // 导入统一的timeout配置
-const TIMEOUTS = require('../../../e2e-test-app/timeout-config.js');
+const TIMEOUTS = require('@testring/timeout-config');
 
 const DEFAULT_CONFIG: PlaywrightPluginConfig = {
     browserName: 'chromium',

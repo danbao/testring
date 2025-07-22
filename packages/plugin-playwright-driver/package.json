@@ -19,6 +19,7 @@
   "dependencies": {
     "@testring/logger": "0.8.0",
     "@testring/plugin-api": "0.8.0",
+    "@testring/timeout-config": "0.8.0",
     "@testring/types": "0.8.0",
     "@types/node": "22.8.5",
     "playwright": "^1.48.0"

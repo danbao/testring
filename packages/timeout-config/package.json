@@ -1,0 +1,16 @@
+{
+  "name": "@testring/timeout-config",
+  "version": "0.8.0",
+  "main": "./index.js",
+  "typings": "./index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ringcentral/testring.git"
+  },
+  "author": "RingCentral",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "22.8.5"
+  }
+} 

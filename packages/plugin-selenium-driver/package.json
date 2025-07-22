@@ -18,6 +18,7 @@
     "@testring/dwnld-collector-crx": "0.8.0",
     "@testring/logger": "0.8.0",
     "@testring/plugin-api": "0.8.0",
+    "@testring/timeout-config": "0.8.0",
     "@testring/types": "0.8.0",
     "@types/deepmerge": "2.2.3",
     "@types/node": "22.8.5",

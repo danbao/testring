@@ -35,7 +35,7 @@ import {
 } from './browser-scripts';
 
 // 导入统一的timeout配置
-const TIMEOUTS = require('../../e2e-test-app/timeout-config.js');
+const TIMEOUTS = require('@testring/timeout-config');
 
 type valueType = string | number | null | undefined;
 
