@@ -9,8 +9,13 @@
   },
   "author": "RingCentral",
   "license": "MIT",
+  "scripts": {
+    "test": "mocha test/**/*.spec.js --recursive"
+  },
   "dependencies": {},
   "devDependencies": {
-    "@types/node": "22.8.5"
+    "@types/node": "22.8.5",
+    "chai": "^4.3.7",
+    "mocha": "^10.8.2"
   }
 } 
