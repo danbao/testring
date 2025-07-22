@@ -34,6 +34,121 @@ if (!token && !isDryRun) {
     throw new Error('NPM_TOKEN required');
 }
 
+// Function to recursively find all files in a directory
+function findFiles(dir, extensions = ['.js', '.ts', '.json', '.d.ts', '.md']) {
+    const files = [];
+    const items = fs.readdirSync(dir);
+    
+    for (const item of items) {
+        const fullPath = path.join(dir, item);
+        const stat = fs.statSync(fullPath);
+        
+        if (stat.isDirectory() && !item.startsWith('.') && item !== 'node_modules') {
+            files.push(...findFiles(fullPath, extensions));
+        } else if (stat.isFile() && extensions.some(ext => item.endsWith(ext))) {
+            files.push(fullPath);
+        }
+    }
+    
+    return files;
+}
+
+// Function to replace package references in source files
+function replacePackageReferences(pkgLocation) {
+    const files = findFiles(pkgLocation);
+    
+    for (const file of files) {
+        try {
+            let content = fs.readFileSync(file, 'utf8');
+            let modified = false;
+            
+            // Replace @testring/ with @testring-dev/
+            if (content.includes('@testring/')) {
+                content = content.replace(/@testring\//g, '@testring-dev/');
+                modified = true;
+            }
+            
+            // Replace 'testring' with 'testring-dev' (in quotes)
+            if (content.includes("'testring'")) {
+                content = content.replace(/'testring'/g, "'testring-dev'");
+                modified = true;
+            }
+            
+            if (content.includes('"testring"')) {
+                content = content.replace(/"testring"/g, '"testring-dev"');
+                modified = true;
+            }
+            
+            // Replace testring with testring-dev (as word boundary)
+            if (content.includes('testring ')) {
+                content = content.replace(/\btestring\s/g, 'testring-dev ');
+                modified = true;
+            }
+            
+            // Replace github.com/ringcentral/testring with git.ringcentral.com/testring/testring-dev
+            if (content.includes('github.com/ringcentral/testring')) {
+                content = content.replace(/github\.com\/ringcentral\/testring/g, 'git.ringcentral.com/testring/testring-dev');
+                modified = true;
+            }
+            
+            if (modified) {
+                fs.writeFileSync(file, content);
+                process.stdout.write(`  Modified file: ${path.relative(pkgLocation, file)}\n`);
+            }
+        } catch (error) {
+            process.stderr.write(`Error processing file ${file}: ${error.message}\n`);
+        }
+    }
+}
+
+// Function to restore package references in source files
+function restorePackageReferences(pkgLocation) {
+    const files = findFiles(pkgLocation);
+    
+    for (const file of files) {
+        try {
+            let content = fs.readFileSync(file, 'utf8');
+            let modified = false;
+            
+            // Restore @testring-dev/ with @testring/
+            if (content.includes('@testring-dev/')) {
+                content = content.replace(/@testring-dev\//g, '@testring/');
+                modified = true;
+            }
+            
+            // Restore 'testring-dev' with 'testring' (in quotes)
+            if (content.includes("'testring-dev'")) {
+                content = content.replace(/'testring-dev'/g, "'testring'");
+                modified = true;
+            }
+            
+            if (content.includes('"testring-dev"')) {
+                content = content.replace(/"testring-dev"/g, '"testring"');
+                modified = true;
+            }
+            
+            // Restore testring-dev with testring (as word boundary)
+            if (content.includes('testring-dev ')) {
+                content = content.replace(/\btestring-dev\s/g, 'testring ');
+                modified = true;
+            }
+            
+            // Restore git.ringcentral.com/testring/testring-dev with github.com/ringcentral/testring
+            if (content.includes('git.ringcentral.com/testring/testring-dev')) {
+                content = content.replace(/git\.ringcentral\.com\/testring\/testring-dev/g, 'github.com/ringcentral/testring');
+                modified = true;
+            }
+            
+            if (modified) {
+                fs.writeFileSync(file, content);
+                process.stdout.write(`  Restored file: ${path.relative(pkgLocation, file)}\n`);
+            }
+        } catch (error) {
+            process.stderr.write(`Error processing file ${file}: ${error.message}\n`);
+        }
+    }
+}
+
 // Function to modify package.json for dev publishing
 function createDevPackageJson(pkg) {
     const packageJsonPath = path.join(pkg.location, 'package.json');
@@ -88,12 +203,15 @@ async function task(pkg) {
     );
     let published = false;
     try {
-        // For dev publishing, we need to temporarily replace the package.json
+        // For dev publishing, we need to temporarily replace the package.json and source files
         if (isDevPublish) {
             const originalPackageJsonPath = path.join(pkg.location, 'package.json');
             
             // Backup original package.json
             originalPackageJson = fs.readFileSync(originalPackageJsonPath, 'utf8');
+            
+            // Replace package references in source files
+            replacePackageReferences(pkg.location);
             
             // Replace with dev version
             fs.writeFileSync(originalPackageJsonPath, JSON.stringify(devPackageJson, null, 2));
@@ -118,10 +236,13 @@ async function task(pkg) {
     } catch (error) {
         process.stderr.write(error.toString());
     } finally {
-        // Restore original package.json if it was modified
+        // Restore original package.json and source files if they were modified
         if (isDevPublish && originalPackageJson) {
             const originalPackageJsonPath = path.join(pkg.location, 'package.json');
             fs.writeFileSync(originalPackageJsonPath, originalPackageJson);
+            
+            // Restore package references in source files
+            restorePackageReferences(pkg.location);
         }
     }
 
