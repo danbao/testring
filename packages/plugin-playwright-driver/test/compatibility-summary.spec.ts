@@ -79,10 +79,10 @@ describe('Plugin Compatibility Summary', () => {
                     }
                 },
                 
-                // Debug configuration
+                // Debug configuration (headless controlled by PLAYWRIGHT_DEBUG environment variable)
                 {
                     browserName: 'chromium' as const,
-                    launchOptions: { headless: false, slowMo: 100 },
+                    launchOptions: { slowMo: 100, args: ['--no-sandbox'] },
                     video: true,
                     trace: true
                 }

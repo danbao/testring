@@ -239,11 +239,11 @@ describe('Playwright Plugin Integration Compatibility Tests', () => {
                 { browserName: 'chromium' as const },
                 { 
                     browserName: 'chromium' as const,
-                    launchOptions: { headless: true, args: ['--no-sandbox'] }
+                    launchOptions: { args: ['--no-sandbox'] }
                 },
                 {
                     browserName: 'firefox' as const,
-                    launchOptions: { headless: false }
+                    launchOptions: { args: ['--no-sandbox'] }
                 },
                 {
                     browserName: 'webkit' as const,
@@ -256,10 +256,10 @@ describe('Playwright Plugin Integration Compatibility Tests', () => {
             });
         });
 
-        it('should support debugging configuration', () => {
+        it('should support debugging configuration (headless controlled by PLAYWRIGHT_DEBUG)', () => {
             const debugConfig = {
                 browserName: 'chromium' as const,
-                launchOptions: { headless: false, slowMo: 100 },
+                launchOptions: { slowMo: 100, args: ['--no-sandbox'] },
                 video: true,
                 trace: true,
                 coverage: true

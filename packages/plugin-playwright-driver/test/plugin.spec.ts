@@ -71,7 +71,8 @@ describe('PlaywrightPlugin', () => {
             const config = {
                 browserName: 'firefox' as const,
                 launchOptions: {
-                    headless: false
+                    // headless mode is controlled by PLAYWRIGHT_DEBUG environment variable
+                    args: ['--no-sandbox']
                 }
             };
             

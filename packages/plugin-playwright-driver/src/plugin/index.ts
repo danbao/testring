@@ -780,10 +780,11 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         const compatConfig = this.handleSeleniumCompatibility(config);
         this.config = { ...DEFAULT_CONFIG, ...compatConfig };
         
-        // Enable non-headless mode for debugging when PLAYWRIGHT_DEBUG is set
+        // PLAYWRIGHT_DEBUG=1 is the only way to control headless mode
+        // When set, it forces the use of non-headless mode and adds slow motion for debugging
         if (process.env['PLAYWRIGHT_DEBUG'] === '1' && this.config.launchOptions) {
             this.config.launchOptions.headless = false;
-            this.config.launchOptions.slowMo = this.config.launchOptions.slowMo || 500; // Add slow motion for better debugging
+            this.config.launchOptions.slowMo = this.config.launchOptions.slowMo || 500;
             this.logger.info('🐛 Playwright Debug Mode: Running in non-headless mode with slowMo=500ms');
         }
         
@@ -914,14 +915,8 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
                     this.logger.warn(`[Selenium Compatibility] Mapped capabilities['goog:chromeOptions'].args to launchOptions.args`);
                 }
                 
-                // Check for headless mode
-                if (chromeOptions.args?.includes('--headless') || chromeOptions.args?.includes('--headless=new')) {
-                    compatConfig.launchOptions = {
-                        ...compatConfig.launchOptions,
-                        headless: true
-                    };
-                    this.logger.warn(`[Selenium Compatibility] Detected headless mode from Chrome args, set launchOptions.headless=true`);
-                }
+                // Note: headless mode is now controlled only by PLAYWRIGHT_DEBUG environment variable
+                // Removing headless detection from Chrome args to avoid conflicts
             }
         }
         
