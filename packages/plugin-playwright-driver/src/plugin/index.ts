@@ -1793,7 +1793,24 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
     public async execute(applicant: string, fn: any, args: any[]): Promise<any> {
         await this.createClient(applicant);
         const { page } = this.getBrowserClient(applicant);
-        return await page.evaluate(fn, ...args);
+        
+        // Handle the argument structure from WebClient.execute: [fn, [actualArgs]]
+        // args[0] contains the actual arguments array
+        const actualArgs = args.length === 1 && Array.isArray(args[0]) ? args[0] : args;
+        
+        // For non-callback functions, wrap args in an object if there are many to avoid Playwright's argument limit
+        if (actualArgs.length > 1) {
+            const functionString = fn.toString();
+            const wrappedFunction = function(argsObject: any) {
+                const args = argsObject.args || [];
+                const functionString = argsObject.functionString;
+                const originalFunction = eval(`(${functionString})`);
+                return originalFunction.apply(null, args);
+            };
+            return await page.evaluate(wrappedFunction, { args: actualArgs, functionString });
+        }
+        
+        return await page.evaluate(fn, ...actualArgs);
     }
 
     public async executeAsync(applicant: string, fn: any, args: any[]): Promise<any> {
@@ -1844,7 +1861,10 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
             return await page.evaluate(wrappedFunction, { fn, args });
         }
         
-        return await page.evaluate(fn, ...args);
+        // Handle the argument structure from WebClient.execute: [fn, [actualArgs]]
+        // args[0] contains the actual arguments array
+        const actualArgs = args.length === 1 && Array.isArray(args[0]) ? args[0] : args;
+        return await page.evaluate(fn, ...actualArgs);
     }
 
     public async frame(applicant: string, frameID: any): Promise<void> {
