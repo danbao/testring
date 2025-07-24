@@ -42,11 +42,19 @@ jobs:
     - name: Build project
       run: npm run build
 
+    - name: Check Docker Environment
+      run: |
+        echo "🔍 Checking Docker environment..."
+        docker --version
+        docker compose version
+        docker info
+        docker system info | grep -E "(Server Version|Operating System|Architecture)" || true
+
     - name: Start Docker Selenium Grid
       run: |
         echo "🚀 Starting Selenium Grid with Docker Compose..."
         cd docker
-        docker-compose -f docker-selenium.yml up -d
+        docker compose -f docker-selenium.yml up -d
         echo "✅ Selenium Grid containers started"
 
     - name: Wait for Selenium Grid to be ready
@@ -132,7 +140,7 @@ jobs:
       run: |
         echo "🧹 Cleaning up Docker containers..."
         cd docker
-        docker-compose -f docker-selenium.yml down -v
+        docker compose -f docker-selenium.yml down -v
         echo "✅ Cleanup completed"
 
     - name: Display final status

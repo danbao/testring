@@ -30,7 +30,7 @@ cd "$DOCKER_DIR"
 
 # 启动 Selenium Grid
 echo "📦 Starting Docker containers..."
-docker-compose -f docker-selenium.yml up -d
+docker compose -f docker-selenium.yml up -d
 
 # 等待 Grid 就绪
 echo "⏳ Waiting for Selenium Grid to be ready..."

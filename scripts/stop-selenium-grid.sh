@@ -22,7 +22,7 @@ cd "$DOCKER_DIR"
 
 # 停止并移除容器
 echo "📦 Stopping Docker containers..."
-docker-compose -f docker-selenium.yml down -v
+docker compose -f docker-selenium.yml down -v
 
 echo "🧹 Cleaning up..."
 # 清理已停止的容器
