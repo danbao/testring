@@ -30,12 +30,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'yarn'
-          cache-dependency-path: docs/yarn.lock
+          node-version: '22'
 
       - name: Enable Corepack
         run: corepack enable
+
+      - name: Cache Yarn dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            docs/.yarn/cache
+            docs/.yarn/unplugged
+            docs/.yarn/install-state.gz
+          key: yarn-${{ runner.os }}-${{ hashFiles('docs/yarn.lock', 'docs/.yarnrc.yml') }}
+          restore-keys: |
+            yarn-${{ runner.os }}-
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
