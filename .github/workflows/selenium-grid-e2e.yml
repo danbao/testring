@@ -99,7 +99,7 @@ jobs:
       run: |
         echo "🧪 Running E2E tests with Selenium Grid..."
         export SELENIUM_GRID_URL=http://localhost:4444/wd/hub
-        npm run test:playwright:custom-grid
+        npm run test:e2e:grid
       env:
         CI: true
         # 设置测试超时
