@@ -1,76 +1,133 @@
 # Testring Documentation
 
-Welcome to the comprehensive documentation for testring, a modern Node.js-based automated UI testing framework designed for web applications.
+This directory contains the complete documentation for Testring, built with [VitePress](https://vitepress.dev/).
 
-## Quick Navigation
+## Development Setup
 
-### 🚀 Getting Started
-- [Installation & Setup](getting-started/README.md)
-- [Quick Start Guide](getting-started/quick-start.md)
-- [Migration Guides](getting-started/migration-guides/README.md)
+### Prerequisites
 
-### 📚 Core Documentation
-- [API Reference](api/README.md) - Framework API documentation
-- [Configuration](configuration/README.md) - Complete configuration options
-- [Guides](guides/README.md) - Comprehensive usage guides
+- Node.js 18+ 
+- npm or yarn
 
-### 🔧 Architecture
-- [Core Modules](core-modules/README.md) - Framework foundation modules
-- [Packages](packages/README.md) - Extension packages and plugins
-- [Playwright Driver](playwright-driver/README.md) - Modern browser automation
+### Local Development
 
-### 🛠️ Development
-- [Development Guide](development/README.md) - Contributing to testring
-- [Plugin Development](guides/plugin-development.md) - Creating custom plugins
-- [Utilities](development/utils.md) - Build and maintenance tools
+1. **Install dependencies**:
+   ```bash
+   cd docs
+   npm install
+   ```
 
-### 📊 Reports & Analysis
-- [Reports](reports/README.md) - Project reports and analysis
-- [Test Coverage](reports/test-coverage-analysis.md) - Coverage analysis
-- [Compatibility](reports/test-compatibility-report.md) - Browser compatibility
+2. **Start development server**:
+   ```bash
+   npm run dev
+   ```
+   The site will be available at http://localhost:5173
 
-## Framework Overview
+3. **Build for production**:
+   ```bash
+   npm run build
+   ```
 
-Testring is a powerful testing framework that provides:
-
-- **Multi-Process Parallel Execution** - Run tests simultaneously with process isolation
-- **Multi-Browser Support** - Chrome, Firefox, Safari, Edge support
-- **Modern Driver Support** - Both Selenium and Playwright drivers
-- **Rich Plugin System** - Extensible architecture with comprehensive plugin support
-- **Advanced Debugging** - Built-in debugging tools and breakpoints
-- **CI/CD Integration** - Seamless integration with continuous integration systems
-
-## Quick Start
-
-```bash
-# Install testring
-npm install --save-dev testring
-
-# Run tests
-testring run
-
-# Run with specific configuration
-testring run --config ./test.config.js
-```
+4. **Preview production build**:
+   ```bash
+   npm run preview
+   ```
 
 ## Documentation Structure
 
-This documentation is organized into logical sections:
+```
+docs/
+├── .vitepress/           # VitePress configuration
+│   ├── config.js         # Main configuration
+│   └── theme/            # Custom theme
+├── public/               # Static assets
+├── getting-started/      # Getting started guides
+├── api/                  # API reference
+├── guides/               # User guides
+├── core-modules/         # Core module documentation
+├── packages/             # Package documentation
+├── playwright-driver/    # Playwright driver docs
+├── configuration/        # Configuration reference
+├── troubleshooting/      # Troubleshooting guides
+├── static-fixtures/      # Test fixture documentation
+└── index.md             # Homepage
+```
 
-1. **Getting Started** - Everything you need to begin using testring
-2. **API & Configuration** - Detailed reference documentation
-3. **Guides** - Step-by-step instructions for common tasks
-4. **Architecture** - Deep dive into framework components
-5. **Development** - Information for contributors and plugin developers
-6. **Reports** - Analysis and metrics about the project
+## GitHub Pages Deployment
 
-## Need Help?
+The documentation is automatically deployed to GitHub Pages when changes are pushed to the `master` branch. The deployment is handled by the GitHub Actions workflow at `.github/workflows/docs.yml`.
 
-- 📖 Browse the [guides](guides/README.md) for step-by-step instructions
-- 🔍 Check the [troubleshooting guide](guides/troubleshooting.md) for common issues
-- 🐛 Report bugs or request features on [GitHub](https://github.com/ringcentral/testring)
-- 💬 Join the community discussions
+### Manual Deployment
+
+To deploy manually:
+
+1. Build the documentation:
+   ```bash
+   npm run build
+   ```
+
+2. The built files will be in `.vitepress/dist/`
+
+## Writing Documentation
+
+### Adding New Pages
+
+1. Create a new `.md` file in the appropriate directory
+2. Add the page to the sidebar configuration in `.vitepress/config.js`
+3. Use proper frontmatter if needed:
+   ```yaml
+   ---
+   title: Page Title
+   description: Page description
+   ---
+   ```
+
+### Markdown Features
+
+VitePress supports enhanced Markdown features:
+
+- **Code blocks with syntax highlighting**
+- **Custom containers** (tip, warning, danger)
+- **Math expressions** with LaTeX
+- **Mermaid diagrams**
+- **Vue components** in Markdown
+
+### Custom Styling
+
+Custom styles are defined in `.vitepress/theme/custom.css`. The theme uses CSS custom properties for consistent styling.
+
+## Features
+
+- **Fast**: Built on Vite for lightning-fast development
+- **SEO-friendly**: Automatic meta tags and sitemap generation
+- **Search**: Built-in client-side search
+- **Responsive**: Mobile-friendly design
+- **Accessible**: WCAG compliant
+- **Dark mode**: Automatic dark/light theme switching
 
 ## Contributing
 
-We welcome contributions! Please see our [development guide](development/README.md) for information on how to contribute to testring.
+When contributing to the documentation:
+
+1. Follow the existing structure and naming conventions
+2. Test locally before submitting
+3. Ensure all links work correctly
+4. Update the sidebar configuration if adding new sections
+5. Use clear, concise language
+6. Include code examples where helpful
+
+## Troubleshooting
+
+### Common Issues
+
+**Build errors**: Check that all internal links are correct and all referenced files exist.
+
+**Styling issues**: Ensure custom CSS follows VitePress conventions and doesn't conflict with the default theme.
+
+**Navigation problems**: Verify the sidebar configuration in `.vitepress/config.js` matches your file structure.
+
+### Getting Help
+
+- [VitePress Documentation](https://vitepress.dev/)
+- [GitHub Issues](https://github.com/ringcentral/testring/issues)
+- [Community Discussions](https://github.com/ringcentral/testring/discussions)

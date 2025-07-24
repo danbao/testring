@@ -1,0 +1,68 @@
+/* Custom styles for Testring documentation */
+
+:root {
+  --vp-c-brand-1: #007bff;
+  --vp-c-brand-2: #0056b3;
+  --vp-c-brand-3: #004085;
+}
+
+/* Custom hero section */
+.VPHero .name {
+  background: linear-gradient(120deg, #007bff 30%, #0056b3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom code blocks */
+.vp-doc [class*="language-"] {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom sidebar */
+.VPSidebar {
+  border-right: 1px solid var(--vp-c-divider);
+}
+
+/* Feature grid styling */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.feature-card {
+  padding: 1.5rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+  transition: all 0.2s ease;
+}
+
+.feature-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.feature-card h3 {
+  margin-top: 0;
+  color: var(--vp-c-brand-1);
+}
+
+/* Badge styling */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  background: var(--vp-c-default-soft);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.badge.api { background-color: #e3f2fd; color: #1976d2; }
+.badge.guide { background-color: #f3e5f5; color: #7b1fa2; }
+.badge.core { background-color: #e8f5e8; color: #388e3c; }
+.badge.package { background-color: #fff3e0; color: #f57c00; } 
