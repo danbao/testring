@@ -31,8 +31,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: docs/package-lock.json
+          cache: 'yarn'
+          cache-dependency-path: docs/yarn.lock
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -40,12 +43,12 @@ jobs:
       - name: Install dependencies
         run: |
           cd docs
-          npm ci
+          yarn install --immutable
 
       - name: Build with VitePress
         run: |
           cd docs
-          npm run build
+          yarn build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -2,15 +2,19 @@
   "name": "testring-docs",
   "version": "1.0.0",
   "description": "Testring Documentation Site",
+  "type": "module",
   "scripts": {
     "dev": "vitepress dev",
-    "build": "vitepress build",
-    "preview": "vitepress preview"
+    "build": "VITEPRESS_PRODUCTION=true vitepress build",
+    "build:preview": "vitepress build && vitepress preview",
+    "build:dev": "vitepress build",
+    "preview": "vitepress build && vitepress preview"
   },
   "devDependencies": {
     "vitepress": "^1.0.0"
   },
   "peerDependencies": {
     "vue": "^3.3.0"
-  }
-} 
+  },
+  "packageManager": "yarn@4.9.2"
+}

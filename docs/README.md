@@ -21,7 +21,7 @@ This directory contains the complete documentation for Testring, built with [Vit
    ```bash
    npm run dev
    ```
-   The site will be available at http://localhost:5173
+   The site will be available at http://localhost:5173 (VitePress default port)
 
 3. **Build for production**:
    ```bash

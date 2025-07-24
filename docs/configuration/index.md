@@ -1,4 +1,3 @@
-
 # Config API
 
 At first, testring have similar API for config file and arguments in command line,
@@ -314,4 +313,4 @@ $ testring run --plugins my-plugin-1 --plugins my-plugin-2
     }]
   ]
 }
-```
+``` 

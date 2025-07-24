@@ -26,4 +26,4 @@ During execute a it opens browser window with recording app and empty browser wi
 
 ```
 testring record
-```
+``` 

@@ -75,7 +75,7 @@ e2e-test-app/
 │   └── simple/                 # Simple test examples
 │       └── .testringrc         # Basic configuration
 ├── static-fixtures/            # HTML test fixtures
-└── [Timeout Guide](../reports/timeout-guide.md)           # Timeout optimization guide
+└── Timeout Guide                                    # Timeout optimization examples included
 ```
 
 ## Usage
@@ -463,7 +463,7 @@ const url = getTargetUrl(api, 'fixture-name.html');
    - Verify Express server configuration
 
 2. **Tests timing out**:
-   - Review timeout configuration in [Timeout Guide](../reports/timeout-guide.md)
+   - Review timeout configuration in the test examples and code comments
    - Adjust environment-specific timeouts
    - Check network connectivity to mock server
 

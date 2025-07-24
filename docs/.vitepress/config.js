@@ -3,7 +3,19 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Testring Documentation',
   description: 'A modern Node.js-based automated UI testing framework for web applications',
-  base: '/testring/',
+  // Only use GitHub Pages base when explicitly set for production
+  base: process.env.VITEPRESS_PRODUCTION === 'true' ? '/testring/' : '/',
+  
+  // Clean URLs - allows accessing /guides/ instead of /guides/README.html
+  cleanUrls: true,
+  
+  // Ignore localhost links and development URLs
+  ignoreDeadLinks: [
+    // Local development links
+    /^http:\/\/localhost:/,
+    // External service links that may not be accessible during build
+    /^https?:\/\/(?:www\.)?(?:selenium\.dev|docs\.seleniumhq\.org)/
+  ],
   
   // Theme config
   themeConfig: {

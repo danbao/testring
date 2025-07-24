@@ -12,4 +12,4 @@ This directory contains guides to help you get started with testring.
 
 - [Main Documentation](../README.md)
 - [API Reference](../api/README.md)
-- [Configuration](../configuration/README.md)
+- [Configuration](../configuration/README.md) 
