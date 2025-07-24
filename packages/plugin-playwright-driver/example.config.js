@@ -1,12 +1,21 @@
 // Example configuration for using @testring/plugin-playwright-driver
+// 
+// Browser Mode Control:
+// - Default: Runs in headless mode for performance and consistency
+// - Set PLAYWRIGHT_DEBUG=1 environment variable to run in non-headless mode with slow motion for debugging
+//
+// Usage examples:
+// - npm test (headless mode)
+// - PLAYWRIGHT_DEBUG=1 npm test (non-headless mode for debugging)
 
 module.exports = {
     plugins: [
-        // Basic configuration - using Chromium in headless mode
+        // Basic configuration - default headless mode (controlled by PLAYWRIGHT_DEBUG environment)
         ['@testring/plugin-playwright-driver', {
             browserName: 'chromium',
             launchOptions: {
-                headless: true,
+                // Note: headless is automatically set to true by default
+                // Only PLAYWRIGHT_DEBUG=1 environment variable can override this to false
                 args: ['--no-sandbox', '--disable-setuid-sandbox']
             },
             contextOptions: {
@@ -14,13 +23,14 @@ module.exports = {
             }
         }],
         
-        // Advanced configuration with debugging features
+        // Advanced configuration with other features
         /*
         ['@testring/plugin-playwright-driver', {
             browserName: 'chromium', // or 'firefox', 'webkit'
             launchOptions: {
-                headless: false,
-                slowMo: 100, // Slow down operations for debugging
+                // headless mode is controlled by PLAYWRIGHT_DEBUG environment variable only
+                // Do not set headless: false here - use PLAYWRIGHT_DEBUG=1 instead
+                slowMo: 100, // Custom slow motion (PLAYWRIGHT_DEBUG=1 sets this to 500ms automatically)
                 devtools: true
             },
             contextOptions: {

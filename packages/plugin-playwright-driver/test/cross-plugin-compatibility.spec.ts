@@ -124,11 +124,11 @@ describe('Cross-Plugin Compatibility Tests', () => {
             });
         });
 
-        it('should support headless configuration similar to Selenium', () => {
+        it('should support basic browser configuration (headless controlled by PLAYWRIGHT_DEBUG)', () => {
             const configs = [
-                { browserName: 'chromium' as const, launchOptions: { headless: true } },
-                { browserName: 'chromium' as const, launchOptions: { headless: false } },
-                { browserName: 'firefox' as const, launchOptions: { headless: true } }
+                { browserName: 'chromium' as const, launchOptions: { args: ['--no-sandbox'] } },
+                { browserName: 'firefox' as const, launchOptions: { args: ['--no-sandbox'] } },
+                { browserName: 'webkit' as const, launchOptions: {} }
             ];
 
             configs.forEach(config => {

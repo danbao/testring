@@ -21,6 +21,8 @@
     "test:playwright": "ts-node src/test-runner.ts --config ./test/playwright/config.js --env-config=./test/playwright/env.json",
     "test:playwright:headless": "ts-node src/test-runner.ts --config ./test/playwright/config.js --env-config=./test/playwright/env.json --headless",
     "test:playwright:grid": "ts-node src/test-runner.ts --config ./test/playwright/config-with-grid.js --env-config=./test/playwright/env.json --headless",
+    "test:playwright:custom-grid": "ts-node src/test-runner.ts --config ./test/playwright/config-custom-grid.js --env-config=./test/playwright/env.json",
+    "test:playwright:remote-fixtures": "ts-node src/test-runner.ts --config ./test/playwright/config-remote-fixtures.js --env-config=./test/playwright/env.json --headless",
     "test:screenshots": "ts-node src/test-runner.ts --config ./test/playwright/config-screenshot.js",
 
     "test:integration": "mocha test/integration/**/*.spec.js --timeout 120000",
