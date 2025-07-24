@@ -560,7 +560,7 @@ The plugin provides the standard testring web application API. Key methods inclu
 - `browser.debug()` - Enter debug mode
 - `browser.pause(milliseconds)` - Pause execution
 
-For complete API documentation, see the [@testring/web-application](../web-application/README.md) documentation.
+For complete API documentation, see the [@testring/web-application](web-application.md) documentation.
 
 ## Best Practices
 
@@ -596,7 +596,7 @@ For complete API documentation, see the [@testring/web-application](../web-appli
 
 ## Migration to Playwright
 
-Consider migrating to the modern [@testring/plugin-playwright-driver](../plugin-playwright-driver/README.md) for:
+Consider migrating to the modern [@testring/plugin-playwright-driver](plugin-playwright-driver.md) for:
 
 - **Better performance** and reliability
 - **Modern browser features** and APIs
