@@ -1,0 +1,118 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main, master, fix-testring-dev-publish ]
+    paths:
+      - 'docs/**'
+      - 'packages/e2e-test-app/static-fixtures/**'
+      - '.github/workflows/github-pages.yml'
+  workflow_dispatch:  # 允许手动触发
+
+# 设置 GITHUB_TOKEN 权限以允许部署到 GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 只允许一个并发部署，跳过正在进行的运行之间排队的运行
+# 但是，不要取消正在进行的运行，因为我们希望这些生产部署完成
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # 构建工作
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          cache-version: 0
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v4
+
+      - name: Sync static fixtures to docs
+        run: |
+          echo "📁 Syncing static fixtures to docs..."
+          # 确保目录存在
+          mkdir -p docs/static-fixtures
+          
+          # 同步静态文件（如果源文件更新的话）
+          if [ -d "packages/e2e-test-app/static-fixtures" ]; then
+            echo "🔄 Copying static fixtures..."
+            cp -r packages/e2e-test-app/static-fixtures/* docs/static-fixtures/
+            echo "✅ Static fixtures synced"
+          else
+            echo "⚠️  Source static-fixtures directory not found"
+          fi
+          
+          # 列出文件
+          echo "📋 Files in docs/static-fixtures:"
+          ls -la docs/static-fixtures/ || echo "Directory is empty"
+
+      - name: Create Gemfile for Jekyll
+        run: |
+          cat > docs/Gemfile << 'EOF'
+          source "https://rubygems.org"
+          
+          gem "jekyll", "~> 4.3"
+          gem "minima", "~> 2.5"
+          gem "jekyll-feed", "~> 0.12"
+          gem "jekyll-sitemap", "~> 1.4"
+          gem "jekyll-seo-tag", "~> 2.8"
+          
+          # Windows and JRuby does not include zoneinfo files
+          gem "tzinfo", ">= 1", "< 3"
+          gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+          
+          # Performance-booster for watching directories on Windows
+          gem "wdm", "~> 0.1.1", :platforms => [:mingw, :mswin, :x64_mingw, :jruby]
+          
+          # Lock `http_parser.rb` gem to `v0.6.x` on JRuby builds
+          gem "http_parser.rb", "~> 0.6.0", :platforms => [:jruby]
+          EOF
+
+      - name: Install dependencies
+        run: |
+          cd docs
+          bundle install
+
+      - name: Build with Jekyll
+        run: |
+          cd docs
+          bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_site
+
+  # 部署工作
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Display deployment info
+        run: |
+          echo "🚀 Deployment completed!"
+          echo "📄 Site URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "🧪 Static fixtures: ${{ steps.deployment.outputs.page_url }}static-fixtures/"
+          echo "📚 Documentation: ${{ steps.deployment.outputs.page_url }}" 

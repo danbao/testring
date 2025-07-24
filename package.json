@@ -34,6 +34,7 @@
     "grid:start": "./scripts/start-selenium-grid.sh",
     "grid:stop": "./scripts/stop-selenium-grid.sh",
     "test:e2e:grid": "lerna run --stream --scope @testring/e2e-test-app test:playwright:custom-grid",
+    "test:e2e:remote": "lerna run --stream --scope @testring/e2e-test-app test:playwright:remote-fixtures",
     "build": "npm run build:main && npm run build:devtool && npm run build:extension",
     "build:main": "lerna exec --ignore=\"@testring/@(e2e-test-app|devtool-frontend|devtool-extension|ui-kit)\" -- tsc -p tsconfig.build.json",
     "build:main:watch": "lerna exec --ignore=\"@testring/@(e2e-test-app|devtool-frontend|devtool-extension|ui-kit)\" --parallel -- tsc --watch --inlineSourceMap",
