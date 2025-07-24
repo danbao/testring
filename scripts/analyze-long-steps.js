@@ -1,97 +1,145 @@
 #!/usr/bin/env node
 
 /**
- * 分析e2e测试日志，找出超过30秒的步骤
+ * Analyze e2e test logs to find steps that take longer than 30 seconds
  */
 
-// 从文件读取测试日志内容
+// Read test log content from file
 function readLogContent() {
     const fs = require('fs');
     const path = require('path');
 
     try {
-        // 尝试读取最新的日志文件 - 从根目录查找
+        // Try to read the latest log file - search from root directory
         const logFiles = [
-            path.join(__dirname, '..', 'packages', 'e2e-test-app', 'performance-test.log'), // 新的性能测试日志
-            path.join(__dirname, '..', 'packages', 'e2e-test-app', 'temp-performance-log.txt'), // 临时日志
-            path.join(__dirname, '..', 'packages', 'e2e-test-app', 'e2e-test-output.log'),
-            path.join(__dirname, '..', 'packages', 'e2e-test-app', 'e2e-test-iframe-fix.log'),
-            path.join(__dirname, '..', 'packages', 'e2e-test-app', 'e2e-test-hybrid-fix.log'),
-            path.join(__dirname, '..', 'packages', 'e2e-test-app', 'e2e-test-locator-api.log')
+            path.join(
+                __dirname,
+                '..',
+                'packages',
+                'e2e-test-app',
+                'performance-test.log',
+            ), // New performance test log
+            path.join(
+                __dirname,
+                '..',
+                'packages',
+                'e2e-test-app',
+                'temp-performance-log.txt',
+            ), // Temporary log
+            path.join(
+                __dirname,
+                '..',
+                'packages',
+                'e2e-test-app',
+                'e2e-test-output.log',
+            ),
+            path.join(
+                __dirname,
+                '..',
+                'packages',
+                'e2e-test-app',
+                'e2e-test-iframe-fix.log',
+            ),
+            path.join(
+                __dirname,
+                '..',
+                'packages',
+                'e2e-test-app',
+                'e2e-test-hybrid-fix.log',
+            ),
+            path.join(
+                __dirname,
+                '..',
+                'packages',
+                'e2e-test-app',
+                'e2e-test-locator-api.log',
+            ),
         ];
 
         for (const logFile of logFiles) {
             if (fs.existsSync(logFile)) {
-                console.log(`📖 Reading log file: ${path.relative(process.cwd(), logFile)}`);
+                console.log(
+                    `📖 Reading log file: ${path.relative(
+                        process.cwd(),
+                        logFile,
+                    )}`,
+                );
                 return fs.readFileSync(logFile, 'utf8');
             }
         }
 
-        // 尝试从最近的测试运行中获取日志
-        console.log('⚠️  No existing log files found, attempting to run tests and capture logs...');
+        // Try to get logs from recent test runs
+        console.log(
+            '⚠️  No existing log files found, attempting to run tests and capture logs...',
+        );
         return runTestsAndCaptureLog();
-
     } catch (error) {
         console.error('Error reading log file:', error.message);
         return '';
     }
 }
 
-// 运行测试并捕获日志
+// Run tests and capture logs
 function runTestsAndCaptureLog() {
-    const { execSync } = require('child_process');
+    const {execSync} = require('child_process');
     const fs = require('fs');
     const path = require('path');
 
     try {
         console.log('🚀 Running E2E tests to generate performance data...');
 
-        // 创建临时日志文件路径
-        const tempLogFile = path.join(__dirname, '..', 'packages', 'e2e-test-app', 'temp-performance-log.txt');
+        // Create temporary log file path
+        const tempLogFile = path.join(
+            __dirname,
+            '..',
+            'packages',
+            'e2e-test-app',
+            'temp-performance-log.txt',
+        );
 
-        // 运行测试并捕获输出
-        const testCommand = 'cd packages/e2e-test-app && npm run test:playwright:headless';
+        // Run tests and capture output
+        const testCommand =
+            'cd packages/e2e-test-app && npm run test:playwright:headless';
 
         try {
             const output = execSync(testCommand, {
                 encoding: 'utf8',
                 stdio: 'pipe',
                 timeout: 300000, // 5 minutes timeout
-                cwd: path.join(__dirname, '..')
+                cwd: path.join(__dirname, '..'),
             });
 
-            // 保存输出到临时文件
+            // Save output to temporary file
             fs.writeFileSync(tempLogFile, output);
-            console.log(`✅ Test completed, log saved to: ${path.relative(process.cwd(), tempLogFile)}`);
+            console.log(
+                `✅ Test completed, log saved to: ${path.relative(
+                    process.cwd(),
+                    tempLogFile,
+                )}`,
+            );
 
             return output;
-
         } catch (testError) {
-            // 即使测试失败，也尝试获取输出
+            // Try to get output even if tests fail
             const output = testError.stdout || testError.stderr || '';
             if (output) {
                 fs.writeFileSync(tempLogFile, output);
-                console.log(`⚠️  Tests failed but captured output: ${path.relative(process.cwd(), tempLogFile)}`);
+                console.log(
+                    `⚠️  Tests failed but captured output: ${path.relative(
+                        process.cwd(),
+                        tempLogFile,
+                    )}`,
+                );
                 return output;
             }
             throw testError;
         }
-
     } catch (error) {
         console.error('❌ Failed to run tests:', error.message);
-        console.log('📝 Using sample data for demonstration...');
-
-        // 返回示例数据
-        return `
-13:03:44 | info      | worker/c-9i0_qG5HckiwGKD-FRY | [web-application] [step] Navigating to http://localhost:8080/alert.html
-13:03:46 | info      | worker/c-9i0_qG5HckiwGKD-FRY | [web-application] [step] Checking if alert is open
-13:03:47 | info      | worker/c-9i0_qG5HckiwGKD-FRY | [web-application] [step] Getting CSS property "background-color" of (//*[@data-test-automation-id='root']//*[@data-test-automation-id='withClass'])[1] for 30000
-13:04:17 | info      | worker/c-9i0_qG5HckiwGKD-FRY | [web-application] [step] Getting CSS property "background-color" of (//*[@data-test-automation-id='root']//*[@data-test-automation-id='withStyle'])[1] for 30000
-13:04:47 | info      | worker/c-9i0_qG5HckiwGKD-FRY | [web-application] [step] [assert] equal(act = "rgba(139,0,0,1)", exp = "rgba(139,0,0,1)")
-13:04:47 | info      | worker/c-9i0_qG5HckiwGKD-FRY | [web-application] [step] Checking if (//*[@data-test-automation-id='root']//*[@data-test-automation-id='withStyle'])[1] has any of the classes customDivClass
-13:05:18 | info      | worker/c-9i0_qG5HckiwGKD-FRY | [web-application] [step] Checking if (//*[@data-test-automation-id='root']//*[@data-test-automation-id='withClass'])[1] has any of the classes customDivClass
-13:05:48 | info      | worker/c-9i0_qG5HckiwGKD-FRY | [web-application] [step] [assert] equal(act = false, exp = false)
-`;
+        console.log(
+            '❌ No log data available - tests failed and no existing log files found',
+        );
+        return '';
     }
 }
 
@@ -112,10 +160,13 @@ function formatDuration(seconds) {
 }
 
 function analyzeLongSteps() {
-    const lines = logContent.trim().split('\n').filter(line => line.trim());
+    const lines = logContent
+        .trim()
+        .split('\n')
+        .filter((line) => line.trim());
     const longSteps = [];
 
-    // 找到所有包含[step]的行
+    // Find all lines containing [step]
     const stepLines = [];
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -124,19 +175,19 @@ function analyzeLongSteps() {
                 index: i,
                 line: line,
                 timeMatch: line.match(/(\d{2}:\d{2}:\d{2})/),
-                time: null
+                time: null,
             });
         }
     }
 
-    // 计算时间
-    stepLines.forEach(step => {
+    // Calculate time
+    stepLines.forEach((step) => {
         if (step.timeMatch) {
             step.time = parseTimeFromLog(step.timeMatch[1]);
         }
     });
 
-    // 分析相邻步骤之间的时间间隔
+    // Analyze time intervals between adjacent steps
     for (let i = 0; i < stepLines.length - 1; i++) {
         const currentStep = stepLines[i];
         const nextStep = stepLines[i + 1];
@@ -144,16 +195,20 @@ function analyzeLongSteps() {
         if (currentStep.time !== null && nextStep.time !== null) {
             let duration = nextStep.time - currentStep.time;
 
-            // 处理跨小时的情况
+            // Handle cross-hour cases
             if (duration < 0) {
-                duration += 3600; // 加一小时
+                duration += 3600; // Add one hour
             }
 
-            // 只记录超过等于30秒的步骤
+            // Only record steps that take 30 seconds or more
             if (duration >= 30) {
-                // 提取步骤描述
-                const stepMatch = currentStep.line.match(/\[step\] (.+?)(?:\s+for \d+)?$/);
-                const stepDescription = stepMatch ? stepMatch[1] : currentStep.line;
+                // Extract step description
+                const stepMatch = currentStep.line.match(
+                    /\[step\] (.+?)(?:\s+for \d+)?$/,
+                );
+                const stepDescription = stepMatch
+                    ? stepMatch[1]
+                    : currentStep.line;
 
                 longSteps.push({
                     startTime: currentStep.timeMatch[1],
@@ -161,7 +216,9 @@ function analyzeLongSteps() {
                     duration: duration,
                     description: stepDescription.trim(),
                     fullLine: currentStep.line,
-                    worker: currentStep.line.match(/worker\/([^|]+)/)?.[1] || 'unknown'
+                    worker:
+                        currentStep.line.match(/worker\/([^|]+)/)?.[1] ||
+                        'unknown',
                 });
             }
         }
@@ -171,10 +228,13 @@ function analyzeLongSteps() {
 }
 
 function analyzeModerateLongSteps() {
-    const lines = logContent.trim().split('\n').filter(line => line.trim());
+    const lines = logContent
+        .trim()
+        .split('\n')
+        .filter((line) => line.trim());
     const longSteps = [];
 
-    // 找到所有包含[step]的行
+    // Find all lines containing [step]
     const stepLines = [];
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -183,19 +243,19 @@ function analyzeModerateLongSteps() {
                 index: i,
                 line: line,
                 timeMatch: line.match(/(\d{2}:\d{2}:\d{2})/),
-                time: null
+                time: null,
             });
         }
     }
 
-    // 计算时间
-    stepLines.forEach(step => {
+    // Calculate time
+    stepLines.forEach((step) => {
         if (step.timeMatch) {
             step.time = parseTimeFromLog(step.timeMatch[1]);
         }
     });
 
-    // 分析相邻步骤之间的时间间隔
+    // Analyze time intervals between adjacent steps
     for (let i = 0; i < stepLines.length - 1; i++) {
         const currentStep = stepLines[i];
         const nextStep = stepLines[i + 1];
@@ -203,16 +263,20 @@ function analyzeModerateLongSteps() {
         if (currentStep.time !== null && nextStep.time !== null) {
             let duration = nextStep.time - currentStep.time;
 
-            // 处理跨小时的情况
+            // Handle cross-hour cases
             if (duration < 0) {
-                duration += 3600; // 加一小时
+                duration += 3600; // Add one hour
             }
 
-            // 记录超过10秒的步骤
+            // Record steps that take more than 10 seconds
             if (duration > 10) {
-                // 提取步骤描述
-                const stepMatch = currentStep.line.match(/\[step\] (.+?)(?:\s+for \d+)?$/);
-                const stepDescription = stepMatch ? stepMatch[1] : currentStep.line;
+                // Extract step description
+                const stepMatch = currentStep.line.match(
+                    /\[step\] (.+?)(?:\s+for \d+)?$/,
+                );
+                const stepDescription = stepMatch
+                    ? stepMatch[1]
+                    : currentStep.line;
 
                 longSteps.push({
                     startTime: currentStep.timeMatch[1],
@@ -220,7 +284,77 @@ function analyzeModerateLongSteps() {
                     duration: duration,
                     description: stepDescription.trim(),
                     fullLine: currentStep.line,
-                    worker: currentStep.line.match(/worker\/([^|]+)/)?.[1] || 'unknown'
+                    worker:
+                        currentStep.line.match(/worker\/([^|]+)/)?.[1] ||
+                        'unknown',
+                });
+            }
+        }
+    }
+
+    return longSteps.sort((a, b) => b.duration - a.duration);
+}
+
+function analyzeFiveSecondSteps() {
+    const lines = logContent
+        .trim()
+        .split('\n')
+        .filter((line) => line.trim());
+    const longSteps = [];
+
+    // Find all lines containing [step]
+    const stepLines = [];
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.includes('[step]') && line.match(/\d{2}:\d{2}:\d{2}/)) {
+            stepLines.push({
+                index: i,
+                line: line,
+                timeMatch: line.match(/(\d{2}:\d{2}:\d{2})/),
+                time: null,
+            });
+        }
+    }
+
+    // Calculate time
+    stepLines.forEach((step) => {
+        if (step.timeMatch) {
+            step.time = parseTimeFromLog(step.timeMatch[1]);
+        }
+    });
+
+    // Analyze time intervals between adjacent steps
+    for (let i = 0; i < stepLines.length - 1; i++) {
+        const currentStep = stepLines[i];
+        const nextStep = stepLines[i + 1];
+
+        if (currentStep.time !== null && nextStep.time !== null) {
+            let duration = nextStep.time - currentStep.time;
+
+            // Handle cross-hour cases
+            if (duration < 0) {
+                duration += 3600; // Add one hour
+            }
+
+            // Record steps that take more than 5 seconds
+            if (duration > 5) {
+                // Extract step description
+                const stepMatch = currentStep.line.match(
+                    /\[step\] (.+?)(?:\s+for \d+)?$/,
+                );
+                const stepDescription = stepMatch
+                    ? stepMatch[1]
+                    : currentStep.line;
+
+                longSteps.push({
+                    startTime: currentStep.timeMatch[1],
+                    endTime: nextStep.timeMatch[1],
+                    duration: duration,
+                    description: stepDescription.trim(),
+                    fullLine: currentStep.line,
+                    worker:
+                        currentStep.line.match(/worker\/([^|]+)/)?.[1] ||
+                        'unknown',
                 });
             }
         }
@@ -232,129 +366,146 @@ function analyzeModerateLongSteps() {
 function generateReport() {
     const longSteps = analyzeLongSteps();
 
-    console.log('🔍 E2E测试中超过30秒的步骤分析');
-    console.log('=' .repeat(80));
+    console.log('🔍 Analysis of E2E test steps taking longer than 30 seconds');
+    console.log('='.repeat(80));
     console.log();
 
-    // 调试信息
-    console.log('📊 调试信息:');
-    console.log(`总共分析了 ${logContent.split('\n').filter(line => line.includes('[step]')).length} 个步骤`);
+    // Debug information
+    const fiveSecondSteps = analyzeFiveSecondSteps();
+    const moderateSteps = analyzeModerateLongSteps();
+
+    console.log('📊 Debug information:');
+    console.log(
+        `Total analyzed steps: ${
+            logContent.split('\n').filter((line) => line.includes('[step]'))
+                .length
+        }`,
+    );
+    console.log(
+        `Found ${fiveSecondSteps.length} steps taking more than 5 seconds`,
+    );
+    console.log(
+        `Found ${moderateSteps.length} steps taking more than 10 seconds`,
+    );
+    console.log(`Found ${longSteps.length} steps taking more than 30 seconds`);
     console.log();
 
     if (longSteps.length === 0) {
-        console.log('✅ 没有发现超过30秒的步骤');
+        console.log('✅ No steps taking longer than 30 seconds found');
 
-        // 显示一些较长的步骤（超过10秒）作为参考
-        const moderateSteps = analyzeModerateLongSteps();
+        // Show some longer steps for reference
         if (moderateSteps.length > 0) {
-            console.log('\n📋 超过10秒的步骤（参考）:');
+            console.log('\n📋 Steps taking more than 10 seconds (reference):');
             moderateSteps.slice(0, 5).forEach((step, index) => {
-                console.log(`${index + 1}. 🕐 持续时间: ${formatDuration(step.duration)}`);
-                console.log(`   ⏰ 时间段: ${step.startTime} → ${step.endTime}`);
+                console.log(
+                    `${index + 1}. 🕐 Duration: ${formatDuration(
+                        step.duration,
+                    )}`,
+                );
+                console.log(
+                    `   ⏰ Time range: ${step.startTime} → ${step.endTime}`,
+                );
                 console.log(`   👷 Worker: ${step.worker}`);
-                console.log(`   📝 步骤: ${step.description}`);
+                console.log(`   � 步骤r: ${step.description}`);
                 console.log();
+            });
+        }
+
+        if (fiveSecondSteps.length > 0) {
+            console.log('\n📋 Steps taking more than 5 seconds statistics:');
+            console.log(`Total: ${fiveSecondSteps.length} steps`);
+            console.log('Top 5 longest:');
+            fiveSecondSteps.slice(0, 5).forEach((step, index) => {
+                console.log(
+                    `${index + 1}. 🕐 ${formatDuration(step.duration)} - ${
+                        step.description
+                    }`,
+                );
             });
         }
         return;
     }
-    
-    console.log(`⚠️  发现 ${longSteps.length} 个超过30秒的步骤:\n`);
-    
-    // 按持续时间排序
+
+    console.log(
+        `⚠️  Found ${longSteps.length} steps taking longer than 30 seconds:\n`,
+    );
+
+    // Sort by duration
     longSteps.sort((a, b) => b.duration - a.duration);
-    
+
     longSteps.forEach((step, index) => {
-        console.log(`${index + 1}. 🕐 持续时间: ${formatDuration(step.duration)}`);
-        console.log(`   ⏰ 时间段: ${step.startTime} → ${step.endTime}`);
-        console.log(`   📝 步骤: ${step.description}`);
+        console.log(
+            `${index + 1}. 🕐 Duration: ${formatDuration(step.duration)}`,
+        );
+        console.log(`   ⏰ Time range: ${step.startTime} → ${step.endTime}`);
+        console.log(`   📝 Step: ${step.description}`);
         console.log();
     });
-    
-    // 统计分析
-    console.log('📊 统计分析:');
+
+    // Statistical analysis
+    console.log('📊 Statistical analysis:');
     console.log('-'.repeat(40));
-    
-    const totalLongTime = longSteps.reduce((sum, step) => sum + step.duration, 0);
+
+    const totalLongTime = longSteps.reduce(
+        (sum, step) => sum + step.duration,
+        0,
+    );
     const averageDuration = Math.round(totalLongTime / longSteps.length);
-    const maxDuration = Math.max(...longSteps.map(step => step.duration));
-    
-    console.log(`总计长时间步骤: ${longSteps.length} 个`);
-    console.log(`总计额外时间: ${formatDuration(totalLongTime)}`);
-    console.log(`平均持续时间: ${formatDuration(averageDuration)}`);
-    console.log(`最长持续时间: ${formatDuration(maxDuration)}`);
-    
-    // 分类分析
-    console.log('\n🏷️  步骤类型分析:');
+    const maxDuration = Math.max(...longSteps.map((step) => step.duration));
+
+    console.log(`Total long-running steps: ${longSteps.length}`);
+    console.log(`Total extra time: ${formatDuration(totalLongTime)}`);
+    console.log(`Average duration: ${formatDuration(averageDuration)}`);
+    console.log(`Maximum duration: ${formatDuration(maxDuration)}`);
+
+    // Category analysis
+    console.log('\n🏷️  Step type analysis:');
     console.log('-'.repeat(40));
-    
+
     const categories = {};
-    longSteps.forEach(step => {
+    longSteps.forEach((step) => {
         let category = 'Other';
-        
+
         if (step.description.includes('Clicking for')) {
             category = 'Click Operations';
-        } else if (step.description.includes('Getting text') || step.description.includes('Getting CSS')) {
+        } else if (
+            step.description.includes('Getting text') ||
+            step.description.includes('Getting CSS')
+        ) {
             category = 'Element Queries';
         } else if (step.description.includes('Waiting')) {
             category = 'Wait Operations';
         } else if (step.description.includes('Checking if')) {
             category = 'Element Checks';
         }
-        
+
         if (!categories[category]) {
             categories[category] = [];
         }
         categories[category].push(step);
     });
-    
+
     Object.entries(categories).forEach(([category, steps]) => {
         const totalTime = steps.reduce((sum, step) => sum + step.duration, 0);
-        console.log(`${category}: ${steps.length} 个步骤, 总计 ${formatDuration(totalTime)}`);
+        console.log(
+            `${category}: ${steps.length} steps, total ${formatDuration(
+                totalTime,
+            )}`,
+        );
     });
 
-    // 问题分析和建议
-    console.log('\n🔧 问题分析和优化建议:');
+    // Problem analysis and suggestions
+    console.log('\n🔧 Problem analysis and optimization suggestions:');
     console.log('='.repeat(80));
 
     longSteps.forEach((step, index) => {
         console.log(`\n${index + 1}. ${step.description}`);
-        console.log(`   持续时间: ${formatDuration(step.duration)}`);
+        console.log(`   Duration: ${formatDuration(step.duration)}`);
 
-        let analysis = '';
-        let suggestion = '';
-
-        if (step.description.includes('halfHoveredButton') || step.description.includes('partiallyHoveredButton')) {
-            analysis = '🔍 问题: 点击被覆盖的按钮，Playwright在非headless模式下等待元素变为可点击';
-            suggestion = '💡 建议: 使用force选项或更短的超时时间，或在CI环境使用headless模式';
-        } else if (step.description.includes('Getting CSS property')) {
-            analysis = '🔍 问题: CSS属性查询超时，可能是元素渲染延迟或选择器问题';
-            suggestion = '💡 建议: 检查元素是否存在，优化CSS选择器，或添加元素等待逻辑';
-        } else if (step.description.includes('Checking if') && step.description.includes('classes')) {
-            analysis = '🔍 问题: 类名检查超时，可能是元素状态变化延迟';
-            suggestion = '💡 建议: 添加元素状态等待，或使用更精确的选择器';
-        } else if (step.description.includes('Waiting')) {
-            analysis = '🔍 问题: 等待操作超时，元素可能不会出现或条件不会满足';
-            suggestion = '💡 建议: 检查等待条件是否正确，考虑使用更短的超时或不同的等待策略';
-        } else if (step.description.includes('Getting selected text')) {
-            analysis = '🔍 问题: 获取选中文本超时，可能是select元素状态问题';
-            suggestion = '💡 建议: 确保select元素已正确渲染和选择，添加状态检查';
-        } else {
-            analysis = '🔍 问题: 步骤执行时间异常长，需要进一步调查';
-            suggestion = '💡 建议: 检查网络连接、元素状态、或考虑优化测试逻辑';
-        }
-
+        const {analysis, suggestion} = getAnalysisAndSuggestion(step);
         console.log(`   ${analysis}`);
         console.log(`   ${suggestion}`);
     });
-
-    console.log('\n📋 总体优化建议:');
-    console.log('-'.repeat(40));
-    console.log('1. 🎯 针对被覆盖元素的点击操作，使用force选项或更短超时');
-    console.log('2. ⚡ 优化CSS和元素查询，添加适当的等待逻辑');
-    console.log('3. 🔄 在CI环境中使用headless模式以获得更一致的性能');
-    console.log('4. 📊 考虑将长时间操作的超时时间从30秒减少到更合理的值');
-    console.log('5. 🧪 添加更多的中间状态检查，避免长时间等待');
 }
 
 function saveReportToFile() {
@@ -363,108 +514,213 @@ function saveReportToFile() {
 
     const longSteps = analyzeLongSteps();
     const moderateSteps = analyzeModerateLongSteps();
+    const fiveSecondSteps = analyzeFiveSecondSteps();
 
-    const reportContent = `# E2E测试长时间步骤分析报告
+    const reportContent = `# E2E Test Long-Running Steps Analysis Report
 
-## 执行时间
-${new Date().toLocaleString('zh-CN')}
+## Execution Time
+${new Date().toLocaleString('en-US')}
 
-## 概述
-- 总共分析了 ${logContent.split('\n').filter(line => line.includes('[step]')).length} 个测试步骤
-- 发现 ${longSteps.length} 个超过30秒的步骤
-- 发现 ${moderateSteps.length} 个超过10秒的步骤
+## Overview
+- Total analyzed test steps: ${
+        logContent.split('\n').filter((line) => line.includes('[step]')).length
+    }
+- Found ${fiveSecondSteps.length} steps taking more than 5 seconds
+- Found ${moderateSteps.length} steps taking more than 10 seconds
+- Found ${longSteps.length} steps taking more than 30 seconds
 
-## 超过30秒的步骤详情
+## Steps Taking More Than 30 Seconds Details
 
-${longSteps.length === 0 ? '✅ 没有发现超过30秒的步骤' : longSteps.map((step, index) => `
+${
+    longSteps.length === 0
+        ? '✅ No steps taking longer than 30 seconds found'
+        : longSteps
+              .map(
+                  (step, index) => `
 ### ${index + 1}. ${step.description}
 
-- **持续时间**: ${formatDuration(step.duration)}
-- **时间段**: ${step.startTime} → ${step.endTime}
+- **Duration**: ${formatDuration(step.duration)}
+- **Time Range**: ${step.startTime} → ${step.endTime}
 - **Worker**: ${step.worker}
-- **完整日志**: \`${step.fullLine}\`
+- **Full Log**: \`${step.fullLine}\`
 
-**问题分析**:
+**Problem Analysis**:
 ${getAnalysisForStep(step)}
 
-**优化建议**:
+**Optimization Suggestions**:
 ${getSuggestionForStep(step)}
-`).join('\n')}
+`,
+              )
+              .join('\n')
+}
 
-## 超过10秒的步骤（前10个）
+## Steps Taking More Than 5 Seconds Statistics
 
-${moderateSteps.slice(0, 10).map((step, index) => `
+Total: ${fiveSecondSteps.length} steps
+
+### Top 10 Longest Steps Taking More Than 5 Seconds
+
+${fiveSecondSteps
+    .slice(0, 10)
+    .map(
+        (step, index) => `
+${index + 1}. **${step.description}**
+   - Duration: ${formatDuration(step.duration)}
+   - Time Range: ${step.startTime} → ${step.endTime}
+   - Worker: ${step.worker}
+`,
+    )
+    .join('\n')}
+
+## Steps Taking More Than 10 Seconds (Top 10)
+
+${moderateSteps
+    .slice(0, 10)
+    .map(
+        (step, index) => `
 ### ${index + 1}. ${step.description}
 
-- **持续时间**: ${formatDuration(step.duration)}
-- **时间段**: ${step.startTime} → ${step.endTime}
+- **Duration**: ${formatDuration(step.duration)}
+- **Time Range**: ${step.startTime} → ${step.endTime}
 - **Worker**: ${step.worker}
-`).join('\n')}
+`,
+    )
+    .join('\n')}
 
-## 总体统计
+## Overall Statistics
 
-${longSteps.length > 0 ? `
-- 总计长时间步骤: ${longSteps.length} 个
-- 总计额外时间: ${formatDuration(longSteps.reduce((sum, step) => sum + step.duration, 0))}
-- 平均持续时间: ${formatDuration(Math.round(longSteps.reduce((sum, step) => sum + step.duration, 0) / longSteps.length))}
-- 最长持续时间: ${formatDuration(Math.max(...longSteps.map(step => step.duration)))}
-` : ''}
+${
+    longSteps.length > 0
+        ? `
+- Total long-running steps: ${longSteps.length}
+- Total extra time: ${formatDuration(
+              longSteps.reduce((sum, step) => sum + step.duration, 0),
+          )}
+- Average duration: ${formatDuration(
+              Math.round(
+                  longSteps.reduce((sum, step) => sum + step.duration, 0) /
+                      longSteps.length,
+              ),
+          )}
+- Maximum duration: ${formatDuration(
+              Math.max(...longSteps.map((step) => step.duration)),
+          )}
+`
+        : ''
+}
 
-## 优化建议
-
-1. 🎯 针对被覆盖元素的点击操作，使用force选项或更短超时
-2. ⚡ 优化CSS和元素查询，添加适当的等待逻辑
-3. 🔄 在CI环境中使用headless模式以获得更一致的性能
-4. 📊 考虑将长时间操作的超时时间从30秒减少到更合理的值
-5. 🧪 添加更多的中间状态检查，避免长时间等待
-
-## 生成时间
+## Generated At
 ${new Date().toISOString()}
 `;
 
-    // 保存到根目录的 docs 文件夹
-    const reportPath = path.join(__dirname, '..', 'docs', 'performance-analysis.md');
+    // Save to docs folder in root directory
+    const reportPath = path.join(
+        __dirname,
+        '..',
+        'docs',
+        'performance-analysis.md',
+    );
 
-    // 确保目录存在
+    // Ensure directory exists
     const docsDir = path.dirname(reportPath);
     if (!fs.existsSync(docsDir)) {
-        fs.mkdirSync(docsDir, { recursive: true });
+        fs.mkdirSync(docsDir, {recursive: true});
     }
 
     fs.writeFileSync(reportPath, reportContent, 'utf8');
-    console.log(`\n📄 详细报告已保存到: ${path.relative(process.cwd(), reportPath)}`);
+    console.log(
+        `\n📄 Detailed report saved to: ${path.relative(
+            process.cwd(),
+            reportPath,
+        )}`,
+    );
+}
+
+// Problem analysis rules list
+const analysisRules = [
+    {
+        patterns: ['halfHoveredButton', 'partiallyHoveredButton'],
+        analysis:
+            '🔍 Issue: Clicking covered button, Playwright waits for element to become clickable in non-headless mode',
+        suggestion:
+            '💡 Suggestion: Use the force option or a shorter timeout, or use headless mode in a CI environment.',
+    },
+    {
+        patterns: ['Getting CSS property'],
+        analysis:
+            '🔍 Issue: CSS property query timeout, possibly due to element rendering delay or selector issues',
+        suggestion:
+            '💡 Suggestion: Check if element exists, optimize CSS selector, or add element wait logic',
+    },
+    {
+        patterns: ['Checking if', 'classes'],
+        matchAll: true,
+        analysis:
+            '🔍 Issue: Class name check timeout, possibly due to element state change delay',
+        suggestion: 
+            '💡 Suggestion: Add element state waiting, or use a more precise selector.',
+    },
+    {
+        patterns: ['Waiting'],
+        analysis:
+            '🔍 Issue: Wait operation timeout, element may not appear or condition may not be met',
+        suggestion:
+            '💡 Suggestion: Check if wait condition is correct, consider using shorter timeout or different wait strategy',
+    },
+    {
+        patterns: ['Getting selected text'],
+        analysis:
+            '🔍 Issue: Getting selected text timeout, possibly due to select element state issues',
+        suggestion:
+            '💡 Suggestion: Ensure select element is properly rendered and selected, add state check',
+    },
+    {
+        patterns: ['Getting text'],
+        analysis:
+            '🔍 Issue: Text retrieval timeout, possibly due to element rendering delay or selector issues',
+        suggestion:
+            '💡 Suggestion: Check if element exists, optimize selector, or add element wait logic',
+    },
+    {
+        patterns: ['Clicking for'],
+        analysis:
+            '🔍 Issue: Click operation timeout, element may not be clickable or is blocked',
+        suggestion:
+            '💡 Suggestion: Check element state, use force option, or optimize element locating',
+    },
+];
+
+function getAnalysisAndSuggestion(step) {
+    const description = step.description;
+
+    for (const rule of analysisRules) {
+        const matches = rule.matchAll
+            ? rule.patterns.every((pattern) => description.includes(pattern))
+            : rule.patterns.some((pattern) => description.includes(pattern));
+
+        if (matches) {
+            return {
+                analysis: rule.analysis,
+                suggestion: rule.suggestion,
+            };
+        }
+    }
+
+    // Default analysis
+    return {
+        analysis:
+            '🔍 Issue: Step execution time is abnormally long, requires further investigation',
+        suggestion:
+            '💡 Suggestion: Check network connection, element state, or consider optimizing test logic',
+    };
 }
 
 function getAnalysisForStep(step) {
-    if (step.description.includes('halfHoveredButton') || step.description.includes('partiallyHoveredButton')) {
-        return '🔍 问题: 点击被覆盖的按钮，Playwright在非headless模式下等待元素变为可点击';
-    } else if (step.description.includes('Getting CSS property')) {
-        return '🔍 问题: CSS属性查询超时，可能是元素渲染延迟或选择器问题';
-    } else if (step.description.includes('Checking if') && step.description.includes('classes')) {
-        return '🔍 问题: 类名检查超时，可能是元素状态变化延迟';
-    } else if (step.description.includes('Waiting')) {
-        return '🔍 问题: 等待操作超时，元素可能不会出现或条件不会满足';
-    } else if (step.description.includes('Getting selected text')) {
-        return '🔍 问题: 获取选中文本超时，可能是select元素状态问题';
-    } else {
-        return '🔍 问题: 步骤执行时间异常长，需要进一步调查';
-    }
+    return getAnalysisAndSuggestion(step).analysis;
 }
 
 function getSuggestionForStep(step) {
-    if (step.description.includes('halfHoveredButton') || step.description.includes('partiallyHoveredButton')) {
-        return '💡 建议: 使用force选项或更短的超时时间，或在CI环境使用headless模式';
-    } else if (step.description.includes('Getting CSS property')) {
-        return '💡 建议: 检查元素是否存在，优化CSS选择器，或添加元素等待逻辑';
-    } else if (step.description.includes('Checking if') && step.description.includes('classes')) {
-        return '💡 建议: 添加元素状态等待，或使用更精确的选择器';
-    } else if (step.description.includes('Waiting')) {
-        return '💡 建议: 检查等待条件是否正确，考虑使用更短的超时或不同的等待策略';
-    } else if (step.description.includes('Getting selected text')) {
-        return '💡 建议: 确保select元素已正确渲染和选择，添加状态检查';
-    } else {
-        return '💡 建议: 检查网络连接、元素状态、或考虑优化测试逻辑';
-    }
+    return getAnalysisAndSuggestion(step).suggestion;
 }
 
 if (require.main === module) {
@@ -472,4 +728,4 @@ if (require.main === module) {
     saveReportToFile();
 }
 
-module.exports = { analyzeLongSteps, generateReport, saveReportToFile };
+module.exports = {analyzeLongSteps, generateReport, saveReportToFile};
