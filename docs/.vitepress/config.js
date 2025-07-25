@@ -26,7 +26,10 @@ export default defineConfig({
     nav: [
       { text: 'Getting Started', link: '/getting-started/' },
       { text: 'API Reference', link: '/api/' },
+      { text: 'Core Modules', link: '/core-modules/' },
+      { text: 'Packages', link: '/packages/' },
       { text: 'Guides', link: '/guides/' },
+      { text: 'Test Fixtures', link: '/static-fixtures/', target: '_blank' },
       { text: 'GitHub', link: 'https://github.com/ringcentral/testring' }
     ],
 
@@ -85,7 +88,8 @@ export default defineConfig({
             { text: 'Pluggable Module', link: '/core-modules/pluggable-module' },
             { text: 'Dependencies Builder', link: '/core-modules/dependencies-builder' },
             { text: 'Async Assert', link: '/core-modules/async-assert' },
-            { text: 'Async Breakpoints', link: '/core-modules/async-breakpoints' }
+            { text: 'Async Breakpoints', link: '/core-modules/async-breakpoints' },
+            { text: 'Testring', link: '/core-modules/testring' }
           ]
         }
       ],
@@ -106,7 +110,9 @@ export default defineConfig({
             { text: 'Plugin Playwright Driver', link: '/packages/plugin-playwright-driver' },
             { text: 'Plugin Selenium Driver', link: '/packages/plugin-selenium-driver' },
             { text: 'Test Utils', link: '/packages/test-utils' },
-            { text: 'Web Application', link: '/packages/web-application' }
+            { text: 'Web Application', link: '/packages/web-application' },
+            { text: 'E2E Test App', link: '/packages/e2e-test-app' },
+            { text: 'Download Collector CRX', link: '/packages/download-collector-crx' }
           ]
         }
       ],
@@ -173,5 +179,10 @@ export default defineConfig({
   },
 
   // Build options
-  buildConcurrency: 5
+  buildConcurrency: 5,
+
+  // Vite config for handling static assets
+  vite: {
+    assetsInclude: ['**/*.html']
+  }
 }) 
