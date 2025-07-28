@@ -1,0 +1,50 @@
+import { Context } from 'hono';
+
+export function getScrollHtml(c: Context) {
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scroll test</title>
+    <style>
+        .container {
+            height: 200px;
+            width: 200px;
+            overflow: auto;
+            background: aliceblue;
+        }
+
+        .extender {
+            height: 200vh;
+        }
+    </style>
+    <script>
+        function onMouseOver(n) {
+            document.getElementById('mouseOverResult').innerText = n.toString();
+        }
+    </script>
+</head>
+<body data-test-automation-id="root">
+    <div class="container" data-test-automation-id="container" id="container">
+        <p data-test-automation-id="item_1" id="item_1" onmouseover="onMouseOver(1)">Text 1</p>
+        <p>Text 2</p>
+        <p>Text 3</p>
+        <p>Text 4</p>
+        <p>Text 5</p>
+        <p>Text 6</p>
+        <p data-test-automation-id="item_7">Text 7</p>
+        <p data-test-automation-id="item_8">Text 8</p>
+        <p>Text 9</p>
+        <p data-test-automation-id="item_10" id="item_10" onmouseover="onMouseOver(10)">Text 10</p>
+    </div>
+    <p id="mouseOverResult" data-test-automation-id="mouseOverResult"></p>
+    <div class="extender"></div>
+    <a data-test-automation-id="button" href="#" onclick="return false">
+        Button
+    </a>
+    <div class="extender"></div>
+</body>
+</html>
+`;
+    return c.html(html);
+}

@@ -1,0 +1,22 @@
+import { Context } from 'hono';
+
+export function getScreenshotHtml(c: Context) {
+    const html = `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Screenshot test</title>
+
+
+</head>
+
+<body data-test-automation-id="root" style="padding:0;">
+    <div style="position: relative; width: 100px; height: 100px;padding:0;background-color: red;">
+
+    </div>
+</body>
+
+</html>`;
+    return c.html(html);
+}

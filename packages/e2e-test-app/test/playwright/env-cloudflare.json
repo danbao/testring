@@ -1,0 +1,5 @@
+{
+  "envParameters" : {
+    "baseUrl" : "https://testring-dev.ringcentral.workers.dev/static/"
+  }
+}

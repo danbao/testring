@@ -116,7 +116,7 @@ await server.start(); // Runs on port 8080
 // Server provides:
 // - Static HTML fixtures at http://localhost:8080/
 // - File upload endpoint at http://localhost:8080/upload
-// - Mock Selenium hub at http://localhost:8080/wd/hub/*
+// - Selenium Grid hub at http://localhost:4444/wd/hub/*
 // - Headers inspection at http://localhost:8080/selenium-headers
 
 // Stop the server

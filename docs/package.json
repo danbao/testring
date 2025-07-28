@@ -8,8 +8,8 @@
     "build": "VITEPRESS_PRODUCTION=true vitepress build",
     "build:preview": "vitepress build && vitepress preview",
     "build:dev": "vitepress build",
-    "preview": "vitepress build && vitepress preview"
-  },
+          "preview": "vitepress build && vitepress preview"
+    },
   "devDependencies": {
     "vitepress": "^1.0.0"
   },

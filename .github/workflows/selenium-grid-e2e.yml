@@ -2,7 +2,7 @@ name: E2E Tests with Docker Selenium Grid
 
 on:
   push:
-    branches: [ master, main ,fix-testring-dev-publish]
+    branches: [ master, main ,selenium-grid-e2e]
     paths:
       - 'packages/e2e-test-app/**'
       - 'packages/plugin-playwright-driver/**'
@@ -10,7 +10,7 @@ on:
       - 'docker/docker-selenium.yml'
       - '.github/workflows/selenium-grid-e2e.yml'
   pull_request:
-    branches: [ master, main ,fix-testring-dev-publish]
+    branches: [ master, main ,selenium-grid-e2e]
     paths:
       - 'packages/e2e-test-app/**'
       - 'packages/plugin-playwright-driver/**'

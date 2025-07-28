@@ -1,22 +1,25 @@
-import express from 'express';
-import * as Http from 'http';
-import * as path from 'node:path';
-import multer from 'multer';
+import { Hono } from 'hono';
+import { serve } from '@hono/node-server';
+import { createSharedApp } from './shared-routes';
 
 const port = 8080;
-const upload = multer({storage: multer.memoryStorage()});
 
 export class MockWebServer {
-    private httpServerInstance!: Http.Server;
-    private static seleniumHubHeaders: Http.IncomingHttpHeaders[] = [];
+    private httpServerInstance: any;
+    private app: Hono;
+
+    constructor() {
+        this.app = this.createHonoApp();
+    }
 
     start(): Promise<void> {
         return new Promise<void>((resolve) => {
-            this.httpServerInstance =
-                MockWebServer.createExpressWebApplication().listen(
-                    port,
-                    resolve,
-                );
+            this.httpServerInstance = serve({
+                fetch: this.app.fetch,
+                port,
+            }, () => {
+                resolve();
+            });
         });
     }
 
@@ -24,62 +27,49 @@ export class MockWebServer {
         this.httpServerInstance.close();
     }
 
-    private static createExpressWebApplication(): express.Application {
-        const app = express();
-        app.use(express.static(path.join(__dirname, '..', 'static-fixtures')));
+    // 获取 Hono app 实例，用于 Cloudflare Workers 部署
+    getApp(): Hono {
+        return this.app;
+    }
 
-        // POST upload endpoint
-        app.post('/upload', upload.single('file'), (req: express.Request, res: express.Response) => {
-            if (!req.file) {
-                res.status(400).json({error: 'No file uploaded'});
-                return;
-            }
-            res.status(200).json({
-                message: 'File received successfully',
-                filename: req.file.originalname,
-            });
-        });
-
-        // mock any request that contains /wd/hub
-        app.all('/wd/hub/*', (req: express.Request, res: express.Response) => {
-            // get request headers
-            const headers = req.headers;
-            // store headers for later use
-            MockWebServer.seleniumHubHeaders.push(headers);
-            res.status(200).json({
-                status: 0,
-                value: {
-                    sessionId: 'mock-session-id',
-                    capabilities: {
-                        browserName: 'mock-browser',
-                        platformName: 'mock-platform',
-                    },
-                },
-            });
-        });
-
-        // endpoint to retrieve stored headers
-        app.get('/selenium-headers', (_req: express.Request, res: express.Response) => {
-            res.status(200).json(MockWebServer.seleniumHubHeaders);
-        });
-
-        // 添加一个简单的测试页面，用于验证 Grid 连接
-        app.get('/grid-test', (_req: express.Request, res: express.Response) => {
-            res.status(200).send(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Grid Test Page</title>
-                </head>
-                <body>
-                    <h1>Mock Selenium Grid Test</h1>
-                    <p>This page is served by the mock Selenium Grid server.</p>
-                    <div data-test-automation-id="grid-status">Connected to Mock Grid</div>
-                </body>
-                </html>
-            `);
-        });
-
+    private createHonoApp(): Hono {
+        // 使用共享的路由（包含 HTML 路由）
+        const app = createSharedApp();
         return app;
     }
+}
+
+// 导出 Hono app 实例，用于 Cloudflare Workers 部署
+export const app = new MockWebServer().getApp();
+
+// 默认导出，用于 Cloudflare Workers
+export default app;
+
+// 如果直接运行此文件，启动服务器
+if (require.main === module) {
+    const server = new MockWebServer();
+
+    server.start().then(() => {
+        console.log('🚀 Mock Web Server 已启动在 http://localhost:8080');
+        console.log('');
+        console.log('可用的端点：');
+        console.log('  POST /upload - 文件上传端点');
+        console.log('  ALL  /wd/hub/* - Mock Selenium WebDriver hub');
+        console.log('  GET  /selenium-headers - 获取存储的请求头');
+        console.log('  GET  /grid-test - 测试页面');
+        console.log('  GET  /health - 健康检查');
+        console.log('  GET  /static/* - HTML 测试页面（所有环境）');
+        console.log('');
+        console.log('按 Ctrl+C 停止服务器');
+    }).catch((error) => {
+        console.error('启动服务器失败:', error);
+        process.exit(1);
+    });
+
+    // 优雅关闭
+    process.on('SIGINT', () => {
+        console.log('\n正在关闭服务器...');
+        server.stop();
+        process.exit(0);
+    });
 }

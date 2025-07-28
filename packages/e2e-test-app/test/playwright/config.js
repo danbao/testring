@@ -41,10 +41,6 @@ module.exports = async (config) => {
                         args: local ? [] : ['--no-sandbox']
                     },
                     clientTimeout: local ? 0 : (config.testTimeout || TIMEOUTS.CLIENT_SESSION),
-                    // 只在环境变量设置时启用 mock Selenium Grid
-                    ...(process.env.TESTRING_USE_MOCK_GRID === 'true' && {
-                        gridUrl: 'http://localhost:8080/wd/hub'
-                    }),
                 },
             ],
             ['babel', babelConfig],
