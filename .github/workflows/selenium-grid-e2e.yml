@@ -67,8 +67,6 @@ jobs:
         while [ $elapsed -lt $timeout ]; do
           if curl -f http://localhost:4444/wd/hub/status >/dev/null 2>&1; then
             echo "✅ Selenium Grid is ready!"
-            echo "Grid status:"
-            curl -s http://localhost:4444/wd/hub/status | jq '.' || curl -s http://localhost:4444/wd/hub/status
             break
           fi
           echo "Waiting for Grid... (${elapsed}s/${timeout}s)"
@@ -90,10 +88,8 @@ jobs:
     - name: Verify Grid nodes
       run: |
         echo "🔍 Checking Grid nodes..."
-        curl -s http://localhost:4444/grid/api/hub | jq '.' || echo "Failed to get hub info"
-        
-        echo "Available sessions:"
-        curl -s http://localhost:4444/wd/hub/sessions | jq '.' || echo "Failed to get sessions info"
+        chmod +x scripts/check-selenium-grid.sh
+        ./scripts/check-selenium-grid.sh
 
     - name: Run E2E tests with Selenium Grid
       run: |
