@@ -2,21 +2,21 @@ name: E2E
 
 on:
   push:
-    branches: [ master, main, selenium-grid-e2e ]
+    branches: [ master, main ]
     paths:
       - 'packages/e2e-test-app/**'
       - 'packages/plugin-playwright-driver/**'
       - 'packages/web-application/**'
       - 'docker/docker-selenium.yml'
-      - '.github/workflows/selenium-grid-e2e.yml'
+      - '.github/workflows/e2e.yml'
   pull_request:
-    branches: [ master, main, selenium-grid-e2e ]
+    branches: [ master, main ]
     paths:
       - 'packages/e2e-test-app/**'
       - 'packages/plugin-playwright-driver/**'
       - 'packages/web-application/**'
       - 'docker/docker-selenium.yml'
-      - '.github/workflows/selenium-grid-e2e.yml'
+      - '.github/workflows/e2e.yml'
   workflow_dispatch:
 
 jobs:
