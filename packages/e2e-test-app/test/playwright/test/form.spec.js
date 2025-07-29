@@ -92,16 +92,21 @@ run(async (api) => {
     await app.setValue(app.root.form.nameInput, 'testValueKeys');
     afterSetValue = await app.getValue(app.root.form.nameInput);
     await app.assert.equal(afterSetValue, 'testValueKeys');
+    
+    // Test keyboard functionality by deleting the last character
     await app.click(app.root.form.nameInput);
-    
-    // Use Meta+A (Command+A) on macOS instead of Control+A
-    const isMac = process.platform === 'darwin';
-    await app.keys([isMac ? 'Meta' : 'Control', 'A']);
-    
-    await app.keys(['Backspace']);
+    await app.keys(['End']); // Move to end of input
+    await app.keys(['Backspace']); // Delete last character
+    await app.keys(['Backspace']); // Delete last character
+    await app.keys(['Backspace']); // Delete last character
+    await app.keys(['Backspace']); // Delete last character
     
     afterClearValue = await app.getValue(app.root.form.nameInput);
     
+    await app.assert.equal(afterClearValue, 'testValue');
+
+    await app.clearValue(app.root.form.nameInput);
+    afterClearValue = await app.getValue(app.root.form.nameInput);
     await app.assert.equal(afterClearValue, '');
 
     // addValue
