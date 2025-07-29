@@ -93,11 +93,15 @@ run(async (api) => {
     afterSetValue = await app.getValue(app.root.form.nameInput);
     await app.assert.equal(afterSetValue, 'testValueKeys');
     await app.click(app.root.form.nameInput);
+    
     // Use Meta+A (Command+A) on macOS instead of Control+A
     const isMac = process.platform === 'darwin';
     await app.keys([isMac ? 'Meta' : 'Control', 'A']);
+    
     await app.keys(['Backspace']);
+    
     afterClearValue = await app.getValue(app.root.form.nameInput);
+    
     await app.assert.equal(afterClearValue, '');
 
     // addValue
