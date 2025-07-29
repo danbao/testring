@@ -1793,73 +1793,95 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         // args[0] contains the actual arguments array
         const actualArgs = args.length === 1 && Array.isArray(args[0]) ? args[0] : args;
         
-        // For non-callback functions, wrap args in an object if there are many to avoid Playwright's argument limit
-        if (actualArgs.length > 1) {
-            const functionString = fn.toString();
-            const wrappedFunction = function(argsObject: any) {
-                const args = argsObject.args || [];
-                const functionString = argsObject.functionString;
-                const originalFunction = eval(`(${functionString})`);
-                return originalFunction.apply(null, args);
-            };
-            return await page.evaluate(wrappedFunction, { args: actualArgs, functionString });
+        try {
+            // For non-callback functions, wrap args in an object if there are many to avoid Playwright's argument limit
+            if (actualArgs.length > 1) {
+                const functionString = fn.toString();
+                const wrappedFunction = function(argsObject: any) {
+                    const args = argsObject.args || [];
+                    const functionString = argsObject.functionString;
+                    const originalFunction = eval(`(${functionString})`);
+                    return originalFunction.apply(null, args);
+                };
+                return await page.evaluate(wrappedFunction, { args: actualArgs, functionString });
+            }
+            
+            return await page.evaluate(fn, ...actualArgs);
+        } catch (error: any) {
+            // Handle navigation errors gracefully
+            if (error.message && error.message.includes('Execution context was destroyed')) {
+                this.logger.warn(`Execute failed due to navigation: ${error.message}`);
+                // Wait a bit for navigation to complete and try again
+                await page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => {});
+                return null; // Return null instead of throwing error
+            }
+            throw error;
         }
-        
-        return await page.evaluate(fn, ...actualArgs);
     }
 
     public async executeAsync(applicant: string, fn: any, args: any[]): Promise<any> {
         await this.createClient(applicant);
         const { page } = this.getBrowserClient(applicant);
         
-        // Handle browser scripts that expect a callback pattern
-        if (typeof fn === 'function' && fn.toString().includes('done(')) {
-            return new Promise((resolve, reject) => {
-                const functionString = fn.toString();
-                
-                // Create a wrapper that converts callback-style to Promise-style
-                const wrappedFunction = function(argsObject: any) {
-                    return new Promise((promiseResolve, promiseReject) => {
-                        const args = argsObject.args || [];
-                        const functionString = argsObject.functionString;
-                        const done = (result: any) => {
-                            if (result instanceof Error || (typeof result === 'string' && result.includes('Error'))) {
-                                promiseReject(new Error(String(result)));
-                            } else {
-                                promiseResolve(result);
+        try {
+            // Handle browser scripts that expect a callback pattern
+            if (typeof fn === 'function' && fn.toString().includes('done(')) {
+                return new Promise((resolve, reject) => {
+                    const functionString = fn.toString();
+                    
+                    // Create a wrapper that converts callback-style to Promise-style
+                    const wrappedFunction = function(argsObject: any) {
+                        return new Promise((promiseResolve, promiseReject) => {
+                            const args = argsObject.args || [];
+                            const functionString = argsObject.functionString;
+                            const done = (result: any) => {
+                                if (result instanceof Error || (typeof result === 'string' && result.includes('Error'))) {
+                                    promiseReject(new Error(String(result)));
+                                } else {
+                                    promiseResolve(result);
+                                }
+                            };
+                            
+                            try {
+                                const originalFunction = eval(`(${functionString})`);
+                                originalFunction.apply(null, [...args, done]);
+                            } catch (error) {
+                                promiseReject(error);
                             }
-                        };
-                        
-                        try {
-                            const originalFunction = eval(`(${functionString})`);
-                            originalFunction.apply(null, [...args, done]);
-                        } catch (error) {
-                            promiseReject(error);
-                        }
-                    });
+                        });
+                    };
+                    
+                    // Wrap all arguments in a single object to avoid Playwright's argument limit
+                    page.evaluate(wrappedFunction, { args, functionString })
+                        .then(resolve)
+                        .catch(reject);
+                });
+            }
+            
+            // For non-callback functions, also wrap args in an object if there are many
+            if (args.length > 1) {
+                const wrappedFunction = function(argsObject: any) {
+                    const args = argsObject.args || [];
+                    const originalFunction = argsObject.fn;
+                    return originalFunction.apply(null, args);
                 };
-                
-                // Wrap all arguments in a single object to avoid Playwright's argument limit
-                page.evaluate(wrappedFunction, { args, functionString })
-                    .then(resolve)
-                    .catch(reject);
-            });
+                return await page.evaluate(wrappedFunction, { fn, args });
+            }
+            
+            // Handle the argument structure from WebClient.execute: [fn, [actualArgs]]
+            // args[0] contains the actual arguments array
+            const actualArgs = args.length === 1 && Array.isArray(args[0]) ? args[0] : args;
+            return await page.evaluate(fn, ...actualArgs);
+        } catch (error: any) {
+            // Handle navigation errors gracefully
+            if (error.message && error.message.includes('Execution context was destroyed')) {
+                this.logger.warn(`ExecuteAsync failed due to navigation: ${error.message}`);
+                // Wait a bit for navigation to complete and try again
+                await page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => {});
+                return null; // Return null instead of throwing error
+            }
+            throw error;
         }
-        
-        // For non-callback functions, also wrap args in an object if there are many
-        if (args.length > 1) {
-            const wrappedFunction = function(argsObject: any) {
-                const args = argsObject.args || [];
-                const originalFunction = argsObject.fn;
-                return originalFunction.apply(null, args);
-            };
-            return await page.evaluate(wrappedFunction, { fn, args });
-        }
-        
-        // Handle the argument structure from WebClient.execute: [fn, [actualArgs]]
-        // args[0] contains the actual arguments array
-        const actualArgs = args.length === 1 && Array.isArray(args[0]) ? args[0] : args;
-        return await page.evaluate(fn, ...actualArgs);
     }
 
     public async frame(applicant: string, frameID: any): Promise<void> {
@@ -2145,7 +2167,9 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
             // Handle file upload
             await page.setInputFiles(normalizedSelector, value);
         } else {
-            await page.fill(normalizedSelector, value, { timeout: TIMEOUTS.FILL }); // 填充操作timeout
+            // Convert value to string for page.fill() which expects string
+            const stringValue = String(value);
+            await page.fill(normalizedSelector, stringValue, { timeout: TIMEOUTS.FILL }); // 填充操作timeout
         }
     }
 
@@ -2161,8 +2185,35 @@ export class PlaywrightPlugin implements IBrowserProxyPlugin {
         await this.createClient(applicant);
         const { page } = this.getBrowserClient(applicant);
         const normalizedSelector = this.normalizeSelector(selector);
-        // 使用统一的超时配置，Playwright 的 selectOption 有完整的自动等待机制
-        await page.selectOption(normalizedSelector, { value }, { timeout: TIMEOUTS.WAIT_FOR_ELEMENT });
+        
+        // 确保 value 是字符串类型
+        const stringValue = String(value);
+        
+        try {
+            // 使用统一的超时配置，Playwright 的 selectOption 有完整的自动等待机制
+            await page.selectOption(normalizedSelector, { value: stringValue }, { timeout: TIMEOUTS.WAIT_FOR_ELEMENT });
+        } catch (error) {
+            // 如果 selectOption 失败，尝试使用更兼容的方法
+            this.logger.debug(`selectOption failed for selector: ${normalizedSelector}, value: ${stringValue}, trying alternative method`);
+            
+            // 尝试使用 evaluate 方法手动设置选项
+            await page.evaluate(({ selector, value }) => {
+                const element = document.querySelector(selector) as HTMLSelectElement;
+                if (!element) {
+                    throw new Error(`Element not found: ${selector}`);
+                }
+                
+                // 查找匹配的选项
+                const option = Array.from(element.options).find(opt => opt.value === value);
+                if (!option) {
+                    throw new Error(`Option with value "${value}" not found in select element`);
+                }
+                
+                // 设置选中状态
+                element.value = value;
+                element.dispatchEvent(new Event('change', { bubbles: true }));
+            }, { selector: normalizedSelector, value: stringValue });
+        }
     }
 
     public async selectByVisibleText(applicant: string, selector: string, text: string): Promise<void> {

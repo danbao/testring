@@ -1571,7 +1571,16 @@ export class WebApplication extends PluggableModule {
         return 'Executing JavaScript function in browser console';
     })
     public execute(fn: (...args: any[]) => any, ...args: any[]) {
-        return this.client.execute(fn, ...args);
+        try {
+            return this.client.execute(fn, ...args);
+        } catch (error: any) {
+            // Handle navigation errors gracefully
+            if (error.message && error.message.includes('Execution context was destroyed')) {
+                this.logger.warn(`Execute failed due to navigation: ${error.message}`);
+                return null; // Return null instead of throwing error
+            }
+            throw error;
+        }
     }
 
     @stepLog(function (this: WebApplication, timeout: number) {
