@@ -3,19 +3,34 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Testring Documentation',
   description: 'A modern Node.js-based automated UI testing framework for web applications',
-  base: '/testring/',
+  // Only use GitHub Pages base when explicitly set for production
+  base: process.env.VITEPRESS_PRODUCTION === 'true' ? '/testring/' : '/',
+  
+  // Clean URLs - allows accessing /guides/ instead of /guides/README.html
+  cleanUrls: true,
+  
+  // Ignore localhost links and development URLs
+  ignoreDeadLinks: [
+    // Local development links
+    /^http:\/\/localhost:/,
+    // External service links that may not be accessible during build
+    /^https?:\/\/(?:www\.)?(?:selenium\.dev|docs\.seleniumhq\.org)/
+  ],
   
   // Theme config
   themeConfig: {
     // Logo
-    logo: '/logo.png',
+    logo: '/logo.svg',
     
     // Navigation
     nav: [
       { text: 'Getting Started', link: '/getting-started/' },
       { text: 'API Reference', link: '/api/' },
+      { text: 'Core Modules', link: '/core-modules/' },
+      { text: 'Packages', link: '/packages/' },
       { text: 'Guides', link: '/guides/' },
-      { text: 'GitHub', link: 'https://github.com/ringcentral/testring' }
+      { text: 'Test Fixtures', link: 'https://testring-dev.ringcentral.workers.dev/', target: '_blank' },
+      { text: 'GitHub', link: 'https://github.com/ringcentral/testring', target: '_blank' }
     ],
 
     // Sidebar
@@ -73,7 +88,8 @@ export default defineConfig({
             { text: 'Pluggable Module', link: '/core-modules/pluggable-module' },
             { text: 'Dependencies Builder', link: '/core-modules/dependencies-builder' },
             { text: 'Async Assert', link: '/core-modules/async-assert' },
-            { text: 'Async Breakpoints', link: '/core-modules/async-breakpoints' }
+            { text: 'Async Breakpoints', link: '/core-modules/async-breakpoints' },
+            { text: 'Testring', link: '/core-modules/testring' }
           ]
         }
       ],
@@ -94,7 +110,9 @@ export default defineConfig({
             { text: 'Plugin Playwright Driver', link: '/packages/plugin-playwright-driver' },
             { text: 'Plugin Selenium Driver', link: '/packages/plugin-selenium-driver' },
             { text: 'Test Utils', link: '/packages/test-utils' },
-            { text: 'Web Application', link: '/packages/web-application' }
+            { text: 'Web Application', link: '/packages/web-application' },
+            { text: 'E2E Test App', link: '/packages/e2e-test-app' },
+            { text: 'Download Collector CRX', link: '/packages/download-collector-crx' }
           ]
         }
       ],
@@ -161,5 +179,10 @@ export default defineConfig({
   },
 
   // Build options
-  buildConcurrency: 5
+  buildConcurrency: 5,
+
+  // Vite config for handling static assets
+  vite: {
+    assetsInclude: ['**/*.html']
+  }
 }) 

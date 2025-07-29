@@ -1,4 +1,4 @@
-name: Deploy VitePress Documentation
+name: Docs
 
 on:
   push:
@@ -25,14 +25,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Needed for lastUpdated feature
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: docs/package-lock.json
+          node-version: '22'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            docs/.yarn/cache
+            docs/.yarn/unplugged
+            docs/.yarn/install-state.gz
+          key: yarn-${{ runner.os }}-${{ hashFiles('docs/yarn.lock', 'docs/.yarnrc.yml') }}
+          restore-keys: |
+            yarn-${{ runner.os }}-
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -40,12 +52,12 @@ jobs:
       - name: Install dependencies
         run: |
           cd docs
-          npm ci
+          yarn install --immutable
 
-      - name: Build with VitePress
+      - name: Build documentation
         run: |
           cd docs
-          npm run build
+          yarn build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

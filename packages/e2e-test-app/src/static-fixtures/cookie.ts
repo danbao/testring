@@ -1,0 +1,24 @@
+import { Context } from 'hono';
+
+export function getCookieHtml(c: Context) {
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cookie test </title>
+    <script>
+        function printCookie() {
+            document.getElementById('cookie_found').innerText = document.cookie;
+        }
+
+        document.cookie = 'test=TestData';
+    </script>
+</head>
+<body data-test-automation-id="root">
+    <button data-test-automation-id="cookie_clear_button" onclick="printCookie()">Cookie cleared!</button>
+    <p id="cookie_found" data-test-automation-id="cookie_found_text"></p>
+</body>
+</html>
+`;
+    return c.html(html);
+}

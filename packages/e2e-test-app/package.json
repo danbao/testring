@@ -12,45 +12,45 @@
     "test": "npm run test:unit && npm run test:e2e",
     "test:all": "npm run test:unit && npm run test:e2e:full && npm run test:integration",
     "test:watch": "echo \"test:watch skipped\"",
-
     "test:unit": "npm run test:simple",
     "test:simple": "testring run --config test/simple/.testringrc --env-parameters.test 10 --rc.tags-list=#P0,#P1",
-
     "test:e2e": "npm run test:playwright:headless",
     "test:e2e:full": "npm run test:playwright:headless && npm run test:screenshots && npm run test:playwright:grid",
     "test:playwright": "ts-node src/test-runner.ts --config ./test/playwright/config.js --env-config=./test/playwright/env.json",
     "test:playwright:headless": "ts-node src/test-runner.ts --config ./test/playwright/config.js --env-config=./test/playwright/env.json --headless",
-    "test:playwright:grid": "ts-node src/test-runner.ts --config ./test/playwright/config-with-grid.js --env-config=./test/playwright/env.json --headless",
-    "test:playwright:custom-grid": "ts-node src/test-runner.ts --config ./test/playwright/config-custom-grid.js --env-config=./test/playwright/env.json",
-    "test:playwright:remote-fixtures": "ts-node src/test-runner.ts --config ./test/playwright/config-remote-fixtures.js --env-config=./test/playwright/env.json --headless",
+    "test:playwright:grid": "ts-node src/test-runner.ts --config ./test/playwright/config-selenium-grid.js --env-config=./test/playwright/env-cloudflare.json",
     "test:screenshots": "ts-node src/test-runner.ts --config ./test/playwright/config-screenshot.js",
-
     "test:integration": "mocha test/integration/**/*.spec.js --timeout 120000",
     "test:integration:process": "mocha test/integration/process-*.spec.js --timeout 120000",
     "test:integration:config": "mocha test/integration/config-*.spec.js --timeout 120000",
     "test:integration:error": "mocha test/integration/error-*.spec.js --timeout 120000",
     "test:integration:performance": "mocha test/integration/performance-*.spec.js --timeout 120000",
-    "build": "echo \"build skipped\"",
-    "build:watch": "echo \"build:watch skipped\""
+    "dev:local": "npm run sync:html && ts-node src/mock-web-server.ts",
+    "dev:worker": "npm run sync:html && wrangler dev",
+    "deploy:worker": "npm run sync:html && wrangler deploy",
+    "start": "npm run dev:local",
+    "deploy": "./scripts/deploy.sh",
+    "sync:html": "node scripts/sync-html-references.js"
   },
   "dependencies": {
+    "@hono/node-server": "^1.12.2",
     "@testring/cli": "0.8.0",
     "@testring/plugin-babel": "0.8.0",
     "@testring/plugin-fs-store": "0.8.0",
     "@testring/plugin-playwright-driver": "0.8.0",
     "@testring/web-application": "0.8.0",
-    "@types/express": "5.0.0",
-    "@types/multer": "1.4.12",
-    "@types/mocha": "^10.0.0",
     "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
     "babel-preset-es2015": "6.24.1",
     "c8": "10.1.3",
     "chai": "^4.3.0",
     "concurrently": "9.0.1",
-    "express": "4.21.1",
+    "hono": "^4.6.3",
     "mocha": "^10.0.0",
-    "multer": "1.4.5-lts.1",
     "testring": "0.8.0",
     "ts-node": "10.9.2"
+  },
+  "devDependencies": {
+    "wrangler": "4.26.0"
   }
 }

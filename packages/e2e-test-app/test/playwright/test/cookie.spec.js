@@ -21,9 +21,12 @@ run(async (api) => {
     await app.assert.equal(cookieValueAfterAdd, '1111');
 
     const allCookies = await app.getCookie();
+    const {baseUrl} = api.getEnvironment();
+    const url = new URL(baseUrl);
+    const domain = url.hostname;
     const expected = [
         {
-            domain: 'localhost',
+            domain: domain,
             httpOnly: false,
             name: 'foo',
             path: '/',

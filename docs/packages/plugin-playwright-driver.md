@@ -625,7 +625,7 @@ The plugin provides the same API as the standard testring web application interf
 - `app.makeScreenshot()` - Take screenshot
 - `app.assert.*` - Assertion methods
 
-For complete API documentation, see the [@testring/web-application](../web-application/README.md) documentation.
+For complete API documentation, see the [@testring/web-application](web-application.md) documentation.
 
 ## Dependencies
 

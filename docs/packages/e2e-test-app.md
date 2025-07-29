@@ -75,7 +75,7 @@ e2e-test-app/
 │   └── simple/                 # Simple test examples
 │       └── .testringrc         # Basic configuration
 ├── static-fixtures/            # HTML test fixtures
-└── [Timeout Guide](../reports/timeout-guide.md)           # Timeout optimization guide
+└── Timeout Guide                                    # Timeout optimization examples included
 ```
 
 ## Usage
@@ -116,7 +116,7 @@ await server.start(); // Runs on port 8080
 // Server provides:
 // - Static HTML fixtures at http://localhost:8080/
 // - File upload endpoint at http://localhost:8080/upload
-// - Mock Selenium hub at http://localhost:8080/wd/hub/*
+// - Selenium Grid hub at http://localhost:4444/wd/hub/*
 // - Headers inspection at http://localhost:8080/selenium-headers
 
 // Stop the server
@@ -463,7 +463,7 @@ const url = getTargetUrl(api, 'fixture-name.html');
    - Verify Express server configuration
 
 2. **Tests timing out**:
-   - Review timeout configuration in [Timeout Guide](../reports/timeout-guide.md)
+   - Review timeout configuration in the test examples and code comments
    - Adjust environment-specific timeouts
    - Check network connectivity to mock server
 

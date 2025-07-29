@@ -1,0 +1,27 @@
+import { Context } from 'hono';
+
+export function getTimezoneHtml(c: Context) {
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Browser Timezone</title>
+</head>
+<body data-test-automation-id="root">
+<div id="timezone" data-test-automation-id="timezone">
+    Current Browser Timezone:
+    <p id="value" data-test-automation-id="value">
+        Loading...
+    </p>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.getElementById('value').innerText = \`\${timezone}\`;
+    });
+</script>
+</body>
+</html>`;
+    return c.html(html);
+}

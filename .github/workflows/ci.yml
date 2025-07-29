@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22, 24]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build project
+      run: npm run build:main
+
+    - name: Install Playwright browsers
+      run: npx playwright install chromium firefox
+
+    - name: Run tests with coverage
+      run: npm run test:ci:coverage
+
+    - name: Analyze test performance
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
+      run: npm run analyze:performance:logs-only
+      continue-on-error: true
+
+    - name: Upload performance analysis
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-analysis-report
+        path: docs/performance-analysis.md
+        retention-days: 30
+      continue-on-error: true
+
+    - name: Display coverage reports
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
+      run: |
+        echo "=== Unit Test Coverage Summary ==="
+        if [ -f "./.coverage/lcov.info" ]; then
+          echo "✅ Unit test coverage report generated"
+          grep -E "^(SF|LF|LH)" ./.coverage/lcov.info | head -20
+        else
+          echo "❌ Unit test coverage file not found"
+        fi
+
+        echo ""
+        echo "=== E2E Test Coverage Summary ==="
+        if [ -f "./c8-cov/lcov.info" ]; then
+          echo "✅ E2E test coverage report generated"
+          grep -E "^(SF|LF|LH)" ./c8-cov/lcov.info | head -20
+        else
+          echo "❌ E2E test coverage file not found"
+        fi
+
+    - name: Prepare coverage report
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
+      run: |
+        mkdir -p ./merged-coverage
+
+        if [ -f "./.coverage/lcov.info" ] && [ -f "./c8-cov/lcov.info" ]; then
+          echo "Both coverage reports found. Using unit test coverage as primary..."
+          cp ./.coverage/lcov.info ./merged-coverage/lcov.info
+          echo "✅ Unit test coverage report prepared for upload"
+        elif [ -f "./.coverage/lcov.info" ]; then
+          echo "Using unit test coverage report..."
+          cp ./.coverage/lcov.info ./merged-coverage/lcov.info
+          echo "✅ Unit test coverage report prepared for upload"
+        elif [ -f "./c8-cov/lcov.info" ]; then
+          echo "Using E2E test coverage report..."
+          cp ./c8-cov/lcov.info ./merged-coverage/lcov.info
+          echo "✅ E2E test coverage report prepared for upload"
+        else
+          echo "❌ No coverage reports found!"
+          ls -la ./.coverage/ || echo "No .coverage directory"
+          ls -la ./c8-cov/ || echo "No c8-cov directory"
+          exit 1
+        fi
+
+    - name: Upload coverage to Coveralls
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
+      uses: coverallsapp/github-action@master
+      with:
+        path-to-lcov: './merged-coverage/lcov.info'
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check SonarQube token
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event_name == 'push')}}
+      run: |
+        if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+          echo "⚠️ SONAR_TOKEN not configured, skipping SonarQube scan"
+          echo "skip_sonar=true" >> $GITHUB_OUTPUT
+        else
+          echo "✅ SONAR_TOKEN found, proceeding with SonarQube scan"
+          echo "skip_sonar=false" >> $GITHUB_OUTPUT
+        fi
+      id: sonar_check
+
+    - name: SonarQube scan
+      if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event_name == 'push') && steps.sonar_check.outputs.skip_sonar == 'false'}}
+      uses: SonarSource/sonarqube-scan-action@v5
+      with:
+        projectBaseDir: .
+        args: >
+          -Dsonar.organization=${{ github.repository_owner }}
+          -Dsonar.projectKey=${{ github.repository_owner }}_${{ github.event.repository.name }}
+          -Dsonar.sources=core,packages
+          -Dsonar.tests=core,packages
+          -Dsonar.test.inclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js
+          -Dsonar.test.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/.nyc_output/**,**/.coverage/**
+          -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/.nyc_output/**,**/.coverage/**,**/*.d.ts,**/test-results/**,**/playwright-report/**,**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js,**/test/**,**/tests/**,**/__tests__/**
+          -Dsonar.javascript.lcov.reportPaths=merged-coverage/lcov.info,.coverage/lcov.info,c8-cov/lcov.info
+          -Dsonar.typescript.lcov.reportPaths=merged-coverage/lcov.info,.coverage/lcov.info,c8-cov/lcov.info
+          -Dsonar.coverage.exclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js,**/test/**,**/tests/**,**/__tests__/**
+          -Dsonar.security.exclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js,**/test/**,**/tests/**,**/__tests__/**
+          -Dsonar.verbose=true
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 

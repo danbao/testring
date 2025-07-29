@@ -11,7 +11,7 @@ run(async (api) => {
             'X-Testring-Custom-Header': 'TestringCustomValue',
         },
         seleniumGrid: {
-            gridUrl: 'http://localhost:8080/wd/hub',
+            gridUrl: 'http://localhost:4444/wd/hub',
             gridHeaders: {
                 'X-Testring-Grid-Header': 'GridTestValue'
             }
@@ -29,7 +29,7 @@ run(async (api) => {
     // 验证 Selenium Grid 配置
     await app.assert.equal(
         config.seleniumGrid.gridUrl,
-        'http://localhost:8080/wd/hub',
+        'http://localhost:4444/wd/hub',
         'Grid URL should be set correctly'
     );
     

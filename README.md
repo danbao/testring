@@ -186,3 +186,27 @@ MIT License - See the [LICENSE](LICENSE) file for details.
 - 📖 [Documentation](docs/)
 - 🐛 [Issue Reporting](https://github.com/ringcentral/testring/issues)
 - 💬 [Discussions](https://github.com/ringcentral/testring/discussions)
+## 🌍 Cloudflare Worker for Test Fixtures
+
+这个项目包含一个独立的 Cloudflare Worker，提供在线测试环境：
+
+```
+cloudflare-worker/
+├── build.js          # 构建脚本
+├── wrangler.toml      # Worker 配置
+├── package.json       # 依赖管理
+├── static-fixtures/   # 测试页面源文件 (24个)
+├── worker.js          # 生成的代码 (gitignored)
+└── README.md          # 详细文档
+```
+
+### 快速开始
+
+```bash
+cd cloudflare-worker
+npm install
+npm run build
+npm run deploy
+```
+
+详细信息请查看 [cloudflare-worker/README.md](cloudflare-worker/README.md)

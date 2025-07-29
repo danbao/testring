@@ -1,0 +1,26 @@
+import { Context } from 'hono';
+
+export function getWaitForExistHtml(c: Context) {
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wait For Exist test</title>
+    <script>
+        function showElement() {
+            setTimeout(() => {
+                const elem = document.createElement('div');
+                elem.setAttribute('data-test-automation-id', 'shouldExist');
+
+                document.body.prepend(elem);
+            }, 1000);
+        }
+    </script>
+</head>
+<body data-test-automation-id="root">
+    <button data-test-automation-id="showElement" onclick="showElement()">show</button>
+</body>
+</html>
+`;
+    return c.html(html);
+}
