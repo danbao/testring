@@ -10,7 +10,7 @@ commands:
 
 Running tests, founded in fs by `glob` pattern.\
 Required parameters:
-* [tests](../configuration/README.md#tests)
+* [tests](../configuration/.md#tests)
 
 ```
 testring run --tests ./__test__/*.js

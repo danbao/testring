@@ -1,8 +1,8 @@
-name: E2E Tests with Docker Selenium Grid
+name: E2E
 
 on:
   push:
-    branches: [ master, main ,selenium-grid-e2e]
+    branches: [ master, main, selenium-grid-e2e ]
     paths:
       - 'packages/e2e-test-app/**'
       - 'packages/plugin-playwright-driver/**'
@@ -10,27 +10,27 @@ on:
       - 'docker/docker-selenium.yml'
       - '.github/workflows/selenium-grid-e2e.yml'
   pull_request:
-    branches: [ master, main ,selenium-grid-e2e]
+    branches: [ master, main, selenium-grid-e2e ]
     paths:
       - 'packages/e2e-test-app/**'
       - 'packages/plugin-playwright-driver/**'
       - 'packages/web-application/**'
       - 'docker/docker-selenium.yml'
       - '.github/workflows/selenium-grid-e2e.yml'
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:
 
 jobs:
-  selenium-grid-tests:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Use Node.js 22
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 22
@@ -42,7 +42,7 @@ jobs:
     - name: Build project
       run: npm run build
 
-    - name: Check Docker Environment
+    - name: Check Docker environment
       run: |
         echo "🔍 Checking Docker environment..."
         docker --version
@@ -50,14 +50,14 @@ jobs:
         docker info
         docker system info | grep -E "(Server Version|Operating System|Architecture)" || true
 
-    - name: Start Docker Selenium Grid
+    - name: Start Selenium Grid
       run: |
         echo "🚀 Starting Selenium Grid with Docker Compose..."
         cd docker
         docker compose -f docker-selenium.yml up -d
         echo "✅ Selenium Grid containers started"
 
-    - name: Wait for Selenium Grid to be ready
+    - name: Wait for Grid to be ready
       run: |
         echo "⏳ Waiting for Selenium Grid to be ready..."
         timeout=300  # 5 minutes timeout
@@ -85,13 +85,13 @@ jobs:
           exit 1
         fi
 
-    - name: Verify Grid nodes
+    - name: Verify Grid
       run: |
         echo "🔍 Checking Grid nodes..."
         chmod +x scripts/check-selenium-grid.sh
         ./scripts/check-selenium-grid.sh
 
-    - name: Run E2E tests with Selenium Grid
+    - name: Run E2E tests
       run: |
         echo "🧪 Running E2E tests with Selenium Grid..."
         export SELENIUM_GRID_URL=http://localhost:4444/wd/hub

@@ -49,5 +49,5 @@ The core modules provide the foundational functionality for the testring framewo
 ## Quick Links
 
 - [Main Documentation](../README.md)
-- [Package Documentation](../packages/README.md)
-- [API Reference](../api/README.md) 
+- [Package Documentation](../packages/.md)
+- [API Reference](../api/.md) 

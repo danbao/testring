@@ -1,7 +1,4 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: Node.js CI
+name: CI
 
 on:
   push:
@@ -11,42 +8,44 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  build:
+  test:
     strategy:
-      fail-fast: false  # Don't let the failure of one task cause the entire matrix to stop.
+      fail-fast: false
       matrix:
         node-version: [20, 22, 24]
         os: [ubuntu-latest, macos-latest, windows-latest]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Disable shallow clone, obtain complete history.
-    - name: Use Node.js ${{ matrix.node-version }}
+        fetch-depth: 0
+
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build:main
 
-    # Install Playwright browsers for E2E tests
-    - name: Install Playwright Browsers
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build project
+      run: npm run build:main
+
+    - name: Install Playwright browsers
       run: npx playwright install chromium firefox
 
-    # Run all tests with coverage
-    - run: npm run test:ci:coverage
+    - name: Run tests with coverage
+      run: npm run test:ci:coverage
 
-    # Run performance analysis after tests
-    - name: Analyze Test Performance
+    - name: Analyze test performance
       if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
-      run: npm run analyze:performance:logs-only  # Use logs-only version in CI since tests already ran
-      continue-on-error: true  # Don't fail CI if performance analysis fails
+      run: npm run analyze:performance:logs-only
+      continue-on-error: true
 
-    # Upload performance analysis report
-    - name: Upload Performance Analysis Report
+    - name: Upload performance analysis
       if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
       uses: actions/upload-artifact@v4
       with:
@@ -55,14 +54,12 @@ jobs:
         retention-days: 30
       continue-on-error: true
 
-    # Display coverage summaries
-    - name: Display Coverage Reports
+    - name: Display coverage reports
       if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
       run: |
         echo "=== Unit Test Coverage Summary ==="
         if [ -f "./.coverage/lcov.info" ]; then
           echo "✅ Unit test coverage report generated"
-          # Display basic coverage info
           grep -E "^(SF|LF|LH)" ./.coverage/lcov.info | head -20
         else
           echo "❌ Unit test coverage file not found"
@@ -72,23 +69,18 @@ jobs:
         echo "=== E2E Test Coverage Summary ==="
         if [ -f "./c8-cov/lcov.info" ]; then
           echo "✅ E2E test coverage report generated"
-          # Display basic coverage info
           grep -E "^(SF|LF|LH)" ./c8-cov/lcov.info | head -20
         else
           echo "❌ E2E test coverage file not found"
         fi
 
-    # Prepare coverage report for Coveralls
-    - name: Prepare Coverage Report
+    - name: Prepare coverage report
       if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
       run: |
-        # Create merged coverage directory
         mkdir -p ./merged-coverage
 
-        # Check which coverage files exist and use the appropriate one
         if [ -f "./.coverage/lcov.info" ] && [ -f "./c8-cov/lcov.info" ]; then
           echo "Both coverage reports found. Using unit test coverage as primary..."
-          # For now, prioritize unit test coverage as it covers more of the codebase
           cp ./.coverage/lcov.info ./merged-coverage/lcov.info
           echo "✅ Unit test coverage report prepared for upload"
         elif [ -f "./.coverage/lcov.info" ]; then
@@ -106,15 +98,14 @@ jobs:
           exit 1
         fi
 
-    - name: Upload Coverage to Coveralls
+    - name: Upload coverage to Coveralls
       if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22'}}
       uses: coverallsapp/github-action@master
       with:
         path-to-lcov: './merged-coverage/lcov.info'
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
-    # Check if SonarQube Token is available
-    - name: Check SonarQube Token
+    - name: Check SonarQube token
       if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event_name == 'push')}}
       run: |
         if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
@@ -126,8 +117,7 @@ jobs:
         fi
       id: sonar_check
 
-    # SonarQube Scan
-    - name: SonarQube Scan
+    - name: SonarQube scan
       if: ${{ matrix.os=='ubuntu-latest' && matrix.node-version=='22' && (github.event_name == 'pull_request' || github.event_name == 'push') && steps.sonar_check.outputs.skip_sonar == 'false'}}
       uses: SonarSource/sonarqube-scan-action@v5
       with:
@@ -146,4 +136,4 @@ jobs:
           -Dsonar.security.exclusions=**/*.spec.ts,**/*.spec.js,**/*.test.ts,**/*.test.js,**/test/**,**/tests/**,**/__tests__/**
           -Dsonar.verbose=true
       env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 

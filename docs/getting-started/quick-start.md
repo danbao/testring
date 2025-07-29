@@ -140,8 +140,8 @@ Update configuration:
 
 ## Next Steps
 
-- [Configuration Guide](../configuration/README.md) - Learn about all configuration options
-- [API Reference](../api/README.md) - Explore the full testring API
+- [Configuration Guide](../configuration/.md) - Learn about all configuration options
+- [API Reference](../api/.md) - Explore the full testring API
 - [Plugin Development](../guides/plugin-development.md) - Create custom plugins
 - [Best Practices](../guides/testing-best-practices.md) - Learn testing best practices
 
@@ -149,7 +149,7 @@ Update configuration:
 
 Check out example projects in the repository:
 - [E2E Test App](../packages/e2e-test-app.md) - Complete example application
-- [Plugin Examples](../packages/README.md) - Various plugin usage examples
+- [Plugin Examples](../packages/.md) - Various plugin usage examples
 
 ## Need Help?
 

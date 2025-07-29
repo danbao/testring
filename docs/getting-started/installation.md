@@ -88,8 +88,8 @@ You should see the testring version number displayed.
 ## Next Steps
 
 1. [Quick Start Guide](quick-start.md) - Create your first test
-2. [Configuration](../configuration/README.md) - Configure testring for your project
-3. [API Reference](../api/README.md) - Learn the testring API
+2. [Configuration](../configuration/.md) - Configure testring for your project
+3. [API Reference](../api/.md) - Learn the testring API
 
 ## Troubleshooting
 

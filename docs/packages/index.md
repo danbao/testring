@@ -50,5 +50,5 @@ npm install --save-dev testring
 ## Quick Links
 
 - [Main Documentation](../README.md)
-- [Core Modules](../core-modules/README.md)
-- [Playwright Driver Details](../playwright-driver/README.md) 
+- [Core Modules](../core-modules/.md)
+- [Playwright Driver Details](../playwright-driver/.md) 

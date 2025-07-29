@@ -267,7 +267,7 @@ testring run --port 8081
 If you're still experiencing issues:
 
 1. Check the [GitHub Issues](https://github.com/ringcentral/testring/issues)
-2. Review the [API Documentation](../api/README.md)
+2. Review the [API Documentation](../api/.md)
 3. Look at [example configurations](../packages/e2e-test-app.md)
 4. Create a minimal reproduction case
 5. Open a new issue with detailed information

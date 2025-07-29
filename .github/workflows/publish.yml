@@ -1,28 +1,31 @@
-name: Publish Version
+name: Publish
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version
-        default: 0.6.0
+        description: Version to publish
+        default: 0.8.0
         required: true
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch full history for commit info
-      - uses: actions/setup-node@v4
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '22.x'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Config git user
+      - name: Configure git
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
@@ -33,8 +36,8 @@ jobs:
           echo "commit_id=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           echo "github_username=${{ github.actor }}" >> $GITHUB_OUTPUT
 
-      - name: Check if should publish to dev
-        id: check_dev_publish
+      - name: Check publish target
+        id: check_publish_target
         run: |
           if [[ "${{ github.repository }}" != "ringcentral/testring" ]] || [[ "${{ github.ref }}" != "refs/heads/master" ]]; then
             if [[ -n "${{ secrets.NPM_TOKEN }}" ]]; then
@@ -52,13 +55,17 @@ jobs:
             echo "Publishing to production packages (ringcentral/testring master branch)"
           fi
 
-      - run: npm ci
-      - run: npx playwright install chromium
-      - run: npm run build:main
+      - name: Install dependencies
+        run: npm ci
 
-      # Production publish (original logic)
+      - name: Install Playwright
+        run: npx playwright install chromium
+
+      - name: Build project
+        run: npm run build:main
+
       - name: Publish to production
-        if: steps.check_dev_publish.outputs.should_publish_dev == 'false'
+        if: steps.check_publish_target.outputs.should_publish_dev == 'false'
         run: |
           npm run publish:version ${{ github.event.inputs.version }}
           npm run publish:ci
@@ -67,9 +74,8 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Dev publish (new logic)
       - name: Publish to dev packages
-        if: steps.check_dev_publish.outputs.should_publish_dev == 'true'
+        if: steps.check_publish_target.outputs.should_publish_dev == 'true'
         run: |
           npm run publish:dev -- --github-username=${{ steps.commit_info.outputs.github_username }} --commit-id=${{ steps.commit_info.outputs.commit_id }}
         env:

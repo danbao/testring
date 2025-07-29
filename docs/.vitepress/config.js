@@ -20,7 +20,7 @@ export default defineConfig({
   // Theme config
   themeConfig: {
     // Logo
-    logo: '/logo.png',
+    logo: '/logo.svg',
     
     // Navigation
     nav: [
@@ -29,10 +29,8 @@ export default defineConfig({
       { text: 'Core Modules', link: '/core-modules/' },
       { text: 'Packages', link: '/packages/' },
       { text: 'Guides', link: '/guides/' },
-      { text: 'Test Fixtures', link: '/static-fixtures/', target: '_blank' },
-      // TODO: 部署 Cloudflare Worker 后，更新为：
-      // { text: 'Test Fixtures', link: 'https://testring-fixtures.your-subdomain.workers.dev/', target: '_blank' },
-      { text: 'GitHub', link: 'https://github.com/ringcentral/testring' }
+      { text: 'Test Fixtures', link: 'https://testring-dev.ringcentral.workers.dev/', target: '_blank' },
+      { text: 'GitHub', link: 'https://github.com/ringcentral/testring', target: '_blank' }
     ],
 
     // Sidebar

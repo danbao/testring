@@ -424,6 +424,6 @@ Following these best practices will help you:
 - Integrate smoothly with CI/CD pipelines
 
 For more specific guidance, see:
-- [API Reference](../api/README.md)
-- [Configuration Guide](../configuration/README.md)
+- [API Reference](../api/.md)
+- [Configuration Guide](../configuration/.md)
 - [Troubleshooting Guide](troubleshooting.md)

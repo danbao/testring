@@ -45,4 +45,4 @@ module.exports = {
 
 - [Main Package Documentation](../packages/plugin-playwright-driver.md)
 - [Plugin Development Guide](../guides/plugin-development.md)
-- [Configuration Reference](../configuration/README.md)
+- [Configuration Reference](../configuration/.md)
