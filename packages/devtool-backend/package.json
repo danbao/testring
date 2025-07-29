@@ -25,14 +25,14 @@
     "babel-types": "6.26.0",
     "express": "4.21.1",
     "redux": "5.0.1",
-    "ws": "8.18.0"
+    "ws": "8.18.3"
   },
   "devDependencies": {
     "@testring/test-utils": "0.8.0",
     "@types/babel-traverse": "6.25.10",
     "@types/express-serve-static-core": "5.0.1",
     "@types/node": "22.8.5",
-    "@types/ws": "8.5.12",
+    "@types/ws": "8.18.1",
     "request": "2.88.2",
     "request-promise": "4.2.6",
     "ts-node": "10.9.2"
