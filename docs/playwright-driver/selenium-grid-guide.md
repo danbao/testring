@@ -1,22 +1,21 @@
-# 🕸️ Selenium Grid Integration Guide
+# Selenium Grid Integration
 
-This guide details how to use Selenium Grid with `@testring/plugin-playwright-driver` for distributed testing.
+This guide covers using Selenium Grid with `@testring/plugin-playwright-driver` for distributed testing.
 
-## 📋 Overview
+## Overview
 
-Playwright can connect to Selenium Grid Hub to run Google Chrome or Microsoft Edge browsers, enabling distributed testing. This is very useful for the following scenarios:
+Playwright can connect to Selenium Grid Hub to run Google Chrome or Microsoft Edge browsers, enabling distributed testing for:
 
 - **Parallel Testing**: Run tests simultaneously on multiple machines
 - **Cross-Platform Testing**: Run tests on different operating systems
 - **Resource Management**: Centrally manage browser resources
 - **Isolated Environments**: Run tests in containerized environments
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Basic Configuration
 
 ```javascript
-// testring.config.js
 module.exports = {
     plugins: [
         ['@testring/plugin-playwright-driver', {
@@ -29,7 +28,7 @@ module.exports = {
 };
 ```
 
-### Environment Variable Configuration
+### Environment Variables
 
 ```bash
 export SELENIUM_REMOTE_URL=http://selenium-hub:4444
@@ -37,60 +36,7 @@ export SELENIUM_REMOTE_CAPABILITIES='{"browserName":"chrome","browserVersion":"l
 export SELENIUM_REMOTE_HEADERS='{"Authorization":"Bearer your-token"}'
 ```
 
-## 🔧 Detailed Configuration
-
-### Configuration Options
-
-| Option | Type | Description |
-|------|------|------|
-| `seleniumGrid.gridUrl` | `string` | URL of the Selenium Grid Hub |
-| `seleniumGrid.gridCapabilities` | `object` | Additional capabilities to pass to the Grid |
-| `seleniumGrid.gridHeaders` | `object` | Additional headers to pass to Grid requests |
-
-### Advanced Configuration Example
-
-```javascript
-module.exports = {
-    plugins: [
-        ['@testring/plugin-playwright-driver', {
-            browserName: 'chromium',
-            seleniumGrid: {
-                gridUrl: 'https://your-selenium-grid.com:4444',
-                gridCapabilities: {
-                    'browserName': 'chrome',
-                    'browserVersion': '120.0',
-                    'platformName': 'linux',
-                    'se:options': {
-                        'args': ['--disable-web-security', '--disable-dev-shm-usage'],
-                        'prefs': {
-                            'profile.default_content_setting_values.notifications': 2
-                        }
-                    },
-                    // Custom labels for test identification
-                    'testName': 'E2E Test Suite',
-                    'buildNumber': process.env.BUILD_NUMBER || 'local',
-                    'projectName': 'My Application'
-                },
-                gridHeaders: {
-                    'Authorization': 'Bearer your-auth-token',
-                    'X-Test-Environment': 'staging',
-                    'X-Team': 'qa-team'
-                }
-            },
-            // Other Playwright configurations remain valid
-            contextOptions: {
-                viewport: { width: 1920, height: 1080 },
-                locale: 'en-US',
-                timezoneId: 'America/New_York'
-            },
-            video: true,
-            trace: true
-        }]
-    ]
-};
-```
-
-## 🌐 Browser Support
+## Browser Support
 
 ### Supported Browsers
 
@@ -123,9 +69,9 @@ module.exports = {
 ❌ **Firefox** - Not supported by Selenium Grid
 ❌ **WebKit** - Not supported by Selenium Grid
 
-## 🐳 Docker Environment Setup
+## Docker Setup
 
-### Docker Compose Example
+### Quick Start with Docker Compose
 
 Create `selenium-grid.yml`:
 
@@ -134,57 +80,25 @@ version: '3.8'
 
 services:
   selenium-hub:
-    image: selenium/hub:4.15.0
+    image: selenium/hub:latest
     container_name: selenium-hub
     ports:
-      - "4442:4442"  # Event bus
-      - "4443:4443"  # Event bus
-      - "4444:4444"  # Web interface
+      - "4444:4444"
     environment:
       - GRID_MAX_SESSION=16
       - GRID_BROWSER_TIMEOUT=300
-      - GRID_TIMEOUT=300
-      - GRID_NEW_SESSION_WAIT_TIMEOUT=10
 
   chrome:
-    image: selenium/node-chrome:4.15.0
+    image: selenium/node-chrome:latest
     shm_size: 2gb
     depends_on:
       - selenium-hub
-    environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444
-      - NODE_MAX_INSTANCES=4
-      - NODE_MAX_SESSION=4
-      - START_XVFB=false
-    scale: 2  # Launch 2 Chrome nodes
-
-  edge:
-    image: selenium/node-edge:4.15.0
-    shm_size: 2gb
-    depends_on:
-      - selenium-hub
-    environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444
-      - NODE_MAX_INSTANCES=2
-      - NODE_MAX_SESSION=2
-      - START_XVFB=false
-    scale: 1  # Launch 1 Edge node
-
-  # Optional: Selenium Grid UI
-  selenium-ui:
-    image: selenium/grid-ui:4.15.0
-    depends_on:
-      - selenium-hub
-    ports:
-      - "7900:7900"
     environment:
       - HUB_HOST=selenium-hub
       - HUB_PORT=4444
 ```
 
-### Starting and Using
+### Usage
 
 ```bash
 # Start Selenium Grid
@@ -200,7 +114,7 @@ npm test
 docker-compose -f selenium-grid.yml down
 ```
 
-## 🔧 Configuration Priority
+## Configuration Priority
 
 Configuration priority order (from highest to lowest):
 
